@@ -1,0 +1,5 @@
+# 個人資料與密碼，只留在你自己的 Mac
+config.yaml
+config.*.yaml
+!config.example.yaml
+__pycache__/

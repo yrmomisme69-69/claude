@@ -1,0 +1,67 @@
+# ============================================================
+#  設定檔範本
+#  使用方法：cp config.example.yaml config.yaml ，再修改 config.yaml
+#  config.yaml 只會留在你的 Mac，不會上傳到 GitHub（已列入 .gitignore）
+# ============================================================
+
+# 商品購買頁網址
+#   測試：iPhone 18 Pro（已開賣）
+#   正式：iPhone Duo 開賣當日，換成它的購買頁網址
+product_url: "https://www.apple.com/hk/shop/buy-iphone/iphone-18-pro"
+store_base: "https://www.apple.com/hk"
+
+# 開賣時間（香港時間，要保留 +08:00）
+#   留空 "" = 立即開始（測試時用）
+#   例子："2026-10-10T20:00:00+08:00"
+launch_time: ""
+
+# 要依次點選的選項，順序照網頁由上到下。
+# 文字只需「部分相同」；同名時會揀最短的，所以 "iPhone 18 Pro" 不會誤選 "iPhone 18 Pro Max"。
+# ⚠️ 下面只是示範，請照 Apple 網頁上實際顯示的文字修改。
+#    找不到選項時，腳本會把頁面上所有選項列出來並 email 給你，照抄即可。
+options:
+  - "iPhone 18 Pro"
+  - "銀色"
+  - "256GB"
+  - "不使用舊機換購"
+  - "不加購 AppleCare+"
+
+# 取貨方式：delivery = 送貨（全自動）；pickup = 門市取貨（選分店和時間要你親手做）
+fulfillment: delivery
+
+# 送貨／聯絡資料。
+# 如果你的 Apple ID 已儲存地址，網頁通常已自動填好，腳本只會填「空白」的欄位。
+# 信用卡資料不要寫在這裏，付款一步由你親手完成。
+contact:
+  last_name: "陳"
+  first_name: "大文"
+  email: "you@example.com"
+  phone: "91234567"
+  address_line1: "XX 道 XX 號 XX 大廈 X 樓 X 室"
+  address_line2: ""
+  district: "油尖旺"
+  region: "九龍"
+
+# 刷新頻率（秒，隨機取範圍內的數值；程式硬性下限 5 秒）
+poll:
+  interval_seconds: [30, 60]         # 平時
+  launch_interval_seconds: [8, 15]   # 開賣前 1 分鐘至開賣後 N 分鐘內
+  launch_fast_minutes: 10            # 上面的 N
+  warmup_minutes: 3                  # 開賣前幾分鐘開始監察（之前完全不發請求）
+  max_backoff_seconds: 600           # 疑似被限流時，最長暫停多久
+
+# Email 通知（建議用 Gmail）
+#   app_password 不是你的 Gmail 密碼，而是「應用程式密碼」：
+#   Google 帳戶 → 安全性 → 兩步驗證（要先開啟）→ 應用程式密碼 → 建立，會得到 16 個字母
+email:
+  enabled: true
+  smtp_host: smtp.gmail.com
+  smtp_port: 465
+  username: "your.name@gmail.com"
+  app_password: "xxxx xxxx xxxx xxxx"
+  to: "your.name@gmail.com"
+
+# Mac 通知中心＋提示音（email 可能遲幾秒才到，這個是即時的）
+mac_alert: true
+
+chrome_debug_port: 9222
