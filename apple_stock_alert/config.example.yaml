@@ -1,0 +1,49 @@
+# ============================================================
+#  有貨提醒設定檔
+#  使用方法：cp config.example.yaml config.yaml ，再修改 config.yaml
+#  config.yaml 只會留在你的 Mac，不會上傳到 GitHub
+# ============================================================
+
+country: hk
+
+# 要監察的型號。part 是 Apple 的型號編號（香港版以 ZP/A 結尾）。
+# 找編號：python3 stock_alert.py --find-parts "購買頁網址"
+# ⚠️ 下面的編號只是示範格式，不是真的，一定要換成你找到的編號。
+parts:
+  - part: "MXXX1ZP/A"
+    name: "iPhone 18 Pro 256GB 銀色"
+  # 可以加多個，例如後備顏色：
+  # - part: "MXXX2ZP/A"
+  #   name: "iPhone 18 Pro 256GB 深藍色"
+
+# 查詢門市時用的地區
+location: "香港"
+
+# 只關注這些門市（門市名稱包含這些字即可）；留空 [] = 任何門市
+# 如果不確定門市名稱，先留空，用 --once 跑一次就會列出所有門市名稱
+stores: []
+
+# 是否一併查看「送貨」是否可以購買
+check_delivery: true
+
+# 查詢間隔（秒，隨機取範圍內的數值；程式硬性下限 60 秒）
+interval_seconds: [180, 300]
+
+# 有貨通知內附上的購買頁連結
+buy_url: "https://www.apple.com/hk/shop/buy-iphone"
+
+# 開賣提醒（不會查詢 Apple，只是準時通知你）
+launch_reminder:
+  time: ""                  # 例如 "2026-10-10T20:00:00+08:00"；留空 = 不用
+  minutes_before: [15, 2]   # 開賣前幾分鐘提醒你
+
+# Email 通知（可以直接照抄 apple_hk_bot/config.yaml 裏的 email 部分）
+email:
+  enabled: true
+  smtp_host: smtp.gmail.com
+  smtp_port: 465
+  username: "your.name@gmail.com"
+  app_password: "xxxx xxxx xxxx xxxx"
+  to: "your.name@gmail.com"
+
+mac_alert: true
