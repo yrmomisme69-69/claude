@@ -6,14 +6,19 @@
 
 country: hk
 
-# 要監察的型號。part 是 Apple 的型號編號（香港版以 ZP/A 結尾）。
+# 是否查詢 Apple 存貨。
+#   true  = 定時查貨，並做開賣提醒
+#   false = 只做開賣提醒，完全不連 Apple（Apple 拒絕查詢時用這個）
+check_stock: true
+
+# 要監察的型號。part 是 Apple 的型號編號（香港版以 ZA/A 或 ZP/A 結尾）。
 # 找編號：python3 stock_alert.py --find-parts "購買頁網址"
 # ⚠️ 下面的編號只是示範格式，不是真的，一定要換成你找到的編號。
 parts:
-  - part: "MXXX1ZP/A"
+  - part: "MXXX1ZA/A"
     name: "iPhone 18 Pro 256GB 銀色"
   # 可以加多個，例如後備顏色：
-  # - part: "MXXX2ZP/A"
+  # - part: "MXXX2ZA/A"
   #   name: "iPhone 18 Pro 256GB 深藍色"
 
 # 查詢門市時用的地區
