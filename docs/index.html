@@ -1,0 +1,1705 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="renderer" content="webkit">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="PRISM 直达按揭与中介渠道成本比较工具（示范原型）。">
+  <title>PRISM｜直达按揭比较</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23102d46'/%3E%3Cpath d='M16 6 26 25H6z' fill='none' stroke='%238bd8c9' stroke-width='3' stroke-linejoin='round'/%3E%3C/svg%3E">
+
+  <style>
+    :root {
+      --navy: #102d46;
+      --teal: #087c72;
+      --background: #f3f6f7;
+      --surface: #ffffff;
+      --text: #183247;
+      --muted: #607584;
+      --border: #dae4e8;
+      --danger: #a12f32;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: #f3f6f7;
+      background: var(--background);
+      color: #183247;
+      color: var(--text);
+      font-family:
+        -apple-system, BlinkMacSystemFont, "Segoe UI",
+        "PingFang SC", "Microsoft YaHei", "Noto Sans SC",
+        "PingFang TC", "Microsoft JhengHei", sans-serif;
+      line-height: 1.6;
+    }
+
+    html:lang(zh-Hant) body {
+      font-family:
+        -apple-system, BlinkMacSystemFont, "Segoe UI",
+        "PingFang TC", "Microsoft JhengHei", "Noto Sans TC",
+        "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+
+    header {
+      padding: 24px 16px;
+      background: var(--navy);
+      color: white;
+    }
+
+    header > div,
+    main {
+      width: 100%;
+      max-width: 1100px;
+      margin: auto;
+    }
+
+    header > div {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+    }
+
+    header strong {
+      font-size: 28px;
+      letter-spacing: 3px;
+    }
+
+    header p {
+      margin: 4px 0 0;
+      color: #c8dce8;
+    }
+
+    #lang-toggle {
+      flex: 0 0 auto;
+      margin-left: 16px;
+      padding: 7px 14px;
+      border-color: rgba(255, 255, 255, 0.45);
+      background: transparent;
+      color: white;
+    }
+
+    main {
+      padding: 24px 16px 60px;
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      font-size: 28px;
+      font-size: clamp(25px, 4vw, 34px);
+    }
+
+    h2 {
+      margin: 0 0 16px;
+      font-size: 21px;
+    }
+
+    p {
+      margin: 8px 0 16px;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .card {
+      margin-bottom: 20px;
+      padding: 24px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: var(--surface);
+    }
+
+    .notice {
+      padding: 16px 20px;
+      border-left: 4px solid var(--teal);
+      background: #e9f5f2;
+      border-radius: 8px;
+      margin-bottom: 24px;
+    }
+
+    .columns {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-gap: 20px;
+      gap: 20px;
+    }
+
+    .fields {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-gap: 16px;
+      gap: 16px;
+    }
+
+    .fields.three {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    label {
+      display: block;
+      font-size: 15px;
+    }
+
+    input,
+    select,
+    button {
+      font: inherit;
+    }
+
+    input[type="number"],
+    select {
+      width: 100%;
+      margin-top: 7px;
+      padding: 11px 12px;
+      border: 1px solid #b9cbd4;
+      border-radius: 8px;
+      background: white;
+      color: var(--text);
+    }
+
+    input:focus,
+    select:focus,
+    button:focus-visible,
+    summary:focus-visible {
+      outline: 3px solid #8bd8c9;
+      outline-offset: 2px;
+    }
+
+    button,
+    .file-button {
+      display: inline-block;
+      padding: 11px 17px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: white;
+      color: var(--text);
+      cursor: pointer;
+      text-align: center;
+    }
+
+    button.primary {
+      background: var(--teal);
+      color: white;
+      border-color: var(--teal);
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* 以外边距代替 flex gap，兼容较旧的手机浏览器。 */
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      margin: 0 -10px -10px 0;
+    }
+
+    .actions > * {
+      margin: 0 10px 10px 0;
+    }
+
+    .presets {
+      margin-top: 20px;
+      margin-bottom: 10px;
+    }
+
+    .policy {
+      padding: 15px;
+      margin-top: 18px;
+      border-radius: 9px;
+      background: #edf7f4;
+    }
+
+    .policy p {
+      margin-bottom: 0;
+    }
+
+    summary {
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 18px;
+    }
+
+    details[open] > summary {
+      margin-bottom: 18px;
+    }
+
+    .check {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 18px;
+    }
+
+    .check input {
+      width: 20px;
+      height: 20px;
+      flex: 0 0 auto;
+      margin: 3px 12px 0 0;
+    }
+
+    #message {
+      margin-top: 16px;
+      color: var(--danger);
+      white-space: pre-line;
+    }
+
+    .result {
+      background: var(--navy);
+      color: white;
+    }
+
+    .result p {
+      color: #cfdee8;
+    }
+
+    .amount {
+      margin: 12px 0;
+      font-size: 38px;
+      font-size: clamp(30px, 6vw, 48px);
+      font-weight: 750;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 580px;
+    }
+
+    th,
+    td {
+      padding: 13px 10px;
+      border-bottom: 1px solid var(--border);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    th:first-child,
+    td:first-child {
+      text-align: left;
+    }
+
+    tr.total {
+      background: #edf7f4;
+      font-weight: 750;
+    }
+
+    .small {
+      font-size: 14px;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    @media (max-width: 700px) {
+      .columns,
+      .fields.three {
+        grid-template-columns: 1fr;
+      }
+
+      .card {
+        padding: 20px 16px;
+      }
+    }
+
+    @media (max-width: 420px) {
+      .fields {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media print {
+      header,
+      .presets,
+      .actions,
+      #message {
+        display: none !important;
+      }
+
+      body {
+        background: white;
+      }
+
+      .card {
+        break-inside: avoid;
+      }
+
+      .result {
+        background: white;
+        color: black;
+      }
+
+      .result p {
+        color: black;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div>
+      <div>
+        <strong>PRISM</strong>
+        <p data-i18n="tagline">直达按揭 · 渠道成本比较</p>
+      </div>
+
+      <button id="lang-toggle" type="button" lang="zh-Hant">繁體</button>
+    </div>
+  </header>
+
+  <main>
+    <h1 data-i18n="heading">直达，还是经中介？</h1>
+
+    <p class="muted" data-i18n="intro">
+      用相同本金及年期，比较两份方案各自的利率、费用、回赠支付与提前清还条款。
+    </p>
+
+    <noscript>
+      <div class="notice">
+        本页需要启用 JavaScript 才能计算。／本頁需要啟用 JavaScript 才能計算。
+      </div>
+    </noscript>
+
+    <div class="notice">
+      <strong data-i18n="noticeTitle">参赛示范原型</strong><br>
+      <span data-i18n="noticeBody">
+        所有预设数字均为合成示例。PRISM 额外 0.20%、上限 HK$10,000 属拟议政策，并非银行正式优惠。本程序不获取报价、不作信贷审批，亦不提交申请。
+      </span>
+    </div>
+
+    <div class="actions presets">
+      <button type="button" data-example="broker" data-i18n="exBroker">
+        示例：中介加码 0.23%
+      </button>
+
+      <button type="button" data-example="direct" data-i18n="exDirect">
+        示例：中介加码 0.15%
+      </button>
+
+      <button type="button" data-example="rate" data-i18n="exRate">
+        示例：PRISM 利率较高
+      </button>
+
+      <button type="button" data-example="early" data-i18n="exEarly">
+        示例：第 18 月退出
+      </button>
+    </div>
+
+    <form id="comparison-form" novalidate>
+      <section class="card">
+        <h2 data-i18n="commonTitle">共同条件</h2>
+
+        <div id="common-fields" class="fields three"></div>
+
+        <label style="margin-top: 18px">
+          <span data-i18n="channelLabel">直达渠道资格情境</span>
+          <select id="channel">
+            <option value="clear" data-i18n="optClear">
+              示例／已确认：没有有效中介转介冲突
+            </option>
+            <option value="unknown" data-i18n="optUnknown">
+              尚未确认资格
+            </option>
+            <option value="conflict" data-i18n="optConflict">
+              已有有效中介转介
+            </option>
+          </select>
+        </label>
+
+        <p class="small muted" data-i18n="commonNote">
+          此处比较两份新按或转入后的报价。原贷款退出费用如适用，须纳入各方案费用。首期拟议本金范围为 HK$200万至500万。
+        </p>
+      </section>
+
+      <div class="columns">
+        <section class="card">
+          <h2 data-i18n="prismTitle">PRISM 直达方案</h2>
+
+          <div id="prism-fields" class="fields"></div>
+
+          <div class="policy">
+            <strong data-i18n="policyTitle">拟议额外回赠：0.20%</strong>
+
+            <p data-i18n="policyBody">
+              上限 HK$10,000，银行基本回赠另计。此月度模型在第 1 月计入加码，提前全清追回期为 24 个月，包含第 24 月。
+            </p>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2 data-i18n="brokerTitle">中介渠道方案</h2>
+
+          <div id="broker-fields" class="fields"></div>
+
+          <p class="small muted" data-i18n="brokerNote">
+            中介额外回赠与银行基本回赠分开填写。“额外回赠上限”填 0 代表无上限；空白不会当成 0。
+          </p>
+        </section>
+      </div>
+
+      <details class="card">
+        <summary data-i18n="advSummary">支付、追回及提前清还条款</summary>
+
+        <p class="small muted" data-i18n="advNote1">
+          第 0 月代表取用时支付；第 1 月代表首期供款后支付。模型假设当月支付先于当月退出。PRISM“30 日内支付”在此以第 1 月近似。
+        </p>
+
+        <div class="columns">
+          <section>
+            <h2 data-i18n="prismTerms">PRISM 条款</h2>
+            <div id="prism-advanced" class="fields"></div>
+          </section>
+
+          <section>
+            <h2 data-i18n="brokerTerms">中介方案条款</h2>
+            <div id="broker-advanced" class="fields"></div>
+          </section>
+        </div>
+
+        <p class="small muted" data-i18n="advNote2">
+          罚款按退出时未还本金计算。回赠在各自追回期内提前全清时，按全数追回处理。0 个月代表没有该追回／罚息期。正常到期还款不属提前清还。
+        </p>
+      </details>
+
+      <section class="card">
+        <h2 data-i18n="checkTitle">核对输入</h2>
+
+        <p id="source-label" class="small muted"></p>
+
+        <label class="check">
+          <input id="confirmed" type="checkbox">
+
+          <span data-i18n="confirmText">
+            我已核对本次输入及条款；如使用示例，我理解其并非实际银行报价。此勾选不代表银行已核实或批准。
+          </span>
+        </label>
+
+        <div class="actions">
+          <button class="primary" type="submit" data-i18n="btnCalc">
+            计算两方案总成本
+          </button>
+
+          <button id="export-button" type="button" disabled data-i18n="btnExport">
+            导出比较 JSON
+          </button>
+
+          <label class="file-button">
+            <span data-i18n="btnImport">导入比较 JSON</span>
+            <input
+              id="import-file"
+              type="file"
+              accept=".json,application/json"
+              hidden
+            >
+          </label>
+        </div>
+
+        <p id="message" role="alert"></p>
+      </section>
+    </form>
+
+    <section id="result-section" hidden>
+      <div class="card result" aria-live="polite">
+        <h2 id="result-title"></h2>
+        <div id="result-difference" class="amount"></div>
+        <p id="result-description"></p>
+      </div>
+
+      <div class="card">
+        <h2 data-i18n="tableTitle">完整成本明细</h2>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th data-i18n="thItem">项目</th>
+                <th data-i18n="nameP">PRISM 直达</th>
+                <th data-i18n="nameM">中介渠道</th>
+              </tr>
+            </thead>
+
+            <tbody id="result-rows"></tbody>
+          </table>
+        </div>
+
+        <p id="pending-note" class="small muted"></p>
+
+        <p class="small muted" data-i18n="formula">
+          净融资成本＝累计利息＋方案费用＋清还罚款＋已付回赠追回－实际已收回赠。未还本金另列，不重复计入融资成本。
+        </p>
+      </div>
+    </section>
+
+    <details class="card">
+      <summary data-i18n="assumpTitle">计算假设与范围</summary>
+
+      <ul>
+        <li data-i18n="assump1">固定年利率、按月等额供款，于指定月份供款后全清。</li>
+        <li data-i18n="assump2">金额未折现，不预测 HIBOR 或未来浮动利率。</li>
+        <li data-i18n="assump3">尚未收到的回赠不提前扣减成本。</li>
+        <li data-i18n="assump4">未付而被取消的回赠，不当作现金追回重复计算。</li>
+        <li data-i18n="assump5">特殊罚息基数、阶梯回赠及分段利率需另行建模。</li>
+        <li data-i18n="assump6">本版不计算部分还款后的利息、供款及余额变化。</li>
+        <li data-i18n="assump7">本版没有多银行拆分贷款、自动补差或轮换转按功能。</li>
+        <li data-i18n="assump8">数据只在本页内存处理；刷新前请自行导出。</li>
+      </ul>
+    </details>
+  </main>
+
+  <script>
+    "use strict";
+
+    // =========================================================
+    // 兼容性说明
+    // 本脚本只使用 ES2015–ES2017 语法（不用 ?.、Object.hasOwn、
+    // 对象展开等较新写法），让较旧的手机、微信及国产浏览器
+    // 也能正常运行。
+    // =========================================================
+
+    // =========================================================
+    // 0. 简体／繁體文字
+    // =========================================================
+
+    const I18N = {
+      hans: {
+        pageTitle: "PRISM｜直达按揭比较",
+        toggle: "繁體",
+        tagline: "直达按揭 · 渠道成本比较",
+        heading: "直达，还是经中介？",
+        intro: "用相同本金及年期，比较两份方案各自的利率、费用、回赠支付与提前清还条款。",
+        noticeTitle: "参赛示范原型",
+        noticeBody: "所有预设数字均为合成示例。PRISM 额外 0.20%、上限 HK$10,000 属拟议政策，并非银行正式优惠。本程序不获取报价、不作信贷审批，亦不提交申请。",
+        exBroker: "示例：中介加码 0.23%",
+        exDirect: "示例：中介加码 0.15%",
+        exRate: "示例：PRISM 利率较高",
+        exEarly: "示例：第 18 月退出",
+        commonTitle: "共同条件",
+        channelLabel: "直达渠道资格情境",
+        optClear: "示例／已确认：没有有效中介转介冲突",
+        optUnknown: "尚未确认资格",
+        optConflict: "已有有效中介转介",
+        commonNote: "此处比较两份新按或转入后的报价。原贷款退出费用如适用，须纳入各方案费用。首期拟议本金范围为 HK$200万至500万。",
+        prismTitle: "PRISM 直达方案",
+        policyTitle: "拟议额外回赠：0.20%",
+        policyBody: "上限 HK$10,000，银行基本回赠另计。此月度模型在第 1 月计入加码，提前全清追回期为 24 个月，包含第 24 月。",
+        brokerTitle: "中介渠道方案",
+        brokerNote: "中介额外回赠与银行基本回赠分开填写。“额外回赠上限”填 0 代表无上限；空白不会当成 0。",
+        advSummary: "支付、追回及提前清还条款",
+        advNote1: "第 0 月代表取用时支付；第 1 月代表首期供款后支付。模型假设当月支付先于当月退出。PRISM“30 日内支付”在此以第 1 月近似。",
+        prismTerms: "PRISM 条款",
+        brokerTerms: "中介方案条款",
+        advNote2: "罚款按退出时未还本金计算。回赠在各自追回期内提前全清时，按全数追回处理。0 个月代表没有该追回／罚息期。正常到期还款不属提前清还。",
+        checkTitle: "核对输入",
+        confirmText: "我已核对本次输入及条款；如使用示例，我理解其并非实际银行报价。此勾选不代表银行已核实或批准。",
+        btnCalc: "计算两方案总成本",
+        btnExport: "导出比较 JSON",
+        btnImport: "导入比较 JSON",
+        tableTitle: "完整成本明细",
+        thItem: "项目",
+        nameP: "PRISM 直达",
+        nameM: "中介渠道",
+        formula: "净融资成本＝累计利息＋方案费用＋清还罚款＋已付回赠追回－实际已收回赠。未还本金另列，不重复计入融资成本。",
+        assumpTitle: "计算假设与范围",
+        assump1: "固定年利率、按月等额供款，于指定月份供款后全清。",
+        assump2: "金额未折现，不预测 HIBOR 或未来浮动利率。",
+        assump3: "尚未收到的回赠不提前扣减成本。",
+        assump4: "未付而被取消的回赠，不当作现金追回重复计算。",
+        assump5: "特殊罚息基数、阶梯回赠及分段利率需另行建模。",
+        assump6: "本版不计算部分还款后的利息、供款及余额变化。",
+        assump7: "本版没有多银行拆分贷款、自动补差或轮换转按功能。",
+        assump8: "数据只在本页内存处理；刷新前请自行导出。",
+
+        fields: {
+          principal: "实际取用本金（HK$）",
+          months: "供款期（月）",
+          horizon: "预计持有期（月）",
+          rateP: "年利率（%）",
+          rateM: "年利率（%）",
+          feesP: "全部方案费用（HK$）",
+          feesM: "全部方案费用（HK$）",
+          basicP: "银行基本回赠（%）",
+          basicM: "银行基本回赠（%）",
+          extraM: "中介额外回赠（%）",
+          capM: "额外回赠上限；0＝无上限（HK$）",
+          basicPayP: "基本回赠支付月",
+          basicPayM: "基本回赠支付月",
+          extraPayM: "中介加码支付月",
+          basicClawP: "基本回赠追回期（月）",
+          basicClawM: "基本回赠追回期（月）",
+          extraClawM: "中介加码追回期（月）",
+          penaltyP: "提前清还罚款（%）",
+          penaltyM: "提前清还罚款（%）",
+          penaltyMonthsP: "罚息期（月）",
+          penaltyMonthsM: "罚息期（月）"
+        },
+
+        rows: [
+          "核定银行基本回赠",
+          "核定渠道额外回赠",
+          "累计利息",
+          "全部方案费用",
+          "提前清还罚款",
+          "基本回赠已付追回",
+          "额外回赠已付追回",
+          "减：实际已收回赠",
+          "未付而取消；不另计成本",
+          "期末保留的已收回赠",
+          "净融资成本",
+          "每月供款",
+          "期末未还本金；另列"
+        ],
+
+        srcDefault: "预设合成示例",
+        srcCustom: "自填情境，尚待核对",
+        srcExample: "已载入合成示例，并非银行实际报价",
+        srcImported: "已导入数据，必须重新核对",
+
+        errFormat: "输入格式无效。",
+        errUnknownField: "输入包含不支持的字段。",
+        errRange: (key, min, max, integer) =>
+          fieldLabel(key) + "须为 " + min + " 至 " + max +
+          (integer ? " 的整数。" : " 之间的数值。"),
+        errHorizon: "持有期不可超过供款期。",
+        errMissing: key => "请填写：" + fieldLabel(key),
+        errConfirm: "请先核对本次输入及计算假设。",
+        errPrincipal: "本金超出首期拟议 HK$200万至500万范围。本版不以此加码政策对超范围贷款作优劣排名。",
+        errChannel: "直达渠道资格未确认或存在中介转介冲突，请先由银行复核；本版暂停优惠排名。",
+        reportNotice: "示例／自填情境，并非银行报价、审批或优惠承诺。",
+
+        resEqual: "按本次输入，两方案净成本相同",
+        resLower: name => "按本次输入，" + name + "净成本较低",
+        resDesc: (amount, held) =>
+          "比较本金 " + amount + "，于第 " + held + " 期供款后全数清还。" +
+          "结果只反映输入条款及本模型假设，不代表全市场最优方案。",
+        pendingYes: "仍有尚未收到的条件回赠，未在本期成本扣除；退出后是否仍可取得，须向报价方确认。",
+        pendingNo: "本期成本只扣除指定时点前已实际收到的回赠。",
+
+        impTooBig: "文件过大，请导入本程序导出的 JSON。",
+        impParse: "文件无法读取，或不是有效的 JSON。",
+        impMismatch: "文件格式或政策版本不相符。",
+        impOk: "导入成功。请重新确认渠道资格及条款，再按计算；程序不会采用文件内原有排名。",
+        impFail: reason => "导入失败：" + reason,
+        exportFallback: content =>
+          "如果没有自动下载，请长按或复制以下内容，另存为 .json 文件：\n\n" + content,
+        unexpected: "发生未预期的错误："
+      },
+
+      hant: {
+        pageTitle: "PRISM｜直達按揭比較",
+        toggle: "简体",
+        tagline: "直達按揭 · 渠道成本比較",
+        heading: "直達，還是經中介？",
+        intro: "用相同本金及年期，比較兩份方案各自的利率、費用、回贈支付與提前清還條款。",
+        noticeTitle: "參賽示範原型",
+        noticeBody: "所有預設數字均為合成示例。PRISM 額外 0.20%、上限 HK$10,000 屬擬議政策，並非銀行正式優惠。本程式不取得報價、不作信貸審批，亦不提交申請。",
+        exBroker: "示例：中介加碼 0.23%",
+        exDirect: "示例：中介加碼 0.15%",
+        exRate: "示例：PRISM 利率較高",
+        exEarly: "示例：第 18 月退出",
+        commonTitle: "共同條件",
+        channelLabel: "直達渠道資格情境",
+        optClear: "示例／已確認：沒有有效中介轉介衝突",
+        optUnknown: "尚未確認資格",
+        optConflict: "已有有效中介轉介",
+        commonNote: "此處比較兩份新按或轉入後的報價。原貸款退出費用如適用，須納入各方案費用。首期擬議本金範圍為 HK$200萬至500萬。",
+        prismTitle: "PRISM 直達方案",
+        policyTitle: "擬議額外回贈：0.20%",
+        policyBody: "上限 HK$10,000，銀行基本回贈另計。此月度模型在第 1 月計入加碼，提前全清追回期為 24 個月，包含第 24 月。",
+        brokerTitle: "中介渠道方案",
+        brokerNote: "中介額外回贈與銀行基本回贈分開填寫。「額外回贈上限」填 0 代表無上限；空白不會當成 0。",
+        advSummary: "支付、追回及提前清還條款",
+        advNote1: "第 0 月代表取用時支付；第 1 月代表首期供款後支付。模型假設當月支付先於當月退出。PRISM「30 日內支付」在此以第 1 月近似。",
+        prismTerms: "PRISM 條款",
+        brokerTerms: "中介方案條款",
+        advNote2: "罰款按退出時未還本金計算。回贈在各自追回期內提前全清時，按全數追回處理。0 個月代表沒有該追回／罰息期。正常到期還款不屬提前清還。",
+        checkTitle: "核對輸入",
+        confirmText: "我已核對本次輸入及條款；如使用示例，我理解其並非實際銀行報價。此勾選不代表銀行已核實或批准。",
+        btnCalc: "計算兩方案總成本",
+        btnExport: "匯出比較 JSON",
+        btnImport: "匯入比較 JSON",
+        tableTitle: "完整成本明細",
+        thItem: "項目",
+        nameP: "PRISM 直達",
+        nameM: "中介渠道",
+        formula: "淨融資成本＝累計利息＋方案費用＋清還罰款＋已付回贈追回－實際已收回贈。未還本金另列，不重複計入融資成本。",
+        assumpTitle: "計算假設與範圍",
+        assump1: "固定年利率、按月等額供款，於指定月份供款後全清。",
+        assump2: "金額未折現，不預測 HIBOR 或未來浮動利率。",
+        assump3: "尚未收到的回贈不提前扣減成本。",
+        assump4: "未付而被取消的回贈，不當作現金追回重複計算。",
+        assump5: "特殊罰息基數、階梯回贈及分段利率需另行建模。",
+        assump6: "本版不計算部分還款後的利息、供款及餘額變化。",
+        assump7: "本版沒有多銀行拆分貸款、自動補差或輪換轉按功能。",
+        assump8: "數據只在本頁記憶體處理；重新整理前請自行匯出。",
+
+        fields: {
+          principal: "實際取用本金（HK$）",
+          months: "供款期（月）",
+          horizon: "預計持有期（月）",
+          rateP: "年利率（%）",
+          rateM: "年利率（%）",
+          feesP: "全部方案費用（HK$）",
+          feesM: "全部方案費用（HK$）",
+          basicP: "銀行基本回贈（%）",
+          basicM: "銀行基本回贈（%）",
+          extraM: "中介額外回贈（%）",
+          capM: "額外回贈上限；0＝無上限（HK$）",
+          basicPayP: "基本回贈支付月",
+          basicPayM: "基本回贈支付月",
+          extraPayM: "中介加碼支付月",
+          basicClawP: "基本回贈追回期（月）",
+          basicClawM: "基本回贈追回期（月）",
+          extraClawM: "中介加碼追回期（月）",
+          penaltyP: "提前清還罰款（%）",
+          penaltyM: "提前清還罰款（%）",
+          penaltyMonthsP: "罰息期（月）",
+          penaltyMonthsM: "罰息期（月）"
+        },
+
+        rows: [
+          "核定銀行基本回贈",
+          "核定渠道額外回贈",
+          "累計利息",
+          "全部方案費用",
+          "提前清還罰款",
+          "基本回贈已付追回",
+          "額外回贈已付追回",
+          "減：實際已收回贈",
+          "未付而取消；不另計成本",
+          "期末保留的已收回贈",
+          "淨融資成本",
+          "每月供款",
+          "期末未還本金；另列"
+        ],
+
+        srcDefault: "預設合成示例",
+        srcCustom: "自填情境，尚待核對",
+        srcExample: "已載入合成示例，並非銀行實際報價",
+        srcImported: "已匯入資料，必須重新核對",
+
+        errFormat: "輸入格式無效。",
+        errUnknownField: "輸入包含未支援的欄位。",
+        errRange: (key, min, max, integer) =>
+          fieldLabel(key) + "須為 " + min + " 至 " + max +
+          (integer ? " 的整數。" : " 之間的數值。"),
+        errHorizon: "持有期不可超過供款期。",
+        errMissing: key => "請填寫：" + fieldLabel(key),
+        errConfirm: "請先核對本次輸入及計算假設。",
+        errPrincipal: "本金超出首期擬議 HK$200萬至500萬範圍。本版不以此加碼政策對超範圍貸款作優劣排名。",
+        errChannel: "直達渠道資格未確認或存在中介轉介衝突，請先由銀行覆核；本版暫停優惠排名。",
+        reportNotice: "示例／自填情境，並非銀行報價、審批或優惠承諾。",
+
+        resEqual: "按本次輸入，兩方案淨成本相同",
+        resLower: name => "按本次輸入，" + name + "淨成本較低",
+        resDesc: (amount, held) =>
+          "比較本金 " + amount + "，於第 " + held + " 期供款後全數清還。" +
+          "結果只反映輸入條款及本模型假設，不代表全市場最優方案。",
+        pendingYes: "仍有尚未收到的條件回贈，未在本期成本扣除；退出後是否仍可取得，須向報價方確認。",
+        pendingNo: "本期成本只扣除指定時點前已實際收到的回贈。",
+
+        impTooBig: "檔案過大，請匯入本程式輸出的 JSON。",
+        impParse: "檔案無法讀取，或不是有效的 JSON。",
+        impMismatch: "檔案格式或政策版本不相符。",
+        impOk: "匯入成功。請重新確認渠道資格及條款，再按計算；程式不會採用檔案內原有排名。",
+        impFail: reason => "匯入失敗：" + reason,
+        exportFallback: content =>
+          "如果沒有自動下載，請長按或複製以下內容，另存為 .json 檔案：\n\n" + content,
+        unexpected: "發生未預期的錯誤："
+      }
+    };
+
+    const LANG_TAGS = { hans: "zh-Hans", hant: "zh-Hant" };
+    const LANG_STORAGE_KEY = "prism-lang";
+
+    let lang = "hans";
+
+    function t(key) {
+      return I18N[lang][key];
+    }
+
+    function fieldLabel(key) {
+      return t("fields")[key];
+    }
+
+    // 带翻译键的错误，切换语言时可以重新显示。
+    function Problem(key, args) {
+      this.key = key;
+      this.args = args || [];
+    }
+
+    function fail(key) {
+      throw new Problem(key, Array.prototype.slice.call(arguments, 1));
+    }
+
+    // 参数本身也可以是 Problem（例如导入失败的原因）。
+    function describe(problem) {
+      const entry = t(problem.key);
+
+      const args = problem.args.map(arg =>
+        arg instanceof Problem ? describe(arg) : arg
+      );
+
+      return typeof entry === "function"
+        ? entry.apply(null, args)
+        : entry;
+    }
+
+    // =========================================================
+    // 1. 拟议政策
+    // 百分比采用一般输入方式：0.20 代表 0.20%，不是 20%。
+    // =========================================================
+
+    const POLICY = Object.freeze({
+      version: "PRISM-v3-core",
+      extraRate: 0.20,
+      extraCap: 10000,
+      extraPayMonth: 1,
+      extraClawbackMonths: 24,
+      minimumPrincipal: 2000000,
+      maximumPrincipal: 5000000
+    });
+
+    // =========================================================
+    // 2. 示例数据
+    // P = PRISM；M = 中介渠道
+    // =========================================================
+
+    const DEFAULTS = Object.freeze({
+      principal: 4000000,
+      months: 360,
+      horizon: 36,
+
+      rateP: 3.5,
+      rateM: 3.5,
+
+      feesP: 0,
+      feesM: 0,
+
+      basicP: 0.8,
+      basicM: 0.8,
+
+      extraM: 0.23,
+      capM: 0,
+
+      basicPayP: 1,
+      basicPayM: 1,
+      extraPayM: 1,
+
+      basicClawP: 24,
+      basicClawM: 24,
+      extraClawM: 24,
+
+      penaltyP: 1,
+      penaltyM: 1,
+
+      penaltyMonthsP: 24,
+      penaltyMonthsM: 24
+    });
+
+    // 字段格式：[最小值、最大值、是否必须为整数]；标签见 I18N。
+    const FIELDS = Object.freeze({
+      principal: [1, 100000000, false],
+      months: [1, 600, true],
+      horizon: [1, 600, true],
+
+      rateP: [0, 30, false],
+      rateM: [0, 30, false],
+
+      feesP: [0, 10000000, false],
+      feesM: [0, 10000000, false],
+
+      basicP: [0, 20, false],
+      basicM: [0, 20, false],
+
+      extraM: [0, 20, false],
+      capM: [0, 10000000, false],
+
+      basicPayP: [0, 600, true],
+      basicPayM: [0, 600, true],
+      extraPayM: [0, 600, true],
+
+      basicClawP: [0, 600, true],
+      basicClawM: [0, 600, true],
+      extraClawM: [0, 600, true],
+
+      penaltyP: [0, 20, false],
+      penaltyM: [0, 20, false],
+
+      penaltyMonthsP: [0, 600, true],
+      penaltyMonthsM: [0, 600, true]
+    });
+
+    const GROUPS = {
+      "common-fields": [
+        "principal", "months", "horizon"
+      ],
+
+      "prism-fields": [
+        "rateP", "basicP", "feesP"
+      ],
+
+      "broker-fields": [
+        "rateM", "basicM", "feesM", "extraM", "capM"
+      ],
+
+      "prism-advanced": [
+        "basicPayP", "basicClawP",
+        "penaltyP", "penaltyMonthsP"
+      ],
+
+      "broker-advanced": [
+        "basicPayM", "basicClawM",
+        "extraPayM", "extraClawM",
+        "penaltyM", "penaltyMonthsM"
+      ]
+    };
+
+    const has = (object, key) =>
+      Object.prototype.hasOwnProperty.call(object, key);
+
+    const $ = id => document.getElementById(id);
+
+    const money = value => {
+      return "HK$" + value.toLocaleString("en-HK", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+    };
+
+    const roundMoney = value => {
+      return Math.round((value + Number.EPSILON) * 100) / 100;
+    };
+
+    let currentSource = "srcDefault";
+    let currentReport = null;
+    let currentMessage = null;
+
+    // =========================================================
+    // 3. 建立及验证输入字段
+    // =========================================================
+
+    function buildFields() {
+      Object.keys(GROUPS).forEach(containerId => {
+        const container = $(containerId);
+
+        for (const key of GROUPS[containerId]) {
+          const range = FIELDS[key];
+          const integer = range[2];
+
+          const label = document.createElement("label");
+          label.htmlFor = "field-" + key;
+
+          const title = document.createElement("span");
+          title.setAttribute("data-field-label", key);
+          label.appendChild(title);
+
+          const input = document.createElement("input");
+
+          input.id = "field-" + key;
+          input.name = key;
+          input.type = "number";
+          input.inputMode = integer ? "numeric" : "decimal";
+          input.min = String(range[0]);
+          input.max = String(range[1]);
+          input.step = integer ? "1" : "any";
+          input.required = true;
+
+          label.appendChild(input);
+          container.appendChild(label);
+        }
+      });
+    }
+
+    function setInputs(values) {
+      for (const key of Object.keys(FIELDS)) {
+        $("field-" + key).value = String(values[key]);
+      }
+    }
+
+    function validateInputs(values) {
+      if (
+        !values ||
+        typeof values !== "object" ||
+        Array.isArray(values)
+      ) {
+        fail("errFormat");
+      }
+
+      // 不接受未定义的字段。
+      for (const key of Object.keys(values)) {
+        if (!has(FIELDS, key)) {
+          fail("errUnknownField");
+        }
+      }
+
+      for (const key of Object.keys(FIELDS)) {
+        const min = FIELDS[key][0];
+        const max = FIELDS[key][1];
+        const integer = FIELDS[key][2];
+        const value = values[key];
+
+        if (
+          typeof value !== "number" ||
+          !Number.isFinite(value) ||
+          value < min ||
+          value > max ||
+          (integer && !Number.isInteger(value))
+        ) {
+          fail("errRange", key, min, max, integer);
+        }
+      }
+
+      if (values.horizon > values.months) {
+        fail("errHorizon");
+      }
+
+      return values;
+    }
+
+    function readInputs() {
+      const values = {};
+
+      for (const key of Object.keys(FIELDS)) {
+        const input = $("field-" + key);
+
+        // 避免 Number("") === 0 把缺失数据当成零。
+        if (input.value.trim() === "") {
+          fail("errMissing", key);
+        }
+
+        values[key] = input.valueAsNumber;
+      }
+
+      return validateInputs(values);
+    }
+
+    // =========================================================
+    // 4. 按揭摊还计算
+    //
+    // 月供：
+    // P × i / [1 - (1+i)^(-n)]
+    //
+    // P = 本金
+    // i = 年利率 / 1200
+    // n = 总供款月数
+    // =========================================================
+
+    function amortize(principal, annualRate, months, held) {
+      const monthlyRate = annualRate / 1200;
+
+      const payment = monthlyRate === 0
+        ? principal / months
+        : principal * monthlyRate /
+          (-Math.expm1(-months * Math.log1p(monthlyRate)));
+
+      let balance = principal;
+      let interest = 0;
+
+      for (let month = 1; month <= held; month++) {
+        const monthlyInterest = balance * monthlyRate;
+
+        interest += monthlyInterest;
+
+        balance = Math.max(
+          0,
+          balance + monthlyInterest - payment
+        );
+      }
+
+      if (held === months) {
+        balance = 0;
+      }
+
+      return {
+        payment,
+        interest,
+        balance
+      };
+    }
+
+    // =========================================================
+    // 5. 回赠状态
+    //
+    // amount：核定金额
+    // received：退出时已收到
+    // clawback：已支付、但须追回
+    // cancelled：未支付、但因提前退出而取消
+    // pending：未收到且未按本模型取消
+    // retained：已收并可保留
+    // =========================================================
+
+    function calculateAward(
+      amount,
+      payMonth,
+      clawbackMonths,
+      held,
+      early
+    ) {
+      amount = roundMoney(amount);
+
+      const received = payMonth <= held ? amount : 0;
+
+      const exitsInsidePeriod =
+        early &&
+        clawbackMonths > 0 &&
+        held <= clawbackMonths;
+
+      const clawback = exitsInsidePeriod
+        ? received
+        : 0;
+
+      const cancelled =
+        exitsInsidePeriod && received === 0
+          ? amount
+          : 0;
+
+      return {
+        amount,
+        received,
+        clawback,
+        cancelled,
+
+        pending: Math.max(
+          0,
+          amount - received - cancelled
+        ),
+
+        retained: received - clawback
+      };
+    }
+
+    function calculatePrismExtra(principal) {
+      return roundMoney(
+        Math.min(
+          principal * POLICY.extraRate / 100,
+          POLICY.extraCap
+        )
+      );
+    }
+
+    // =========================================================
+    // 6. 双渠道计算引擎
+    // 排名完全按计算结果，不预设 PRISM 胜出。
+    // =========================================================
+
+    function calculateOffers(input) {
+      const x = validateInputs(input);
+
+      const held = x.horizon;
+      const early = held < x.months;
+
+      const p = amortize(
+        x.principal,
+        x.rateP,
+        x.months,
+        held
+      );
+
+      const m = amortize(
+        x.principal,
+        x.rateM,
+        x.months,
+        held
+      );
+
+      // PRISM 的银行基本回赠。
+      p.basic = calculateAward(
+        x.principal * x.basicP / 100,
+        x.basicPayP,
+        x.basicClawP,
+        held,
+        early
+      );
+
+      // PRISM 的拟议渠道加码。
+      p.extra = calculateAward(
+        calculatePrismExtra(x.principal),
+        POLICY.extraPayMonth,
+        POLICY.extraClawbackMonths,
+        held,
+        early
+      );
+
+      // 中介方案的银行基本回赠。
+      m.basic = calculateAward(
+        x.principal * x.basicM / 100,
+        x.basicPayM,
+        x.basicClawM,
+        held,
+        early
+      );
+
+      const rawBrokerExtra =
+        x.principal * x.extraM / 100;
+
+      const cappedBrokerExtra = x.capM > 0
+        ? Math.min(rawBrokerExtra, x.capM)
+        : rawBrokerExtra;
+
+      // 中介渠道加码。
+      m.extra = calculateAward(
+        cappedBrokerExtra,
+        x.extraPayM,
+        x.extraClawM,
+        held,
+        early
+      );
+
+      for (const pair of [[p, "P"], [m, "M"]]) {
+        const offer = pair[0];
+        const suffix = pair[1];
+
+        offer.fees = x["fees" + suffix];
+
+        const insidePenaltyPeriod =
+          early &&
+          held <= x["penaltyMonths" + suffix];
+
+        offer.penalty = insidePenaltyPeriod
+          ? offer.balance * x["penalty" + suffix] / 100
+          : 0;
+
+        offer.received =
+          offer.basic.received + offer.extra.received;
+
+        offer.clawback =
+          offer.basic.clawback + offer.extra.clawback;
+
+        offer.cancelled =
+          offer.basic.cancelled + offer.extra.cancelled;
+
+        offer.pending =
+          offer.basic.pending + offer.extra.pending;
+
+        offer.retained =
+          offer.received - offer.clawback;
+
+        offer.cost =
+          offer.interest +
+          offer.fees +
+          offer.penalty +
+          offer.clawback -
+          offer.received;
+      }
+
+      return {
+        p,
+        m,
+        held,
+
+        // 负数：PRISM 成本较低；正数：中介成本较低。
+        difference: p.cost - m.cost
+      };
+    }
+
+    // =========================================================
+    // 7. 显示结果及提示
+    // =========================================================
+
+    function showMessage(message) {
+      currentMessage = message;
+
+      if (!message) {
+        $("message").textContent = "";
+      } else if (message instanceof Problem) {
+        $("message").textContent = describe(message);
+      } else {
+        $("message").textContent = t("unexpected") + message;
+      }
+    }
+
+    function invalidateResult() {
+      currentReport = null;
+
+      $("result-section").hidden = true;
+      $("export-button").disabled = true;
+      showMessage(null);
+    }
+
+    function renderResult(result, inputs) {
+      const difference = result.difference;
+      const equal = Math.abs(difference) < 0.005;
+
+      $("result-title").textContent = equal
+        ? t("resEqual")
+        : t("resLower")(difference < 0 ? t("nameP") : t("nameM"));
+
+      $("result-difference").textContent =
+        money(Math.abs(difference));
+
+      $("result-description").textContent =
+        t("resDesc")(money(inputs.principal), result.held);
+
+      const getters = [
+        v => v.basic.amount,
+        v => v.extra.amount,
+        v => v.interest,
+        v => v.fees,
+        v => v.penalty,
+        v => v.basic.clawback,
+        v => v.extra.clawback,
+        v => v.received,
+        v => v.cancelled,
+        v => v.retained,
+        v => v.cost,
+        v => v.payment,
+        v => v.balance
+      ];
+
+      const TOTAL_ROW = 10;
+      const labels = t("rows");
+      const tbody = $("result-rows");
+
+      while (tbody.firstChild) {
+        tbody.removeChild(tbody.firstChild);
+      }
+
+      getters.forEach((getValue, index) => {
+        const tr = document.createElement("tr");
+
+        if (index === TOTAL_ROW) {
+          tr.className = "total";
+        }
+
+        for (const value of [
+          labels[index],
+          money(getValue(result.p)),
+          money(getValue(result.m))
+        ]) {
+          const td = document.createElement("td");
+          td.textContent = value;
+          tr.appendChild(td);
+        }
+
+        tbody.appendChild(tr);
+      });
+
+      const pending = result.p.pending + result.m.pending;
+
+      $("pending-note").textContent = pending > 0
+        ? t("pendingYes")
+        : t("pendingNo");
+
+      $("result-section").hidden = false;
+      $("export-button").disabled = false;
+    }
+
+    function setSource(key) {
+      currentSource = key;
+      $("source-label").textContent = t(key);
+    }
+
+    // =========================================================
+    // 8. 语言切换
+    // =========================================================
+
+    function applyLanguage(next) {
+      lang = next;
+
+      document.documentElement.lang = LANG_TAGS[lang];
+      document.title = t("pageTitle");
+
+      const nodes = document.querySelectorAll("[data-i18n]");
+
+      for (let i = 0; i < nodes.length; i++) {
+        nodes[i].textContent = t(nodes[i].getAttribute("data-i18n"));
+      }
+
+      const fieldLabels = document.querySelectorAll("[data-field-label]");
+
+      for (let i = 0; i < fieldLabels.length; i++) {
+        fieldLabels[i].textContent =
+          t("fields")[fieldLabels[i].getAttribute("data-field-label")];
+      }
+
+      const toggle = $("lang-toggle");
+      toggle.textContent = t("toggle");
+      toggle.lang = LANG_TAGS[lang === "hans" ? "hant" : "hans"];
+
+      $("source-label").textContent = t(currentSource);
+
+      if (currentReport) {
+        renderResult(currentReport.result, currentReport.inputs);
+      }
+
+      showMessage(currentMessage);
+    }
+
+    function initialLanguage() {
+      const match = /[?&]lang=(hans|hant)\b/.exec(location.search);
+
+      if (match) {
+        return match[1];
+      }
+
+      try {
+        const saved = localStorage.getItem(LANG_STORAGE_KEY);
+
+        if (saved === "hans" || saved === "hant") {
+          return saved;
+        }
+      } catch (error) {
+        // 私密模式等情况下无法读取，使用默认简体。
+      }
+
+      return "hans";
+    }
+
+    $("lang-toggle").addEventListener("click", () => {
+      const next = lang === "hans" ? "hant" : "hans";
+
+      try {
+        localStorage.setItem(LANG_STORAGE_KEY, next);
+      } catch (error) {
+        // 无法保存时，本次浏览仍可切换。
+      }
+
+      applyLanguage(next);
+    });
+
+    // =========================================================
+    // 9. 表单操作
+    // =========================================================
+
+    $("comparison-form").addEventListener("submit", event => {
+      event.preventDefault();
+      invalidateResult();
+
+      try {
+        const inputs = readInputs();
+
+        if (!$("confirmed").checked) {
+          fail("errConfirm");
+        }
+
+        if (
+          inputs.principal < POLICY.minimumPrincipal ||
+          inputs.principal > POLICY.maximumPrincipal
+        ) {
+          fail("errPrincipal");
+        }
+
+        if ($("channel").value !== "clear") {
+          fail("errChannel");
+        }
+
+        const result = calculateOffers(inputs);
+
+        currentReport = {
+          format: "prism-core-comparison",
+          version: 1,
+          policy: POLICY.version,
+          generatedAt: new Date().toISOString(),
+          source: t(currentSource),
+          inputs: Object.assign({}, inputs),
+          result,
+          notice: t("reportNotice")
+        };
+
+        renderResult(result, inputs);
+      } catch (error) {
+        showMessage(error instanceof Problem ? error : error.message);
+      }
+    });
+
+    $("comparison-form").addEventListener("input", event => {
+      const target = event.target;
+
+      if (
+        target.id === "confirmed" ||
+        target.id === "import-file"
+      ) {
+        return;
+      }
+
+      $("confirmed").checked = false;
+      invalidateResult();
+
+      if (has(FIELDS, target.name)) {
+        setSource("srcCustom");
+      }
+    });
+
+    $("confirmed").addEventListener("change", () => {
+      if (!$("confirmed").checked) {
+        invalidateResult();
+      }
+    });
+
+    // =========================================================
+    // 10. 示例情境
+    // =========================================================
+
+    function loadExample(type) {
+      const values = Object.assign({}, DEFAULTS);
+
+      if (type === "direct") {
+        values.extraM = 0.15;
+      }
+
+      if (type === "rate") {
+        values.rateP = 3.6;
+        values.extraM = 0;
+      }
+
+      if (type === "early") {
+        values.horizon = 18;
+      }
+
+      setInputs(values);
+      setSource("srcExample");
+
+      $("channel").value = "clear";
+      $("confirmed").checked = false;
+
+      invalidateResult();
+    }
+
+    const exampleButtons = document.querySelectorAll("[data-example]");
+
+    for (let i = 0; i < exampleButtons.length; i++) {
+      const button = exampleButtons[i];
+
+      button.addEventListener("click", () => {
+        loadExample(button.getAttribute("data-example"));
+      });
+    }
+
+    // =========================================================
+    // 11. JSON 导出
+    // =========================================================
+
+    $("export-button").addEventListener("click", () => {
+      if (!currentReport) {
+        return;
+      }
+
+      const content = JSON.stringify(currentReport, null, 2);
+
+      const blob = new Blob([content], {
+        type: "application/json;charset=utf-8"
+      });
+
+      // 旧版 IE／Edge
+      if (window.navigator.msSaveOrOpenBlob) {
+        window.navigator.msSaveOrOpenBlob(blob, "PRISM_Comparison.json");
+        return;
+      }
+
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+
+      anchor.href = url;
+      anchor.download = "PRISM_Comparison.json";
+
+      document.body.appendChild(anchor);
+      anchor.click();
+      document.body.removeChild(anchor);
+
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+      // 微信等内置浏览器通常禁止下载，改为显示内容让用户复制。
+      if (/MicroMessenger|QQ\/|Weibo/i.test(navigator.userAgent)) {
+        showMessage(new Problem("exportFallback", [content]));
+      }
+    });
+
+    // =========================================================
+    // 12. JSON 导入
+    //
+    // 只采用验证后的输入。
+    // 不信任导入文件内的结果、排名及核对状态。
+    // =========================================================
+
+    function readFileText(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(new Problem("impParse"));
+        reader.readAsText(file, "utf-8");
+      });
+    }
+
+    $("import-file").addEventListener("change", event => {
+      const input = event.target;
+      const file = input.files && input.files[0];
+
+      if (!file) {
+        return;
+      }
+
+      const failImport = error => {
+        const reason = error instanceof Problem
+          ? error
+          : new Problem("impParse");
+
+        showMessage(new Problem("impFail", [reason]));
+      };
+
+      Promise.resolve()
+        .then(() => {
+          if (file.size > 200000) {
+            fail("impTooBig");
+          }
+
+          return readFileText(file);
+        })
+        .then(text => {
+          let data;
+
+          try {
+            data = JSON.parse(text);
+          } catch (error) {
+            fail("impParse");
+          }
+
+          if (
+            !data ||
+            data.format !== "prism-core-comparison" ||
+            data.version !== 1 ||
+            data.policy !== POLICY.version
+          ) {
+            fail("impMismatch");
+          }
+
+          const validated = validateInputs(data.inputs);
+
+          setInputs(validated);
+          setSource("srcImported");
+
+          $("confirmed").checked = false;
+          $("channel").value = "unknown";
+
+          invalidateResult();
+          showMessage(new Problem("impOk"));
+        })
+        .catch(failImport)
+        .then(() => {
+          input.value = "";
+        });
+    });
+
+    // =========================================================
+    // 13. 启动
+    // =========================================================
+
+    buildFields();
+    applyLanguage(initialLanguage());
+    loadExample("broker");
+  </script>
+</body>
+</html>
