@@ -1,0 +1,4615 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="renderer" content="webkit">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="PRISM 直達按揭：銀行內嵌的按揭申請與成本核對服務。2026 工行杯參賽項目的立項書與可操作原型（合成資料演示）。">
+  <title>PRISM 直達按揭｜銀行內嵌的按揭申請與成本核對服務</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23102d46'/%3E%3Cpath d='M16 6 26 25H6z' fill='none' stroke='%238bd8c9' stroke-width='3' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <script>
+    // 記住使用者選擇的語言：若與本頁不同，轉到另一語言版本。
+    (function () {
+      try {
+        var saved = localStorage.getItem("prism-lang");
+        if ((saved === "hans" || saved === "hant") && saved !== "hant") {
+          location.replace("../index.html" + location.hash);
+        }
+      } catch (error) {}
+    })();
+  </script>
+  <style>
+    :root {
+      --navy: #102d46;
+      --navy-2: #1b4263;
+      --teal: #087c72;
+      --teal-soft: #e9f5f2;
+      --background: #f3f6f7;
+      --surface: #ffffff;
+      --text: #183247;
+      --muted: #607584;
+      --border: #dae4e8;
+      --danger: #a12f32;
+      --danger-soft: #fbeeee;
+      --warn: #8a5a00;
+      --warn-soft: #fff5e0;
+      --good: #1f7a3f;
+      --good-soft: #e7f5ec;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      margin: 0;
+      background: #f3f6f7;
+      background: var(--background);
+      color: #183247;
+      color: var(--text);
+      font-family:
+        -apple-system, BlinkMacSystemFont, "Segoe UI",
+        "PingFang SC", "Microsoft YaHei", "Noto Sans SC",
+        "PingFang TC", "Microsoft JhengHei", sans-serif;
+      line-height: 1.65;
+    }
+
+    html:lang(zh-Hant) body {
+      font-family:
+        -apple-system, BlinkMacSystemFont, "Segoe UI",
+        "PingFang TC", "Microsoft JhengHei", "Noto Sans TC",
+        "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+
+    a {
+      color: var(--teal);
+    }
+
+    /* ---------- 頁首及導覽 ---------- */
+
+    .site-header {
+      background: var(--navy);
+      color: white;
+    }
+
+    .site-header .bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 1100px;
+      margin: auto;
+      padding: 16px 16px 10px;
+    }
+
+    .brand {
+      color: white;
+      text-decoration: none;
+    }
+
+    .brand strong {
+      display: block;
+      font-size: 24px;
+      letter-spacing: 3px;
+      line-height: 1.2;
+    }
+
+    .brand span {
+      color: #c8dce8;
+      font-size: 13px;
+    }
+
+    #lang-toggle {
+      flex: 0 0 auto;
+      margin-left: 16px;
+      padding: 6px 14px;
+      border: 1px solid rgba(255, 255, 255, 0.45);
+      border-radius: 8px;
+      color: white;
+      text-decoration: none;
+      font-size: 15px;
+    }
+
+    .site-nav {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: var(--navy);
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .site-nav .tabs {
+      display: flex;
+      width: 100%;
+      max-width: 1100px;
+      margin: auto;
+      padding: 0 8px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      white-space: nowrap;
+    }
+
+    .site-nav a {
+      flex: 0 0 auto;
+      padding: 11px 12px;
+      border-bottom: 3px solid transparent;
+      color: #c8dce8;
+      text-decoration: none;
+      font-size: 15px;
+    }
+
+    .site-nav a.active {
+      border-bottom-color: #8bd8c9;
+      color: white;
+      font-weight: 700;
+    }
+
+    main {
+      width: 100%;
+      max-width: 1100px;
+      margin: auto;
+      padding: 24px 16px 60px;
+    }
+
+    footer {
+      padding: 24px 16px 40px;
+      color: var(--muted);
+      font-size: 13px;
+      text-align: center;
+    }
+
+    /* ---------- 基本排版 ---------- */
+
+    h1 {
+      margin: 0 0 12px;
+      font-size: 28px;
+      font-size: clamp(25px, 4vw, 34px);
+      line-height: 1.3;
+    }
+
+    h2 {
+      margin: 0 0 14px;
+      font-size: 21px;
+      line-height: 1.4;
+    }
+
+    h3 {
+      margin: 20px 0 8px;
+      font-size: 17px;
+    }
+
+    p {
+      margin: 8px 0 14px;
+    }
+
+    ul,
+    ol {
+      padding-left: 22px;
+    }
+
+    li {
+      margin-bottom: 6px;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .small {
+      font-size: 14px;
+    }
+
+    .lead {
+      font-size: 17px;
+    }
+
+    .card {
+      margin-bottom: 20px;
+      padding: 24px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: var(--surface);
+    }
+
+    .notice {
+      margin-bottom: 20px;
+      padding: 14px 18px;
+      border-left: 4px solid var(--teal);
+      border-radius: 8px;
+      background: var(--teal-soft);
+    }
+
+    .notice.warn {
+      border-left-color: #d49a1a;
+      background: var(--warn-soft);
+    }
+
+    .notice.danger {
+      border-left-color: var(--danger);
+      background: var(--danger-soft);
+    }
+
+    .notice p:last-child {
+      margin-bottom: 0;
+    }
+
+    .page-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .page-head h1 {
+      margin: 0 12px 6px 0;
+    }
+
+    .columns {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-gap: 20px;
+      gap: 20px;
+    }
+
+    /* 讓格線內的卡片可以收窄，寬表格改在卡片內捲動。 */
+    .columns > *,
+    .grid-3 > *,
+    .grid-4 > *,
+    .fields > *,
+    .kpis > *,
+    .app-layout > * {
+      min-width: 0;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-gap: 16px;
+      gap: 16px;
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-gap: 16px;
+      gap: 16px;
+    }
+
+    /* ---------- 狀態標籤 ---------- */
+
+    .tag {
+      display: inline-block;
+      padding: 1px 9px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.8;
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+
+    .tag.done {
+      background: var(--good-soft);
+      color: var(--good);
+    }
+
+    .tag.sim {
+      background: var(--warn-soft);
+      color: var(--warn);
+    }
+
+    .tag.plan {
+      background: #edf0f2;
+      color: #52606b;
+    }
+
+    .tag.bad {
+      background: var(--danger-soft);
+      color: var(--danger);
+    }
+
+    /* ---------- 表單 ---------- */
+
+    label {
+      display: block;
+      font-size: 15px;
+    }
+
+    input,
+    select,
+    button,
+    textarea {
+      font: inherit;
+    }
+
+    input[type="number"],
+    input[type="text"],
+    select {
+      width: 100%;
+      margin-top: 6px;
+      padding: 10px 12px;
+      border: 1px solid #b9cbd4;
+      border-radius: 8px;
+      background: white;
+      color: var(--text);
+    }
+
+    input:disabled,
+    select:disabled {
+      background: #eef2f4;
+      color: var(--muted);
+    }
+
+    input:focus,
+    select:focus,
+    button:focus-visible,
+    a:focus-visible,
+    summary:focus-visible {
+      outline: 3px solid #8bd8c9;
+      outline-offset: 2px;
+    }
+
+    .fields {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-gap: 14px;
+      gap: 14px;
+    }
+
+    .fields.three {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .fields.four {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .fields.five {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+
+    button,
+    .button,
+    .file-button {
+      display: inline-block;
+      padding: 10px 16px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: white;
+      color: var(--text);
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+      line-height: 1.5;
+    }
+
+    button.primary,
+    .button.primary {
+      border-color: var(--teal);
+      background: var(--teal);
+      color: white;
+    }
+
+    button.link {
+      padding: 0;
+      border: 0;
+      background: none;
+      color: var(--teal);
+      text-decoration: underline;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* 以外邊距代替 flex gap，兼容較舊的手機瀏覽器。 */
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      margin: 0 -10px -10px 0;
+    }
+
+    .actions > * {
+      margin: 0 10px 10px 0;
+    }
+
+    .check {
+      display: flex;
+      align-items: flex-start;
+      margin: 12px 0;
+    }
+
+    .check input {
+      width: 20px;
+      height: 20px;
+      flex: 0 0 auto;
+      margin: 3px 10px 0 0;
+    }
+
+    .message {
+      color: var(--danger);
+      white-space: pre-line;
+    }
+
+    .message:empty {
+      display: none;
+    }
+
+    /* ---------- 表格 ---------- */
+
+    .table-wrap {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      margin: 8px 0 14px;
+    }
+
+    table {
+      width: 100%;
+      min-width: 520px;
+      border-collapse: collapse;
+      font-size: 15px;
+    }
+
+    .phone table,
+    table.fit {
+      min-width: 0;
+    }
+
+    th,
+    td {
+      padding: 10px 10px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    thead th {
+      background: #f6f9fa;
+      font-size: 14px;
+    }
+
+    table.num td,
+    table.num th {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    table.num td:first-child,
+    table.num th:first-child {
+      text-align: left;
+      white-space: normal;
+    }
+
+    tr.total {
+      background: var(--teal-soft);
+      font-weight: 750;
+    }
+
+    td.neg {
+      color: var(--danger);
+    }
+
+    td.pos {
+      color: var(--good);
+    }
+
+    td.unknown {
+      color: var(--warn);
+      font-weight: 700;
+    }
+
+    /* ---------- 首頁 ---------- */
+
+    .hero {
+      padding: 28px 24px;
+      border-radius: 18px;
+      background: var(--navy);
+      background: linear-gradient(135deg, #102d46 0%, #1b4263 60%, #0c5c5a 100%);
+      color: white;
+    }
+
+    .hero .eyebrow {
+      margin: 0 0 12px;
+      color: #a9d9cf;
+      font-size: 14px;
+    }
+
+    .hero h1 {
+      margin-bottom: 4px;
+      font-size: 34px;
+      font-size: clamp(30px, 6vw, 46px);
+      letter-spacing: 1px;
+    }
+
+    .hero .sub {
+      margin: 0 0 16px;
+      color: #d9e8f0;
+      font-size: 19px;
+    }
+
+    .hero p {
+      color: #d9e8f0;
+    }
+
+    .hero .button {
+      border-color: rgba(255, 255, 255, 0.5);
+      background: transparent;
+      color: white;
+    }
+
+    .hero .button.primary {
+      border-color: #8bd8c9;
+      background: #8bd8c9;
+      color: var(--navy);
+      font-weight: 700;
+    }
+
+    .facts {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-gap: 8px 20px;
+      gap: 8px 20px;
+      margin: 0;
+    }
+
+    .facts div {
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .facts dt {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .facts dd {
+      margin: 0;
+      font-weight: 600;
+    }
+
+    .stat {
+      padding: 18px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--surface);
+    }
+
+    .stat b {
+      display: block;
+      color: var(--navy);
+      font-size: 26px;
+      line-height: 1.3;
+    }
+
+    .stat span {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .case-card {
+      display: flex;
+      flex-direction: column;
+      padding: 18px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--surface);
+    }
+
+    .case-card h3 {
+      margin: 6px 0 6px;
+    }
+
+    .case-card p {
+      flex: 1 1 auto;
+      margin: 0 0 12px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .case-card .num {
+      color: var(--teal);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    /* ---------- 立項書 ---------- */
+
+    .doc {
+      font-size: 16px;
+    }
+
+    .doc h2 {
+      margin-top: 8px;
+      padding-top: 8px;
+    }
+
+    .doc .chapter {
+      scroll-margin-top: 60px;
+    }
+
+    .toc {
+      columns: 2;
+      column-gap: 32px;
+      padding-left: 0;
+      list-style: none;
+    }
+
+    .toc li {
+      break-inside: avoid;
+    }
+
+    .refs li {
+      margin-bottom: 12px;
+      word-break: break-word;
+    }
+
+    .formula {
+      padding: 10px 14px;
+      border-radius: 8px;
+      background: #f6f9fa;
+      font-family: "SFMono-Regular", Menlo, Consolas, monospace;
+      font-size: 14px;
+      overflow-x: auto;
+    }
+
+    /* ---------- 原型 App ---------- */
+
+    .app-layout {
+      display: grid;
+      grid-template-columns: 400px minmax(0, 1fr);
+      grid-gap: 28px;
+      gap: 28px;
+      align-items: start;
+    }
+
+    .phone {
+      overflow: hidden;
+      border: 10px solid var(--navy);
+      border-radius: 34px;
+      background: #f7f9fa;
+      box-shadow: 0 18px 40px rgba(16, 45, 70, 0.18);
+    }
+
+    .phone-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      background: var(--navy);
+      color: white;
+      font-size: 14px;
+    }
+
+    .phone-top b {
+      letter-spacing: 1px;
+    }
+
+    .phone-body {
+      min-height: 620px;
+      padding: 16px;
+    }
+
+    .steps {
+      display: flex;
+      margin: 0 0 14px;
+      padding: 0;
+      list-style: none;
+    }
+
+    .steps li {
+      flex: 1 1 0;
+      height: 6px;
+      margin: 0 2px;
+      border-radius: 3px;
+      background: var(--border);
+    }
+
+    .steps li.on {
+      background: var(--teal);
+    }
+
+    .screen h2 {
+      font-size: 19px;
+    }
+
+    .tile {
+      margin-bottom: 12px;
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: white;
+    }
+
+    .tile.big {
+      display: block;
+      width: 100%;
+      text-align: left;
+    }
+
+    .tile.big b {
+      display: block;
+      font-size: 17px;
+    }
+
+    .tile.big span {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .doc-item {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+    }
+
+    .doc-item .info {
+      flex: 1 1 auto;
+      margin-right: 8px;
+    }
+
+    .doc-item .info b {
+      display: block;
+    }
+
+    .doc-item .info small {
+      display: block;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .doc-item .ops {
+      margin-top: 8px;
+    }
+
+    .doc-item .ops button {
+      margin: 0 6px 6px 0;
+      padding: 5px 10px;
+      font-size: 13px;
+    }
+
+    .kv {
+      margin: 0;
+    }
+
+    .kv div {
+      display: flex;
+      justify-content: space-between;
+      padding: 7px 0;
+      border-bottom: 1px dashed var(--border);
+      font-size: 14px;
+    }
+
+    .kv dt {
+      color: var(--muted);
+      margin-right: 12px;
+    }
+
+    .kv dd {
+      margin: 0;
+      font-weight: 600;
+      text-align: right;
+    }
+
+    .timeline {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .timeline li {
+      position: relative;
+      margin: 0;
+      padding: 0 0 14px 26px;
+      font-size: 14px;
+    }
+
+    .timeline li::before {
+      content: "";
+      position: absolute;
+      top: 5px;
+      left: 4px;
+      width: 11px;
+      height: 11px;
+      border: 2px solid #b9cbd4;
+      border-radius: 50%;
+      background: white;
+    }
+
+    .timeline li.done::before {
+      border-color: var(--teal);
+      background: var(--teal);
+    }
+
+    .timeline li.current::before {
+      border-color: var(--teal);
+      box-shadow: 0 0 0 4px rgba(8, 124, 114, 0.18);
+    }
+
+    .timeline li small {
+      display: block;
+      color: var(--muted);
+    }
+
+    .faq-answer {
+      padding: 12px 14px;
+      border-radius: 10px;
+      background: var(--teal-soft);
+      font-size: 14px;
+    }
+
+    .faq-answer .src {
+      display: block;
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .faq-list button {
+      display: block;
+      width: 100%;
+      margin-bottom: 8px;
+      text-align: left;
+      font-size: 14px;
+    }
+
+    /* ---------- 結果 ---------- */
+
+    .result {
+      background: var(--navy);
+      color: white;
+    }
+
+    .result p {
+      color: #cfdee8;
+    }
+
+    .result.stopped {
+      background: #5b3a0c;
+    }
+
+    .amount {
+      margin: 8px 0;
+      font-size: 38px;
+      font-size: clamp(30px, 6vw, 46px);
+      font-weight: 750;
+      line-height: 1.2;
+    }
+
+    .kpis {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-gap: 12px;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .kpi {
+      padding: 14px;
+      border-radius: 12px;
+      background: #f6f9fa;
+    }
+
+    .kpi b {
+      display: block;
+      font-size: 22px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .kpi span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .kpi.good b {
+      color: var(--good);
+    }
+
+    .kpi.bad b {
+      color: var(--danger);
+    }
+
+    .chart svg {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .chart .axis {
+      stroke: #b9cbd4;
+      stroke-width: 1;
+    }
+
+    .chart .zero {
+      stroke: #607584;
+      stroke-width: 1;
+      stroke-dasharray: 4 3;
+    }
+
+    .chart .line {
+      fill: none;
+      stroke: var(--teal);
+      stroke-width: 2.5;
+    }
+
+    .chart .line-2 {
+      fill: none;
+      stroke: var(--navy);
+      stroke-width: 2.5;
+    }
+
+    .chart .bar-pos {
+      fill: #7cc8bb;
+    }
+
+    .chart .bar-neg {
+      fill: #e3a3a5;
+    }
+
+    .chart text {
+      fill: #607584;
+      font-size: 12px;
+    }
+
+    .legend {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .legend i {
+      display: inline-block;
+      width: 14px;
+      height: 4px;
+      margin: 0 6px 3px 0;
+      border-radius: 2px;
+      vertical-align: middle;
+    }
+
+    .row-list .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      grid-gap: 10px;
+      gap: 10px;
+      align-items: end;
+      margin-bottom: 10px;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    /* ---------- 響應式 ---------- */
+
+    @media (max-width: 900px) {
+      .app-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .phone {
+        max-width: 420px;
+        margin: auto;
+      }
+
+      .grid-4 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .fields.five {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 700px) {
+      .columns,
+      .grid-3,
+      .fields.three,
+      .kpis {
+        grid-template-columns: 1fr;
+      }
+
+      .fields.four {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .facts {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .card {
+        padding: 20px 16px;
+      }
+
+      .toc {
+        columns: 1;
+      }
+
+      .hero {
+        padding: 22px 18px;
+      }
+    }
+
+    @media (max-width: 460px) {
+      .phone {
+        border-width: 0;
+        border-radius: 14px;
+        box-shadow: none;
+      }
+
+      .phone-body {
+        padding: 12px;
+      }
+
+      .fields,
+      .fields.five,
+      .grid-4 {
+        grid-template-columns: 1fr;
+      }
+
+      .fields.four {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .facts {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media print {
+      .site-header,
+      .site-nav,
+      .actions,
+      footer {
+        display: none !important;
+      }
+
+      body {
+        background: white;
+      }
+
+      .card {
+        break-inside: avoid;
+      }
+
+      .result,
+      .hero {
+        background: white;
+        color: black;
+      }
+
+      .result p,
+      .hero p {
+        color: black;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="site-header">
+    <div class="bar">
+      <a class="brand" href="#home">
+        <strong>PRISM</strong>
+        <span>直達按揭 · 銀行內嵌的按揭申請與成本核對服務</span>
+      </a>
+      <a id="lang-toggle" href="../index.html" lang="zh-Hans" data-lang="hans">简体</a>
+    </div>
+  </header>
+
+  <nav class="site-nav" aria-label="主選單">
+    <div class="tabs">
+      <a href="#home" data-nav="home">首頁</a>
+      <a href="#proposal" data-nav="proposal">立項書</a>
+      <a href="#app" data-nav="app">原型 App</a>
+      <a href="#cost" data-nav="cost">持有期成本</a>
+      <a href="#offer" data-nav="offer">優惠與成數</a>
+      <a href="#finance" data-nav="finance">財務模型</a>
+    </div>
+  </nav>
+
+  <main>
+    <noscript>
+      <div class="notice danger">
+        本網站的計算及原型需要啟用 JavaScript。
+      </div>
+    </noscript>
+
+    <!-- =====================================================
+         首頁
+         ===================================================== -->
+    <section data-route="home">
+      <div class="hero">
+        <p class="eyebrow">2026 工行杯 · 第一屆香港大學生金融科技創新大賽 · 第十七屆全國大學生金融科技創新大賽</p>
+        <h1>PRISM 直達按揭</h1>
+        <p class="sub">銀行內嵌的按揭申請與成本核對服務</p>
+        <p>
+          讓尚未決定辦理渠道的本行出糧標準按揭客戶，重用有效資料、取得銀行條件方案、看清持有期成本，並由同一案件跟進至放款及回贈。客戶毋須先自行找齊外部報價。
+        </p>
+        <div class="actions">
+          <a class="button primary" href="#app">試用原型 App</a>
+          <a class="button" href="#cost">持有期成本比較</a>
+          <a class="button" href="#proposal">閱讀立項書</a>
+        </div>
+      </div>
+
+      <div class="notice warn" style="margin-top: 20px">
+        <p>
+          <strong>參賽示範網站：</strong>本提案建議先以60萬港元進行受控驗證。銀行合作、優惠政策及系統接駁仍待確認；本網站不代表工銀亞洲已批准或推出相關服務。演示站只用合成資料，不取得真實報價、不作信貸審批，亦不提交申請。文內金額均為港元。
+        </p>
+      </div>
+
+      <div class="card">
+        <dl class="facts">
+          <div><dt>學校</dt><dd>香港恒生大學</dd></div>
+          <div><dt>擬選方向</dt><dd>數字金融</dd></div>
+          <div><dt>應用場景</dt><dd>工銀亞洲香港住宅按揭</dd></div>
+          <div><dt>團隊名稱</dt><dd>待確認正式報名名稱</dd></div>
+          <div><dt>版本</dt><dd>v14 整合修訂稿</dd></div>
+          <div><dt>日期</dt><dd>2026年10月1日</dd></div>
+        </dl>
+      </div>
+
+      <div class="grid-4" style="margin-bottom: 20px">
+        <div class="stat"><b>200萬–500萬</b><span>首期聚焦的標準私人住宅新按及他行轉入本金</span></div>
+        <div class="stat"><b>0.20%</b><span>擬議 PRISM 加碼，每宗上限 HK$10,000（待批准）</span></div>
+        <div class="stat"><b>60萬</b><span>建議銀行先審批的封頂驗證額</span></div>
+        <div class="stat"><b>最多 20 宗</b><span>首期受惠取用的銀行試點</span></div>
+      </div>
+
+      <div class="card">
+        <h2>核心創新</h2>
+        <p>把條款原文、核對結果、成本計算及案件狀態連在同一流程。條款改動後，系統重新計算並提示重新確認；缺少罰息或回贈追回條款時，停止完整排名。AI負責抽取與解釋，固定程式負責計算，銀行保留定價與授信權限。</p>
+        <div class="grid-3">
+          <div>
+            <h3>① 條款可追溯</h3>
+            <p class="small muted">條款欄位附帶來源及核對狀態，修改關鍵條款會使舊核驗失效，減少舊報價被繼續引用。</p>
+          </div>
+          <div>
+            <h3>② 持有期同一口徑</h3>
+            <p class="small muted">把罰息和回贈追回納入同一口徑，明確顯示結論反轉的原因。</p>
+          </div>
+          <div>
+            <h3>③ 資料延續</h3>
+            <p class="small muted">計算所用資料延續至申請和優惠跟進，減少客戶再次輸入和轉交。</p>
+          </div>
+        </div>
+      </div>
+
+      <h2>四個展示案例</h2>
+      <p class="muted">按立項書「展示安排」，每個案例都可以直接操作。</p>
+      <div class="grid-4" style="margin-bottom: 20px">
+        <div class="case-card">
+          <span class="num">案例 1 <span class="tag sim">模擬</span></span>
+          <h3>零外部報價也能開始申請</h3>
+          <p>由手機銀行入口開始，重用行內資料、補交缺件，取得本行條件方案。</p>
+          <a class="button" href="#app" data-demo="app-start">開始</a>
+        </div>
+        <div class="case-card">
+          <span class="num">案例 2 <span class="tag done">已實作</span></span>
+          <h3>持有 12 月與 36 月結論不同</h3>
+          <p>立項書教學例子：轉按方案在 24 月內較貴，第 25 月起反轉為較省。</p>
+          <a class="button" href="#cost" data-demo="cost-teaching">查看</a>
+        </div>
+        <div class="case-card">
+          <span class="num">案例 3 <span class="tag done">已實作</span></span>
+          <h3>24 個月內全清按比例追回</h3>
+          <p>400萬貸款：第12月額外還本40萬追回800元，第18月全清再追回7,200元。</p>
+          <a class="button" href="#offer" data-demo="offer-example">查看</a>
+        </div>
+        <div class="case-card">
+          <span class="num">案例 4 <span class="tag done">已實作</span></span>
+          <h3>缺少追回條款時停止排名</h3>
+          <p>條款未知不當作零；系統停止完整排名，列出缺項並交專員處理。</p>
+          <a class="button" href="#cost" data-demo="cost-missing">查看</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>功能狀態</h2>
+        <p class="small muted">畫面逐項標示已實作、模擬及規劃，避免用示意畫面代替銀行接口。</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>功能</th><th>狀態</th><th>說明</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>持有期成本引擎</td><td><span class="tag done">已實作</span></td><td>在瀏覽器內按固定程式計算月供、利息、罰息、回贈支付及追回；可匯入匯出。</td></tr>
+              <tr><td>缺項停止排名</td><td><span class="tag done">已實作</span></td><td>罰息或回贈追回條款未知時，不當作零，停止完整排名。</td></tr>
+              <tr><td>PRISM 優惠追回與成數檢查</td><td><span class="tag done">已實作</span></td><td>0.20%／上限 10,000 元、24 個月按比例追回、回贈超過 1% 的成數處理。</td></tr>
+              <tr><td>銀行財務模型</td><td><span class="tag done">已實作</span></td><td>每宗貢獻、五年淨現值、不利情境及投資門檻，可自行修改假設。</td></tr>
+              <tr><td>申請流程、條件方案、案件跟進</td><td><span class="tag sim">模擬</span></td><td>以合成客戶及合成方案演示 5 步流程；不連接銀行系統。</td></tr>
+              <tr><td>解釋服務</td><td><span class="tag sim">模擬</span></td><td>以固定核准說明回答；無來源不補寫，可轉人工。</td></tr>
+              <tr><td>行內資料重用、信貸及定價接口</td><td><span class="tag plan">規劃</span></td><td>待銀行整合，逐模組安全及業務驗收後才稱上線。</td></tr>
+              <tr><td>AI 條款抽取（OCR＋語言模型）</td><td><span class="tag plan">規劃</span></td><td>先與人工及規則方式對照驗證，不能減少全程工時則沿用人工流程。</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="small muted">
+          <span class="tag done">已實作</span> 在本網站真實運算
+          <span class="tag sim">模擬</span> 以合成資料演示流程
+          <span class="tag plan">規劃</span> 待銀行協作及整合
+        </p>
+      </div>
+    </section>
+
+    <!-- =====================================================
+         立項書
+         ===================================================== -->
+    <section data-route="proposal" hidden>
+      <article class="doc">
+        <div class="page-head">
+          <h1>PRISM 直達按揭 項目立項書</h1>
+          <span class="tag plan">v14 整合修訂稿</span>
+        </div>
+        <p class="muted">銀行內嵌的按揭申請與成本核對服務 · 香港恒生大學 · 2026年10月1日</p>
+
+        <div class="card">
+          <h2>項目定位</h2>
+          <p>讓尚未決定辦理渠道的本行出糧標準按揭客戶，重用有效資料、取得銀行條件方案、看清持有期成本，並由同一案件跟進至放款及回贈。客戶毋須先自行找齊外部報價。</p>
+          <p>本提案建議先以60萬港元進行受控驗證。銀行合作、優惠政策及系統接駁仍待確認；本稿不代表工銀亞洲已批准或推出相關服務。</p>
+        </div>
+
+        <div class="card">
+          <h2>目錄</h2>
+          <ol class="toc">
+            <li><button class="link" type="button" data-scroll="ch1">1 項目摘要</button></li>
+            <li><button class="link" type="button" data-scroll="ch2">2 客戶與需求</button></li>
+            <li><button class="link" type="button" data-scroll="ch3">3 產品方案</button></li>
+            <li><button class="link" type="button" data-scroll="ch3b">3 產品方案：成本與優惠</button></li>
+            <li><button class="link" type="button" data-scroll="ch4">4 技術設計</button></li>
+            <li><button class="link" type="button" data-scroll="ch5">5 商業模式</button></li>
+            <li><button class="link" type="button" data-scroll="ch5b">5 商業模式：財務結果</button></li>
+            <li><button class="link" type="button" data-scroll="ch6">6 風險管理</button></li>
+            <li><button class="link" type="button" data-scroll="ch7">7 實施與驗證</button></li>
+            <li><button class="link" type="button" data-scroll="ch7b">7 實施與驗證：驗證方法</button></li>
+            <li><button class="link" type="button" data-scroll="ch8">8 團隊與成果</button></li>
+            <li><button class="link" type="button" data-scroll="appendix">附錄 計算口徑</button></li>
+            <li><button class="link" type="button" data-scroll="refs">參考資料</button></li>
+          </ol>
+        </div>
+
+        <!-- 1 -->
+        <div class="card chapter" id="ch1">
+          <h2>1 項目摘要</h2>
+          <p>我們建議把PRISM嵌入現有手機銀行和按揭工作台，服務在本行出糧、有按揭需要但尚未決定辦理渠道的既有關係客戶。系統整理資料與條款，銀行負責出價、審批及跟進，客戶只需確認事實、補交必要文件及簽署。</p>
+          <p>核心創新是把條款原文、核對結果、成本計算及案件狀態連在同一流程。條款改動後，系統重新計算並提示重新確認；缺少罰息或回贈追回條款時，停止完整排名。AI負責抽取與解釋，固定程式負責計算，銀行保留定價與授信權限。</p>
+          <p>客戶收益是少重填、少追問及更容易理解費用；銀行收益須來自可證明的渠道成本節省。現有資料未能證明實際節佣率，因此只建議分段驗證，不把正淨現值當作已實現收益。</p>
+          <p>首期聚焦200萬至500萬元的標準私人住宅新按及他行轉入。先做同價流程測試，再開展最多20宗受惠取用的銀行試點。資助房屋及跨行代申請另行評估；本行到期續留只列附加情境，不計入主情境淨現值。</p>
+          <p class="small muted">文內金額均為港元；市場事實附來源，財務數字與服務時限均為明示假設或擬議目標。取用指貸款正式發放。</p>
+        </div>
+
+        <!-- 2 -->
+        <div class="card chapter" id="ch2">
+          <h2>2 客戶與需求</h2>
+          <h3>客戶問題</h3>
+          <p>按揭客戶需要知道可申請的融資額、尚欠哪些文件，以及利率、回贈和提前清還條款如何影響實際支出。單純增加一個上載報價的入口，仍把搜集和整理工作留給客戶。PRISM由銀行承接文件清單、條件方案與進度跟進。</p>
+          <p>例如，一名本行出糧客戶準備申請400萬元按揭。PRISM先列出銀行已有且仍有效的資料、需要更新的項目及剩餘缺件，讓專員據此取得本行條件方案。客戶可以較早發現資料或融資缺口，但條件方案不等於最終批核，也不能保證避免交易損失。</p>
+
+          <h3>目標客群</h3>
+          <p>首期客戶須為本行出糧客戶，具可核實的固定收入、擬購或持有香港標準私人住宅，尚未決定辦理渠道，且未有中介就該宗交易向本行提交有效轉介。這是試點範圍，不是銀行實際信貸政策；不適合標準流程者由一般人工服務承接。</p>
+
+          <h3>需求證據</h3>
+          <p>金管局公布的2026年7月統計顯示，當月新申請9,212宗，新批貸款448億元，其中轉按73億元。[1] 8月新批貸款回落至322億元，但轉按貸款按月增6.8%至78億元，是唯一上升的類別。[9] 業界按官方數據整理，8月新批轉按1,586宗，約佔新批6,090宗的26%，宗數及金額均創33個月新高。[10] 轉按升溫支持首期納入他行轉入客戶，但月度流量不能直接推算PRISM可取得的客戶數。</p>
+          <p>現有研究材料記載兩次探索訪談，反映受訪者關注融資不確定性、重交資料及熟悉的銀行關係。原始錄音、書面記錄和引用許可尚待整理；兩人經驗不代表市場比例，也不能證明各渠道息率必定相同。問卷尚未取得一致的完成紀錄，本稿不列調查結果。提交前擬補充8至10名近期置業或轉按者（兼顧曾用及未用中介者）及2至3名從業者訪談，重點了解渠道選擇原因、直接辦理所需的最低優惠及對銀行比較立場的顧慮；未完成前不列結論。</p>
+
+          <h3>替代選擇</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>選擇</th><th>既有能力</th><th>PRISM須證明的改善</th></tr></thead>
+              <tbody>
+                <tr><td>按揭中介</td><td>經絡明示免費服務，並可協助多行申請。[2]</td><td>本行條件合適時，直接辦理是否更省力；不能以節省客戶中介費作賣點。</td></tr>
+                <tr><td>銀行數碼按揭</td><td>DBS稱約10分鐘填申請，提交後約1分鐘有結果，仍須文件核驗。[3]</td><td>速度已是競爭要求；須展示條款可追溯及案件承接的新增價值。</td></tr>
+                <tr><td>本行現有服務</td><td>預填、申請及專員功能須向銀行盤點。</td><td>以相同任務量度重填、補件、處理時間；已有功能直接重用。</td></tr>
+                <tr><td>一般AI工具</td><td>可解釋條款及處理客戶提供的資料。</td><td>須取得銀行授權方案，連接可追蹤的申請與責任人。</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 3 -->
+        <div class="card chapter" id="ch3">
+          <h2>3 產品方案</h2>
+          <h3>申請流程</h3>
+          <p>入口提供「申請本行按揭」及「評估轉按成本」。取得其他銀行報價屬自選功能；沒有外部報價，客戶仍可完成本行申請。<a href="#app">在原型 App 試用 →</a></p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>步驟</th><th>系統及銀行工作</th><th>客戶工作</th></tr></thead>
+              <tbody>
+                <tr><td>1 確認需要</td><td>辨識新按或轉入，取得指定用途授權。</td><td>確認物業、融資額、年期及預計持有期。</td></tr>
+                <tr><td>2 整理資料</td><td>重用有效資料；列出過期、矛盾及待補項。</td><td>確認事實並補交必要文件。</td></tr>
+                <tr><td>3 取得方案</td><td>由授權系統或職員出具帶編號、有效期及條件的方案。</td><td>閱讀尚待核驗事項，決定是否繼續。</td></tr>
+                <tr><td>4 核對成本</td><td>按持有期計算成本，列優惠、支付及追回條件。</td><td>查看情境並確認正式申請。</td></tr>
+                <tr><td>5 跟進取用</td><td>同一案件顯示負責人、下一步、補件及優惠狀態。</td><td>完成法定確認、簽署及必要補件。</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>方案內容</h3>
+          <p>條件方案須列本金、年期、利率及封頂、費用、回贈、提前清還和追回條款，並顯示出具者、資料日期、有效期及待完成核驗。收入、估值、信貸或產品條件變更時，銀行重新審核；系統保留前後版本及客戶確認記錄。</p>
+
+          <h3>資料來源</h3>
+          <p>本行方案以銀行授權來源為準。公開市場資料只作參考，顯示來源、查核日和缺項；首期最多維護5家銀行的官方資料，營運人員每日查核，過期項目停止用於比較。外部個人報價只有在資格、有效期及關鍵條款核實後才進入可比結果。</p>
+
+          <h3>服務時限</h3>
+          <p>人工試點目標為1工作日首次聯絡、1工作日初次資料審查，以及資料齊備後1工作日出具條件方案。補件通知不算出價完成；逾時須列原因、責任人和下一期限，等待期間每2工作日更新。</p>
+          <p>銀行整合後，再驗證標準數碼路徑90%的個案能否於10分鐘內取得條件結果，由開始申請計時，包含登入、同意及資料補充，並披露適用比例、轉人工及未完成個案。首期不宣稱已達十分快批，正式審批、律師文件及放款另行計時。</p>
+        </div>
+
+        <!-- 3b -->
+        <div class="card chapter" id="ch3b">
+          <h2>3 產品方案：成本與優惠</h2>
+          <h3>持有期成本</h3>
+          <p>淨融資成本為利息、方案特有費用、清還罰款及回贈追回之和，再減已收回贈。比較須固定本金、年期、比較日及利率情境；退出時仍須清還的本金另列，避免把成本較低誤解為所需現金較少。</p>
+          <p>以下為教學例子：原貸款500萬元、30年、年息3.5%，已供36月，剩餘本金4,701,770.78元及324月。A維持3.5%，原退出限制已屆滿；B轉按3.6%，費用10,000元、回贈1%。B於第1至24月月末全清須支付當時餘額1%罰款並退回全部回贈，第25月起不適用。</p>
+          <div class="table-wrap">
+            <table class="num">
+              <thead><tr><th>退出時間</th><th>A淨成本 元</th><th>B淨成本 元</th><th>B減A 元</th></tr></thead>
+              <tbody>
+                <tr><td>12個月</td><td>162,863</td><td>223,511</td><td>+60,648</td></tr>
+                <tr><td>24個月</td><td>321,936</td><td>386,124</td><td>+64,188</td></tr>
+                <tr><td>25個月</td><td>335,017</td><td>307,690</td><td>−27,327</td></tr>
+                <tr><td>36個月</td><td>477,085</td><td>453,945</td><td>−23,140</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>36月時B成本較低23,140元，但退出仍須清還本金A 4,370,575.05元或B 4,375,196.83元。本例固定利率且假設交易完成已收回贈，只用於展示持有期影響；正式服務按實際付款日及合約計息，另列浮息情境。<a href="#cost" data-demo="cost-teaching">用計算器重算 →</a></p>
+
+          <h3>直達優惠</h3>
+          <p>建議PRISM加碼為實際取用本金0.20%，每宗上限10,000元；銀行基本回贈另列，全部屬待批准政策。本案不設按中介報價補差：核實外部中介報價即表示客戶已接觸中介，容易引起轉介歸屬爭議，亦增加渠道誤標風險。</p>
+          <p>例如400萬元貸款，PRISM加碼為8,000元。若中介或其他銀行提供較高優惠，系統按相同持有期口徑照實顯示差距，由客戶自行選擇；未確認個人資格的公開優惠，只可列為參考。</p>
+          <p>擬議優惠於符合資格並取用後30曆日內支付；取用日起至24個月屆滿當日全清或轉按離行，追回未曾追回的已付PRISM餘額，取消未付部分。期內非例行部分還本按原優惠乘以還本額佔原本金比例調整，正常供款不調整。正式截止日期及例外由銀行合約列明。<a href="#offer" data-demo="offer-example">試算追回 →</a></p>
+          <p>發出有效優惠前須完成預算預留及雙人覆核。不得改寫有效轉介來源、重複付獎，或藉降低基本回贈抵銷加碼。已接受且有效的優惠不因事後預算不足而減少；現金回贈的成數處理見第6章。</p>
+        </div>
+
+        <!-- 4 -->
+        <div class="card chapter" id="ch4">
+          <h2>4 技術設計</h2>
+          <h3>系統架構</h3>
+          <p>PRISM沿用銀行登入、案件及信貸流程，新增條款資料結構、成本服務及優惠狀態記錄。首期由授權職員輸入核准方案；待流程與計算通過驗收，再接銀行接口及啟用AI輔助抽取。</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>模組</th><th>輸入及輸出</th><th>控制</th></tr></thead>
+              <tbody>
+                <tr><td>資料重用</td><td>行內有效資料形成預填內容、矛盾及缺件清單。</td><td>每項記用途、有效期及確認狀態；入帳不自動等同合資格收入。</td></tr>
+                <tr><td>條款核對</td><td>OCR及語言模型產生欄位草稿，連回原文頁碼或段落。</td><td>利率、費用、罰息和追回由職員核實；未知不當零。</td></tr>
+                <tr><td>成本引擎</td><td>按核實條款計月供、利息、退出成本及餘額。</td><td>固定程式計算；保存輸入、規則版本及計算時間。</td></tr>
+                <tr><td>案件及優惠</td><td>唯一案件編號貫穿申請、補件、取用和優惠。</td><td>定價、審批與付款權限分開；同一事件重送只處理一次。</td></tr>
+                <tr><td>解釋服務</td><td>以核准條款庫和已核實結果回答問題。</td><td>無來源不補寫；可轉人工；模型沒有出價或付款權限。</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>創新內容</h3>
+          <p>第一，條款欄位附帶來源及核對狀態，修改關鍵條款會使舊核驗失效，減少舊報價被繼續引用。第二，持有期計算把罰息和回贈追回納入同一口徑，明確顯示結論反轉的原因。第三，計算所用資料能延續至申請和優惠跟進，減少客戶再次輸入和轉交。</p>
+          <p>這屬銀行流程與應用整合創新。介面和計算器可被複製，競爭力須由銀行實際導入、可核驗結果及處理效率證明。首期不自行訓練信貸模型，不假設已取得跨行按揭報價接口。</p>
+
+          <h3>AI驗證</h3>
+          <p>以同一組匿名或合成報價，比較人工、OCR加規則及OCR加語言模型三種方式，記錄關鍵欄位正確率、漏讀、轉人工率及覆核時間。若加入AI不能減少全程工時，或錯誤難以攔截，先沿用受控人工流程。RAG提供來源約束，不保證零錯誤。</p>
+
+          <h3>故障處理</h3>
+          <p>未支援的浮息重設、部分還本或特殊條款停止自動排名，交專員處理。接口失敗保留案件，避免重複信貸查詢；解釋服務失效時顯示核准固定說明。真實文件只在銀行核准環境處理，演示站只用合成資料。</p>
+        </div>
+
+        <!-- 5 -->
+        <div class="card chapter" id="ch5">
+          <h2>5 商業模式</h2>
+          <h3>效益來源</h3>
+          <p>營運及收益主體為銀行，客戶不另付平台費。主模型只衡量「本來仍會在本行取用，但由轉介改為直接申請」的渠道替代效益。經核實的可避免淨佣金，先支付新增優惠和服務成本，餘額才是項目貢獻。</p>
+          <p>本來已會直接申請的客戶沒有節佣，但仍計全數優惠和服務成本。真正新增貸款須另建模型，計入基本回贈、資金、信貸損失、資本及服務成本；本行續留只列附加情境，交叉銷售不計入，避免抬高回報。</p>
+
+          <h3>每宗收支</h3>
+          <p>以下為待驗證的管理情境：平均本金400萬元，可避免淨佣金率0.45%，全體受惠取用中有效替代本行轉介成交的比例為80%。這些數字不是市場平均或銀行已確認條件。<a href="#finance">在財務模型頁修改假設 →</a></p>
+          <div class="table-wrap">
+            <table class="num">
+              <thead><tr><th>項目</th><th>計算</th><th>每宗 港元</th></tr></thead>
+              <tbody>
+                <tr><td>平均避免佣金</td><td>400萬 × 0.45% × 80%</td><td>14,400</td></tr>
+                <tr><td>基礎加碼</td><td>400萬 × 0.20%</td><td>−8,000</td></tr>
+                <tr><td>新增處理</td><td>包含未取用及撤回個案分攤</td><td>−1,200</td></tr>
+                <tr><td>增量獲客</td><td>包含未轉化線索分攤</td><td>−300</td></tr>
+                <tr class="total"><td>淨變動貢獻</td><td>未扣固定營運及前置投入</td><td>4,900</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>1,200元處理成本假設包括全體新增工時分攤至每宗取用後3小時、全負擔時薪300元，以及300元資料與查詢費。雙人覆核、未成交者及申訴工時均須記錄；固定管理與逐宗工時不可重複計薪。</p>
+
+          <h3>客戶來源</h3>
+          <p>初期透過手機銀行、分行及客戶主動查詢接觸，不購入外部地產名單。年度漏斗假設為：合法可觸達客戶中20%近期有需要、50%開始、70%完成資料、60%適合標準流程、60%取用，合計2.52%。</p>
+          <div class="table-wrap">
+            <table class="num">
+              <thead><tr><th>營運年</th><th>Y1</th><th>Y2</th><th>Y3</th><th>Y4</th><th>Y5</th></tr></thead>
+              <tbody>
+                <tr><td>取用目標 宗</td><td>100</td><td>250</td><td>500</td><td>800</td><td>1,000</td></tr>
+                <tr><td>約需可觸達人數</td><td>4,000</td><td>10,000</td><td>20,000</td><td>32,000</td><td>40,000</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>各比例尚待CRM名單與試點證明。每年須去重，跨年度重複接觸另行披露；可觸達客戶不等於有按揭意向者。名單不足即下修取用目標。</p>
+        </div>
+
+        <!-- 5b -->
+        <div class="card chapter" id="ch5b">
+          <h2>5 商業模式：財務結果</h2>
+          <h3>五年情境</h3>
+          <p>前置投入按300萬元計算，Y1為正式上線後第一個營運年。全部前置試點成本及優惠計入T0，不重入正式取用宗數。下表單位為萬港元，宗數除外。</p>
+          <div class="table-wrap">
+            <table class="num">
+              <thead><tr><th>項目</th><th>Y1</th><th>Y2</th><th>Y3</th><th>Y4</th><th>Y5</th></tr></thead>
+              <tbody>
+                <tr><td>受惠取用 宗</td><td>100</td><td>250</td><td>500</td><td>800</td><td>1,000</td></tr>
+                <tr><td>避免佣金</td><td>144.00</td><td>360.00</td><td>720.00</td><td>1,152.00</td><td>1,440.00</td></tr>
+                <tr><td>變動成本</td><td>−95.00</td><td>−237.50</td><td>−475.00</td><td>−760.00</td><td>−950.00</td></tr>
+                <tr><td>固定營運</td><td>−80.00</td><td>−85.00</td><td>−90.00</td><td>−95.00</td><td>−100.00</td></tr>
+                <tr><td>年度營運淨額</td><td>−31.00</td><td>37.50</td><td>155.00</td><td>297.00</td><td>390.00</td></tr>
+                <tr class="total"><td>含T0累計淨額</td><td>−331.00</td><td>−293.50</td><td>−138.50</td><td>158.50</td><td>548.50</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>上述假設下，Y2年度營運轉正，Y4未折現累計回本；10%折現率下五年淨現值為正264.28萬元，折現回本在Y4。若只計首三個營運年，淨現值為負180.74萬元，即正值依賴Y4及Y5的規模，須在擴大前以實際取用量驗證。這是稅前增量現金流，沒有終值或追回回贈收入，不等於會計淨利。</p>
+
+          <h3>不利情境</h3>
+          <div class="table-wrap">
+            <table class="num">
+              <thead><tr><th>改變的假設</th><th>每宗貢獻 元</th><th>五年淨現值 萬</th></tr></thead>
+              <tbody>
+                <tr><td>管理情境（不設補差）</td><td>4,900</td><td>+264.28</td></tr>
+                <tr><td>淨佣金降至0.40%</td><td>3,300</td><td>−30.20</td></tr>
+                <tr><td>平均本金降至300萬元</td><td>3,300</td><td>−30.20</td></tr>
+                <tr><td>取用量減半</td><td>4,900</td><td>−186.65</td></tr>
+                <tr><td>取用量改為100／200／300／400／500宗</td><td>4,900</td><td>−115.60</td></tr>
+                <tr><td>上項保守取用量且前置投入降至180萬元</td><td>4,900</td><td>+4.40</td></tr>
+                <tr><td>PRISM加碼提高至0.25%</td><td>2,900</td><td>−103.82</td></tr>
+                <tr><td>佣金0.40%且有效節佣比例60%</td><td>100</td><td>−619.17</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>除列明變數外，其餘維持管理情境。若PRISM加碼提高至0.23%，淨現值只剩正43.42萬元；每宗再增加1小時人手、即300元，便轉為負11.80萬元。取用規模、節佣及人手成本均是立項關鍵；若後期取用量未達管理情境，須相應縮減前置投入或加入經驗證的其他效益。</p>
+
+          <h3>投資門檻</h3>
+          <p>在同一宗數及成本下，每宗淨變動貢獻須至少3,464.10元，五年淨現值才不低於零。佣金維持0.45%時，有效節佣比例須至少72.02%；比例維持80%時，佣金須至少0.40513%。門檻必須以對照及實付資料驗證；有效節佣比例的上限以本行過去12至24個月出糧客戶按揭經中介辦理的比例為錨，不應高於該歷史比例。</p>
+          <p>固定營運包含平台、資料、安全、管理及每年10至20萬元渠道影響預留；實際超支照計。300萬元只是前置額，按年末計最大累計資金缺口至少331.0萬元，另須安排月度周轉。</p>
+
+          <h3>附加情境：到期續留</h3>
+          <p>主情境不計本行續留。為說明節佣不足時的補充價值，另列附加情境：每個增量留存帳戶年指相對對照組多留一年的貸款，按平均餘額350萬元及0.60%風險調整貢獻計約21,000元，未扣續留優惠。下表列出抵消各不利情境所需的增量留存量。</p>
+          <div class="table-wrap">
+            <table class="num">
+              <thead><tr><th>需抵消的情境</th><th>淨現值缺口 萬</th><th>每年所需帳戶年</th></tr></thead>
+              <tbody>
+                <tr><td>淨佣金降至0.40%</td><td>30.20</td><td>約4</td></tr>
+                <tr><td>取用量改為100至500宗</td><td>115.60</td><td>約15</td></tr>
+                <tr><td>佣金0.40%且節佣比例60%</td><td>619.17</td><td>約78</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>計算方法為缺口除以五年10%年金因子3.7908，再除以每帳戶年2.1萬元。若另計續留報價優惠，所需帳戶年相應增加。續留客戶已是本行借款人，不涉中介佣金爭奪，但增量留存必須以隨機對照的到期客戶驗證；對照結果成立前，不併入主情境。</p>
+        </div>
+
+        <!-- 6 -->
+        <div class="card chapter" id="ch6">
+          <h2>6 風險管理</h2>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>主要風險</th><th>控制與處理</th><th>負責職能</th></tr></thead>
+              <tbody>
+                <tr><td>比較偏向本行</td><td>披露銀行銷售立場；成本結果與推廣分開。同條款換品牌結果須相同，外行較省亦照實顯示。</td><td>產品及合規</td></tr>
+                <tr><td>錯讀或錯算</td><td>關鍵欄位逐項覆核，缺項停止完整排名。保存來源及版本，錯誤發現後停用受影響模板並更正。</td><td>營運及獨立驗證</td></tr>
+                <tr><td>資料及AI風險</td><td>用途分開、最少取數、加密及最小權限；不用客戶文件默認訓練模型，提供人工處理及更正渠道。</td><td>私隱及資安</td></tr>
+                <tr><td>授信誤導</td><td>條件方案清楚列未完成核驗及失效情況；沿用銀行信貸政策，不以AI輸出作批准。</td><td>信貸及法務</td></tr>
+                <tr><td>渠道與付款爭議</td><td>有效轉介不改標直客；優惠先預留後承諾，支付及追回逐宗對帳。</td><td>渠道及財務</td></tr>
+                <tr><td>成本或渠道流失</td><td>同時計PRISM及銀行整體取用、渠道貢獻和補救成本。調整未來活動，不削減已接受有效優惠。</td><td>業務及財務</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>回贈處理</h3>
+          <p>金管局2005年公布的處理原則並非一律把現金回贈限制在1%。回贈超過貸款額1%時，須把該筆回贈計入貸款額計算按揭成數，而非只計超出部分。[4] 試點前由銀行合規確認優惠分類、合併計算及現行適用要求，不能透過改名或拆筆迴避。</p>
+          <p>例如貸款400萬元、估值600萬元，基本回贈0.90%加PRISM0.20%，合計44,000元，超過貸款額1%；若全部按該規則處理，成數為（4,000,000＋44,000）÷6,000,000＝67.40%。接近適用上限時，重新核對本金與首期並取得客戶確認，不靜默減少放款。<a href="#offer" data-demo="ltv-example">試算成數 →</a></p>
+
+          <h3>資料與責任</h3>
+          <p>生成式AI治理參照金管局消費者保障通告及私隱專員公署框架。[5][6] 比較、貸款申請及推廣用途分開，保留期限按資料用途和法定責任制定；不以統一30日刪除承諾取代銀行紀錄要求。</p>
+          <p>上線前由業務確認價格、信貸確認條件方案、合規和私隱確認披露及用途、IT與資安完成安全驗收、財務確認優惠責任。上述是擬議責任安排，現階段未取得銀行或監管批准。</p>
+        </div>
+
+        <!-- 7 -->
+        <div class="card chapter" id="ch7">
+          <h2>7 實施與驗證</h2>
+          <h3>分段投入</h3>
+          <p>本計劃建議銀行先審批60萬元封頂驗證，並非向賽事評判申請資助。先確認現行流程和客戶需求，再以銀行正常授信流程承接最多20宗受惠取用。</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>首期用途</th><th style="text-align:right">萬港元</th><th>交付</th></tr></thead>
+              <tbody>
+                <tr><td>流程與計算</td><td style="text-align:right">12.0</td><td>無外部報價旅程、成本引擎及案件交接</td></tr>
+                <tr><td>條款與公開資料</td><td style="text-align:right">6.0</td><td>1至2類報價模板及最多5行官方參考</td></tr>
+                <tr><td>安全及獨立驗證</td><td style="text-align:right">8.0</td><td>資料、計算、渠道與優惠控制</td></tr>
+                <tr><td>客戶與基線研究</td><td style="text-align:right">6.0</td><td>訪談、現行流程、CRM範圍及渠道歷史比例</td></tr>
+                <tr><td>優惠預留</td><td style="text-align:right">20.0</td><td>20宗 × 每宗最高10,000元</td></tr>
+                <tr><td>增量處理</td><td style="text-align:right">2.4</td><td>含未取用分攤的成本目標</td></tr>
+                <tr><td>支援與備用</td><td style="text-align:right">5.6</td><td>獲客、協調及修正</td></tr>
+                <tr class="total"><td>合計</td><td style="text-align:right">60.0</td><td>包含於前置300萬元</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>完整前置額分為首期60萬、擴大驗證及基本整合100萬、安全上線及必要自動化100萬、備用40萬。後240萬元按證據釋放，全部金額均待銀行範圍評估及報價。</p>
+          <p>第二段100萬元內，可另設最多75萬元的對照驗證額，涵蓋最多50宗受惠取用。若用盡，該段只餘25萬元作整合；須相應縮小建置範圍，不能把試點視為免費附加項。</p>
+
+          <h3>工作安排</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>階段</th><th>工作</th><th>決策</th></tr></thead>
+              <tbody>
+                <tr><td>第1至4週</td><td>盤點現有流程、價格、佣金、名單及銀行協作條件。</td><td>核心資料不足，先補研究，不承諾真實優惠。</td></tr>
+                <tr><td>第5至8週</td><td>20人同價流程測試；獨立重算及安全設計。</td><td>流程可用且責任批准後，才進銀行試點。</td></tr>
+                <tr><td>第9至12週起</td><td>最多20宗受惠取用試點及工時記錄。</td><td>這不是12週全部放款承諾；按實際週期追蹤。</td></tr>
+                <tr><td>其後按證據</td><td>較大對照、銀行整合及分模組上線。</td><td>樣本不足或經濟不成立，不全面放量。</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 7b -->
+        <div class="card chapter" id="ch7b">
+          <h2>7 實施與驗證：驗證方法</h2>
+          <h3>先測流程 再測優惠</h3>
+          <p>第一輪在相同價格下比較現行流程與PRISM，記錄客戶實際工作；第二輪在銀行批准後，測試PRISM連同固定優惠政策的完整效果。這樣才能區分功能改善與補貼吸引力。</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>驗證項目</th><th>方法</th><th>通過條件或決策用途</th></tr></thead>
+              <tbody>
+                <tr><td>客戶選擇</td><td>訪談12名近期置業或轉按者及3至5名從業者；記錄不選PRISM的原因。</td><td>確認願意直接辦理的具體客群，探索樣本不推算全港比例。</td></tr>
+                <tr><td>客戶工作量</td><td>20人完成相同任務；量度主動操作分鐘、重填欄位、補件及追問次數。</td><td>在正式試點前按基線鎖定改善門檻；不得省略必要核驗或降低資料質量。</td></tr>
+                <tr><td>服務能力</td><td>分別記首次聯絡、資料齊備、條件方案及正式批核時間。</td><td>檢查第3章工作日目標；數碼整合後另測P90十分鐘及適用比例。</td></tr>
+                <tr><td>計算與AI</td><td>獨立攤還表、品牌對調、缺項、到期前後、重送及AI對照。</td><td>已支援案例同口徑差額不超過1元；嚴重未修正錯算為零；未支援正確轉人工。</td></tr>
+                <tr><td>銀行增量效益</td><td>佣金實付、全體受邀者取用、全部工時、優惠及渠道變動。</td><td>採較審慎估計重算全案和剩餘投入，支持下一段支出才擴大。</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>對照設計</h3>
+          <p>在同意參與且無渠道衝突的客群內隨機分組，按原分組分析所有受邀者，包括未申請或未取用者。無法隨機時採配對或分期推出，披露選擇偏差，不把高意向成交者直接與所有普通客戶比較。</p>
+          <p>財務先取12至24個月渠道合約和實付資料，扣除不會消失的費用及本可追回佣金。有效節佣比例須結合對照取用與銀行整體業務變化估計，不能由App來源標籤或客戶自述直接代替。其上限以本行過去12至24個月出糧客戶按揭經中介辦理的比例為錨；若歷史比例低於模型假設，須先下調後重算。</p>
+
+          <h3>放量條件</h3>
+          <p>20宗試點主要檢驗流程、成本和控制；追加50宗也不保證足以驗證80%有效節佣比例。銀行研究人員須按基線波動、目標差異和追蹤期估計樣本；如果證據不足，就延長驗證或停止擴張。</p>
+          <p>重大錯算或資料事故先停受影響功能並補救；財務不成立則重新設計未來客群、價格或投入。若只有服務改善，須另以服務項目審批，不能繼續宣稱已證明盈利。</p>
+        </div>
+
+        <!-- 8 -->
+        <div class="card chapter" id="ch8">
+          <h2>8 團隊與成果</h2>
+          <h3>成果狀態</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>狀態</th><th>內容</th><th>提交證據</th></tr></thead>
+              <tbody>
+                <tr><td>原型演示</td><td>App v3成本及回贈試算、持有期結果、缺項提示、匯入匯出與離線版。</td><td>提交前附實機演示及測試記錄；僅用合成或手動資料。</td></tr>
+                <tr><td>研究材料</td><td>兩次探索訪談；問卷尚未有可核實的完成結果。</td><td>整理匿名原始記錄及引用許可；未核實前不列調查統計。</td></tr>
+                <tr><td>首期擬驗證</td><td>資料清單、本行職員出價、案件交接及優惠覆核。</td><td>銀行協作、試點批准、工時與客戶選擇記錄。</td></tr>
+                <tr><td>待銀行整合</td><td>行內資料重用、信貸及定價接口、正式案件及付款台帳。</td><td>逐模組安全及業務驗收後才稱上線。</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>團隊分工</h3>
+          <p>學校為香港恒生大學。兩稿的正式隊名和成員資料未一致，以下先列需配置的工作，不虛填成員經歷。提交前以報名頁補齊，團隊人數須符合最多3人的要求。[7]</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>角色</th><th>姓名</th><th>主要工作</th></tr></thead>
+              <tbody>
+                <tr><td>隊長</td><td>待確認</td><td>需求研究、銀行訪談、項目協調及答辯</td></tr>
+                <tr><td>成員</td><td>待確認</td><td>原型、條款資料結構與計算驗證</td></tr>
+                <tr><td>成員</td><td>待確認</td><td>財務模型、對照設計、資料及引用整理</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>指導老師及正式隊伍名稱待確認。銀行業務、信貸、營運、IT、合規及財務屬擬議協作職能，並非已加入團隊的合作方。</p>
+
+          <h3>展示安排</h3>
+          <p>展示四個案例：零外部報價也能開始申請；持有12月與36月時成本結論不同；24個月內全清時PRISM優惠如何按比例追回；缺少追回條款時停止排名。畫面逐項標示已實作、模擬及規劃，避免用示意畫面代替銀行接口。<a href="#home">回首頁查看案例 →</a></p>
+          <p>擬提供立項書、原型及短片作參賽材料，具體檔案種類以報名頁要求為準。主辦方2026年9月20日通知列港澳台作品截止為2026年10月19日24時；隊長須在期限前完成成員維護及上載。[8]</p>
+
+          <h3>立項建議</h3>
+          <p>在指定銀行協作窗口、核定資料用途和試點優惠後，啟動60萬元封頂驗證。先交付可重算的原型、真實客戶工作量和全成本證據，再決定是否接入銀行並擴張。</p>
+        </div>
+
+        <!-- 附錄 -->
+        <div class="card chapter" id="appendix">
+          <h2>附錄 計算口徑</h2>
+          <h3>按揭模型</h3>
+          <p>P為本金，年利率r，月利率i＝r÷12，n為剩餘月數，M為月供，Bₜ為第t次供款後本金，Iₜ為累計利息。教學模型假設月末等額本息及固定利率。</p>
+          <p class="formula">M ＝ P × i ÷ [1 − (1＋i)^(−n)]　　Bₜ ＝ Bₜ₋₁ × (1＋i) − M　　Iₜ ＝ Iₜ₋₁ ＋ Bₜ₋₁ × i</p>
+          <p>i＝0時，月供為P÷n。淨融資成本＝累計利息＋費用＋清還罰款＋回贈追回−已收回贈；期末本金另列。正式服務另按合約日數、利率重設、封頂及取整規則驗證。</p>
+
+          <h3>銀行模型</h3>
+          <p>每宗淨變動貢獻U＝αPc−R−v−A。α是全體受惠取用中有效替代本行轉介成交的比例，c是可避免淨佣金率，R是PRISM加碼，v是處理成本，A是獲客成本。Q是年度取用宗數，F是年度固定營運，T0是前置投入。</p>
+          <p class="formula">U ＝ α·P·c − R − v − A　　NPV ＝ −T0 ＋ Σₜ (Qₜ·U − Fₜ) ÷ (1＋10%)ᵗ</p>
+          <p>管理情境：P＝400萬元，α＝80%，c＝0.45%；R＝min（P×0.20%，10,000）；v＝1,200元；A＝300元。Q為100／250／500／800／1,000；F為80／85／90／95／100萬元；T0為300萬元。折現率10%屬管理假設。</p>
+
+          <h3>優惠及日期</h3>
+          <p>PRISM加碼上限10,000元，本案不設按中介報價補差。敏感度分析中的0.23%及0.25%只指PRISM額外優惠，不包括銀行基本回贈。附加續留情境的每年所需帳戶年＝淨現值缺口÷3.7908÷2.1萬元。每份優惠書須列確切有效日、預計支付日、追回截止日及部分還本安排。</p>
+          <p>例：400萬元貸款已付PRISM優惠8,000元，第12月額外還本40萬元，按比例追回800元；第18月全清，再追回餘額7,200元。原銀行基本回贈及清還罰款另計，不得重複追回同一優惠。</p>
+
+          <h3>必留資料</h3>
+          <p>每宗方案保存本金、年期、利率與重設、封頂、費用、各筆回贈、支付及追回日期、來源、核對人、版本和未解決項目。每宗案件記錄全部工時、查詢、獲客、優惠、佣金及補救成本，未取用個案也納入分攤。</p>
+        </div>
+
+        <!-- 參考資料 -->
+        <div class="card chapter" id="refs">
+          <h2>參考資料</h2>
+          <p class="small muted">查核日期為2026年10月1日。市場數據主表採2026年7月官方原文；8月數據按金管局9月30日公布的媒體報道及業界整理補充，正式提交前應以官方附件核對。業者網頁只支持其自述服務，不用於推定全行業成效；文內全部財務及服務目標均為本提案假設。</p>
+          <ol class="refs small">
+            <li>香港金融管理局 2026年7月住宅按揭統計。2026年8月31日公布。用於月度申請及批出規模。<br><a href="https://www.info.gov.hk/gia/general/202608/31/P2026083100508.htm" target="_blank" rel="noopener">https://www.info.gov.hk/gia/general/202608/31/P2026083100508.htm</a></li>
+            <li>經絡按揭轉介 常見問題。用於免費服務及協助多行申請的業者自述。<br><a href="https://www.mreferral.com/faq/" target="_blank" rel="noopener">https://www.mreferral.com/faq/</a></li>
+            <li>DBS Hong Kong One Minute Instant Approval。區分填寫申請、初步結果和其後文件核驗。<br><a href="https://www.dbs.com.hk/personal/loans/home-loans/one-min-approval" target="_blank" rel="noopener">https://www.dbs.com.hk/personal/loans/home-loans/one-min-approval</a></li>
+            <li>香港政府新聞網 現金回贈與按揭成數。2005年3月3日。說明沒有一律回贈上限及超過1%的成數處理；現行適用須銀行確認。<br><a href="https://www.news.gov.hk/isd/ebulletin/en/category/businessandfinance/050303/html/050303en03004.htm" target="_blank" rel="noopener">https://www.news.gov.hk/isd/ebulletin/en/category/businessandfinance/050303/html/050303en03004.htm</a></li>
+            <li>香港金融管理局 生成式AI消費者保障通告。正文日期2024年8月19日。支持問責、公平、人工介入及資料保障設計。<br><a href="https://brdr.hkma.gov.hk/eng/doc-ldg/docId/getPdf/20241107-1-EN/20241107-1-EN.pdf" target="_blank" rel="noopener">https://brdr.hkma.gov.hk/eng/doc-ldg/docId/getPdf/20241107-1-EN/20241107-1-EN.pdf</a></li>
+            <li>私隱專員公署 人工智能個人資料保障模範框架。2024年6月11日。支持風險評估、資料管理及持續監察。<br><a href="https://www.pcpd.org.hk/english/news_events/media_statements/press_20240611.html" target="_blank" rel="noopener">https://www.pcpd.org.hk/english/news_events/media_statements/press_20240611.html</a></li>
+            <li>工行杯 參賽指引。確認最多3名隊員等規則；香港賽區細節以主辦方通知及報名頁為準。<br><a href="https://www.gonghangbei.com/sszy.html" target="_blank" rel="noopener">https://www.gonghangbei.com/sszy.html</a></li>
+            <li>工行杯 作品提交截止通知。2026年9月20日。港澳台作品截止2026年10月19日24時。<br><a href="https://www.gonghangbei.com/index/Details/index.html?id=131" target="_blank" rel="noopener">https://www.gonghangbei.com/index/Details/index.html?id=131</a></li>
+            <li>香港電台 金管局2026年8月住宅按揭統計報道。2026年9月30日。用於8月新批貸款額及轉按貸款額變化；正式提交前以金管局原文核對。<br><a href="https://news.rthk.hk/rthk/ch/component/k2/1872158-20260930.htm" target="_blank" rel="noopener">https://news.rthk.hk/rthk/ch/component/k2/1872158-20260930.htm</a></li>
+            <li>香港經濟日報 經絡按揭轉介分析。2026年9月30日。業界按金管局數據整理的8月轉按宗數；屬二手整理，不作官方統計。<br><a href="https://ps.hket.com/article/4202507/" target="_blank" rel="noopener">https://ps.hket.com/article/4202507/</a></li>
+          </ol>
+        </div>
+      </article>
+    </section>
+
+    <!-- =====================================================
+         原型 App
+         ===================================================== -->
+    <section data-route="app" hidden>
+      <div class="page-head">
+        <h1>原型 App</h1>
+        <span class="tag sim">模擬</span>
+      </div>
+      <p class="muted">模擬 PRISM 嵌入本行手機銀行後的 5 步流程。客戶、資料及方案全部為合成示例，不連接任何銀行系統；非真實銀行畫面。</p>
+
+      <div class="app-layout">
+        <div class="phone">
+          <div class="phone-top">
+            <b>本行手機銀行 · PRISM</b>
+            <span>示意</span>
+          </div>
+          <div class="phone-body">
+            <ol class="steps" id="app-steps"></ol>
+            <div id="app-screen" class="screen" aria-live="polite"></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="card">
+            <h2>解釋服務 <span class="tag sim">固定核准說明</span></h2>
+            <p class="small muted">以核准條款庫和已核實結果回答問題；無來源不補寫，可轉人工。本演示不接入生成式 AI，相當於立項書「解釋服務失效時顯示核准固定說明」的模式。</p>
+            <label>
+              輸入你的問題
+              <input id="faq-query" type="text" placeholder="例如：優惠甚麼時候會被追回？">
+            </label>
+            <div class="actions" style="margin-top: 10px">
+              <button id="faq-ask" type="button" class="primary">查詢</button>
+            </div>
+            <div id="faq-answer" style="margin-top: 14px"></div>
+            <h3>常見問題</h3>
+            <div id="faq-list" class="faq-list"></div>
+          </div>
+
+          <div class="card">
+            <h2>本流程對應的立項書要求</h2>
+            <ul class="small">
+              <li>沒有外部報價也能完成本行申請；外部報價屬自選。</li>
+              <li>每項資料記用途、有效期及確認狀態；入帳不自動等同合資格收入。</li>
+              <li>條件方案帶編號、有效期、出具者及待完成核驗；不等於最終批核。</li>
+              <li>條款改動後舊核驗失效，須重新計算並重新確認。</li>
+              <li>同一案件顯示負責人、下一步、補件及優惠狀態。</li>
+              <li>已有有效中介轉介的交易不改標直客；資助房屋另行評估。</li>
+            </ul>
+            <p class="small muted">
+              <span class="tag plan">規劃</span> 行內資料重用接口、信貸及定價接口、AI 條款抽取，待銀行整合後才上線。
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================
+         持有期成本
+         ===================================================== -->
+    <section data-route="cost" hidden>
+      <div class="page-head">
+        <h1>持有期成本比較</h1>
+        <span class="tag done">已實作</span>
+      </div>
+      <p class="muted">用相同本金及年期，比較兩份方案在不同退出時間的淨融資成本。淨融資成本＝累計利息＋方案費用＋清還罰款＋已付回贈追回－實際已收回贈；未還本金另列。</p>
+
+      <div class="actions" style="margin: 16px 0 20px">
+        <button type="button" data-preset="teaching">立項書教學例子</button>
+        <button type="button" data-preset="missing">缺少追回條款</button>
+        <button type="button" data-preset="broker">PRISM vs 中介加碼 0.23%</button>
+        <button type="button" data-preset="direct">PRISM vs 中介加碼 0.15%</button>
+        <button type="button" data-preset="rate">PRISM 利率較高</button>
+        <button type="button" data-preset="early">第 18 月退出</button>
+      </div>
+
+      <form id="cost-form" novalidate>
+        <section class="card">
+          <h2>共同條件</h2>
+          <div id="cost-common" class="fields three"></div>
+          <div id="channel-wrap" style="margin-top: 14px">
+            <label>
+              直達渠道資格情境
+              <select id="cost-channel">
+                <option value="clear">示例／已確認：沒有有效中介轉介衝突</option>
+                <option value="unknown">尚未確認資格</option>
+                <option value="conflict">已有有效中介轉介</option>
+              </select>
+            </label>
+            <p class="small muted">只在其中一份方案為「PRISM 直達」時適用。首期擬議本金範圍為 HK$200萬至500萬。</p>
+          </div>
+        </section>
+
+        <div class="columns">
+          <section class="card" id="offer-A"></section>
+          <section class="card" id="offer-B"></section>
+        </div>
+
+        <section class="card">
+          <h2>核對輸入</h2>
+          <p id="cost-source" class="small muted"></p>
+          <label class="check">
+            <input id="cost-confirmed" type="checkbox">
+            <span>我已核對本次輸入及條款；如使用示例，我理解其並非實際銀行報價。此勾選不代表銀行已核實或批准。</span>
+          </label>
+          <div class="actions">
+            <button class="primary" type="submit">計算兩方案總成本</button>
+            <button id="cost-export" type="button" disabled>匯出比較 JSON</button>
+            <label class="file-button">
+              匯入比較 JSON
+              <input id="cost-import" type="file" accept=".json,application/json" hidden>
+            </label>
+          </div>
+          <p id="cost-message" class="message" role="alert"></p>
+        </section>
+      </form>
+
+      <section id="cost-result" hidden>
+        <div id="cost-headline" class="card result" aria-live="polite">
+          <h2 id="cost-title"></h2>
+          <div id="cost-difference" class="amount"></div>
+          <p id="cost-description"></p>
+        </div>
+
+        <div class="card">
+          <h2>按退出時間比較</h2>
+          <div class="table-wrap">
+            <table class="num">
+              <thead id="exit-head"></thead>
+              <tbody id="exit-rows"></tbody>
+            </table>
+          </div>
+          <p id="crossover-note" class="small"></p>
+          <div class="chart" id="cost-chart"></div>
+          <p class="legend"><i style="background: var(--teal)"></i><span id="chart-legend"></span></p>
+        </div>
+
+        <div class="card">
+          <h2 id="breakdown-title">完整成本明細</h2>
+          <div class="table-wrap">
+            <table class="num">
+              <thead id="breakdown-head"></thead>
+              <tbody id="breakdown-rows"></tbody>
+            </table>
+          </div>
+          <p id="pending-note" class="small muted"></p>
+        </div>
+      </section>
+
+      <details class="card">
+        <summary><strong>計算假設與範圍</strong></summary>
+        <ul class="small">
+          <li>固定年利率、按月等額供款，於指定月份供款後全清。金額未折現，不預測 HIBOR 或未來浮動利率。</li>
+          <li>第 0 月代表取用時支付；第 1 月代表首期供款後支付。模型假設當月支付先於當月退出。PRISM「30 日內支付」以第 1 月近似。</li>
+          <li>罰款按退出時未還本金計算。回贈在各自追回期內提前全清時，按全數追回處理；0 個月代表沒有該追回／罰息期。正常到期還款不屬提前清還。</li>
+          <li>尚未收到的回贈不提前扣減成本；未付而被取消的回贈，不當作現金追回重複計算。</li>
+          <li>條款未知不當作零：罰息或回贈追回條款未知時，停止完整排名。</li>
+          <li>本版不計算部分還款後的利息、供款及餘額變化（PRISM 優惠的部分還本追回見「優惠與成數」頁）。</li>
+          <li>數據只在本頁記憶體處理，不會上傳；重新整理前請自行匯出。</li>
+        </ul>
+      </details>
+    </section>
+
+    <!-- =====================================================
+         優惠與成數
+         ===================================================== -->
+    <section data-route="offer" hidden>
+      <div class="page-head">
+        <h1>PRISM 優惠與按揭成數</h1>
+        <span class="tag done">已實作</span>
+      </div>
+      <p class="muted">擬議政策：PRISM 加碼為實際取用本金 0.20%，每宗上限 HK$10,000；銀行基本回贈另列。全部屬待批准政策。</p>
+
+      <div class="columns">
+        <section class="card">
+          <h2>加碼支付與追回</h2>
+          <div class="fields">
+            <label>實際取用本金（HK$）<input id="of-principal" type="number" min="1" step="any" inputmode="decimal"></label>
+            <label>全清或轉按離行月份（留空＝未全清）<input id="of-exit" type="number" min="1" max="600" step="1" inputmode="numeric"></label>
+          </div>
+          <h3>期內非例行部分還本</h3>
+          <div id="of-prepay" class="row-list"></div>
+          <div class="actions">
+            <button id="of-add" type="button">＋ 加一筆部分還本</button>
+            <button id="of-example" type="button">載入立項書例子</button>
+          </div>
+          <p id="of-message" class="message" role="alert"></p>
+        </section>
+
+        <section class="card">
+          <h2>結果</h2>
+          <dl class="kv" id="of-summary"></dl>
+          <div class="table-wrap">
+            <table class="num fit">
+              <thead><tr><th>事件</th><th>追回</th><th>累計追回</th><th>客戶保留</th></tr></thead>
+              <tbody id="of-rows"></tbody>
+            </table>
+          </div>
+          <p class="small muted">取用後30曆日內支付；取用日起至24個月屆滿當日全清或轉按離行，追回未曾追回的已付PRISM餘額，取消未付部分。期內非例行部分還本按原優惠乘以還本額佔原本金比例調整，正常供款不調整。原銀行基本回贈及清還罰款另計，不得重複追回同一優惠。</p>
+        </section>
+      </div>
+
+      <div class="columns">
+        <section class="card">
+          <h2>現金回贈與按揭成數</h2>
+          <div class="fields">
+            <label>貸款額（HK$）<input id="ltv-loan" type="number" min="1" step="any" inputmode="decimal"></label>
+            <label>物業估值（HK$）<input id="ltv-value" type="number" min="1" step="any" inputmode="decimal"></label>
+            <label>銀行基本回贈（%）<input id="ltv-basic" type="number" min="0" max="20" step="any" inputmode="decimal"></label>
+            <label>其他現金回贈（HK$）<input id="ltv-other" type="number" min="0" step="any" inputmode="decimal"></label>
+            <label>適用成數上限（%）<input id="ltv-cap" type="number" min="1" max="100" step="any" inputmode="decimal"></label>
+            <label>是否計入 PRISM 加碼
+              <select id="ltv-prism">
+                <option value="yes">計入（0.20%，上限 10,000）</option>
+                <option value="no">不計入</option>
+              </select>
+            </label>
+          </div>
+          <p class="small muted">適用成數上限按物業類型、價格及借款人情況而定，須由銀行確認；此處只作試算輸入。</p>
+          <div class="actions">
+            <button id="ltv-example" type="button">載入立項書例子</button>
+          </div>
+          <p id="ltv-message" class="message" role="alert"></p>
+        </section>
+
+        <section class="card">
+          <h2>成數結果</h2>
+          <dl class="kv" id="ltv-summary"></dl>
+          <div id="ltv-verdict" style="margin-top: 14px"></div>
+          <p class="small muted">金管局2005年公布的處理原則並非一律把現金回贈限制在1%。回贈超過貸款額1%時，須把該筆回贈計入貸款額計算按揭成數，而非只計超出部分。試點前由銀行合規確認優惠分類、合併計算及現行適用要求，不能透過改名或拆筆迴避。</p>
+        </section>
+      </div>
+
+      <div class="card">
+        <h2>優惠規則</h2>
+        <ul>
+          <li>本案不設按中介報價補差：核實外部中介報價即表示客戶已接觸中介，容易引起轉介歸屬爭議，亦增加渠道誤標風險。</li>
+          <li>若中介或其他銀行提供較高優惠，系統按相同持有期口徑照實顯示差距，由客戶自行選擇；未確認個人資格的公開優惠，只可列為參考。</li>
+          <li>發出有效優惠前須完成預算預留及雙人覆核。不得改寫有效轉介來源、重複付獎，或藉降低基本回贈抵銷加碼。</li>
+          <li>已接受且有效的優惠不因事後預算不足而減少。</li>
+          <li>每份優惠書須列確切有效日、預計支付日、追回截止日及部分還本安排。</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- =====================================================
+         財務模型
+         ===================================================== -->
+    <section data-route="finance" hidden>
+      <div class="page-head">
+        <h1>銀行財務模型</h1>
+        <span class="tag done">已實作</span>
+        <span class="tag sim">管理情境假設</span>
+      </div>
+      <p class="muted">主模型只衡量「本來仍會在本行取用，但由轉介改為直接申請」的渠道替代效益。以下全部為待驗證的管理情境假設，不是市場平均或銀行已確認條件。修改任何數字，結果即時更新。</p>
+
+      <form id="fin-form" novalidate>
+        <section class="card">
+          <h2>每宗假設　U＝αPc−R−v−A</h2>
+          <div id="fin-unit" class="fields four"></div>
+        </section>
+        <section class="card">
+          <h2>年度假設</h2>
+          <div id="fin-years" class="fields five"></div>
+          <div id="fin-global" class="fields three" style="margin-top: 14px"></div>
+          <div class="actions" style="margin-top: 16px">
+            <button id="fin-reset" type="button">恢復管理情境</button>
+          </div>
+          <p id="fin-message" class="message" role="alert"></p>
+        </section>
+      </form>
+
+      <section id="fin-result">
+        <div class="kpis" id="fin-kpis"></div>
+
+        <div class="card">
+          <h2>每宗收支</h2>
+          <div class="table-wrap">
+            <table class="num">
+              <thead><tr><th>項目</th><th>計算</th><th>每宗 港元</th></tr></thead>
+              <tbody id="fin-unit-rows"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>五年情境（萬港元，宗數除外）</h2>
+          <div class="table-wrap">
+            <table class="num">
+              <thead><tr><th>項目</th><th>Y1</th><th>Y2</th><th>Y3</th><th>Y4</th><th>Y5</th></tr></thead>
+              <tbody id="fin-year-rows"></tbody>
+            </table>
+          </div>
+          <div class="chart" id="fin-chart"></div>
+          <p class="legend">
+            <i style="background: #7cc8bb"></i>年度營運淨額（正）
+            <i style="background: #e3a3a5; margin-left: 12px"></i>年度營運淨額（負）
+            <i style="background: var(--navy); margin-left: 12px"></i>含T0累計淨額
+          </p>
+          <p class="small muted">稅前增量現金流，沒有終值或追回回贈收入，不等於會計淨利。</p>
+        </div>
+
+        <div class="card">
+          <h2>投資門檻</h2>
+          <dl class="kv" id="fin-threshold"></dl>
+          <p class="small muted">門檻必須以對照及實付資料驗證；有效節佣比例的上限以本行過去12至24個月出糧客戶按揭經中介辦理的比例為錨，不應高於該歷史比例。</p>
+        </div>
+
+        <div class="card">
+          <h2>不利情境</h2>
+          <p class="small muted">除列明變數外，其餘維持你在上方輸入的假設（預設即立項書管理情境）。</p>
+          <div class="table-wrap">
+            <table class="num">
+              <thead><tr><th>改變的假設</th><th>每宗貢獻 元</th><th>五年淨現值 萬</th></tr></thead>
+              <tbody id="fin-sens-rows"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div>
+          <div class="card">
+            <h2>客戶來源漏斗</h2>
+            <div id="fin-funnel" class="fields five"></div>
+            <div class="table-wrap">
+              <table class="num">
+                <thead><tr><th>營運年</th><th>Y1</th><th>Y2</th><th>Y3</th><th>Y4</th><th>Y5</th></tr></thead>
+                <tbody id="fin-funnel-rows"></tbody>
+              </table>
+            </div>
+            <p class="small muted">各比例尚待CRM名單與試點證明；可觸達客戶不等於有按揭意向者。名單不足即下修取用目標。</p>
+          </div>
+
+          <div class="card">
+            <h2>附加情境：到期續留</h2>
+            <div id="fin-retain" class="fields"></div>
+            <div class="table-wrap">
+              <table class="num">
+                <thead><tr><th>需抵消的情境</th><th>淨現值缺口 萬</th><th>每年所需帳戶年</th></tr></thead>
+                <tbody id="fin-retain-rows"></tbody>
+              </table>
+            </div>
+            <p class="small muted">主情境不計本行續留。所需帳戶年＝淨現值缺口÷五年年金因子÷每帳戶年貢獻；未扣續留優惠。對照結果成立前，不併入主情境。</p>
+          </div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <footer>
+    PRISM 直達按揭 · 2026 工行杯參賽項目示範網站 · 香港恒生大學<br>
+    全部為合成示例及待驗證假設，不構成銀行報價、審批、優惠承諾或財務建議。
+  </footer>
+
+  <script>
+    "use strict";
+
+    // =========================================================
+    // PRISM 直達按揭 示範網站
+    //
+    // 兼容性：只使用 ES2015–ES2017 語法（不用 ?.、Object.hasOwn、
+    // 物件展開等較新寫法），讓較舊的手機、微信及國產瀏覽器也能運行。
+    // 全部計算在瀏覽器內完成，不上傳任何資料。
+    // =========================================================
+
+    // =========================================================
+    // 0. 通用工具
+    // =========================================================
+
+    const $ = id => document.getElementById(id);
+
+    const has = (object, key) =>
+      Object.prototype.hasOwnProperty.call(object, key);
+
+    const esc = value => String(value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+
+    const roundMoney = value => {
+      return Math.round((value + Number.EPSILON) * 100) / 100;
+    };
+
+    // 與原版 v3 相同的金額格式。
+    const money = value => {
+      return "HK$" + value.toLocaleString("en-HK", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+    };
+
+    function fmt(value, digits) {
+      const d = digits === undefined ? 0 : digits;
+      const text = Math.abs(value).toLocaleString("en-US", {
+        minimumFractionDigits: d,
+        maximumFractionDigits: d
+      });
+      const zero = Number(text.replace(/,/g, "")) === 0;
+
+      return (value < 0 && !zero ? "−" : "") + text;
+    }
+
+    // 最多保留 digits 位小數，去掉尾部的 0（例如 0.450 → 0.45）。
+    function trim(value, digits) {
+      return fmt(value, digits).replace(/(\.\d*?)0+$/, "$1").replace(/\.$/, "");
+    }
+
+    function signed(value, digits) {
+      const text = fmt(value, digits);
+      return value > 0 && Number(text.replace(/[^\d.]/g, "")) !== 0
+        ? "+" + text
+        : text;
+    }
+
+    function clearChildren(node) {
+      while (node.firstChild) {
+        node.removeChild(node.firstChild);
+      }
+    }
+
+    function isoDate(date) {
+      const pad = n => (n < 10 ? "0" : "") + n;
+      return date.getFullYear() + "-" + pad(date.getMonth() + 1) + "-" + pad(date.getDate());
+    }
+
+    function readNumber(id, label, min, max, integer, allowEmpty) {
+      const input = $(id);
+      const text = input.value.trim();
+
+      if (text === "") {
+        if (allowEmpty) {
+          return null;
+        }
+        throw new Error("請填寫：" + label);
+      }
+
+      const value = input.valueAsNumber;
+
+      if (
+        !Number.isFinite(value) ||
+        value < min ||
+        value > max ||
+        (integer && !Number.isInteger(value))
+      ) {
+        throw new Error(
+          label + "須為 " + min + " 至 " + max +
+          (integer ? " 的整數。" : " 之間的數值。")
+        );
+      }
+
+      return value;
+    }
+
+    // =========================================================
+    // 1. 頁面路由（#home、#proposal …）
+    // =========================================================
+
+    const ROUTES = ["home", "proposal", "app", "cost", "offer", "finance"];
+    let currentRoute = null;
+
+    function showRoute() {
+      let route = location.hash.replace(/^#/, "");
+
+      if (ROUTES.indexOf(route) < 0) {
+        route = "home";
+      }
+
+      const sections = document.querySelectorAll("[data-route]");
+
+      for (let i = 0; i < sections.length; i++) {
+        sections[i].hidden = sections[i].getAttribute("data-route") !== route;
+      }
+
+      const links = document.querySelectorAll("[data-nav]");
+
+      for (let i = 0; i < links.length; i++) {
+        const active = links[i].getAttribute("data-nav") === route;
+        links[i].className = active ? "active" : "";
+        if (active) {
+          links[i].setAttribute("aria-current", "page");
+        } else {
+          links[i].removeAttribute("aria-current");
+        }
+      }
+
+      if (route !== currentRoute) {
+        currentRoute = route;
+        window.scrollTo(0, 0);
+      }
+    }
+
+    window.addEventListener("hashchange", showRoute);
+
+    // 立項書目錄：在頁內捲動，不改變路由。
+    (function () {
+      const buttons = document.querySelectorAll("[data-scroll]");
+
+      for (let i = 0; i < buttons.length; i++) {
+        buttons[i].addEventListener("click", () => {
+          const target = $(buttons[i].getAttribute("data-scroll"));
+          if (target) {
+            target.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
+        });
+      }
+    })();
+
+    // 語言切換：記住選擇並保留目前頁面。
+    $("lang-toggle").addEventListener("click", event => {
+      const target = event.currentTarget;
+
+      try {
+        localStorage.setItem("prism-lang", target.getAttribute("data-lang"));
+      } catch (error) {
+        // 私密模式等情況下無法儲存，仍可切換。
+      }
+
+      target.href = target.getAttribute("href").split("#")[0] + location.hash;
+    });
+
+    // =========================================================
+    // 2. 擬議政策
+    // 百分比採一般輸入方式：0.20 代表 0.20%，不是 20%。
+    // =========================================================
+
+    const POLICY = Object.freeze({
+      version: "PRISM-v3-core",
+      extraRate: 0.20,
+      extraCap: 10000,
+      extraPayMonth: 1,
+      extraClawbackMonths: 24,
+      minimumPrincipal: 2000000,
+      maximumPrincipal: 5000000
+    });
+
+    // =========================================================
+    // 3. 持有期成本引擎（與原版 v3 計算完全相同）
+    // =========================================================
+
+    // 月供：P × i / [1 - (1+i)^(-n)]，i = 年利率 / 1200
+    function amortize(principal, annualRate, months, held) {
+      const monthlyRate = annualRate / 1200;
+
+      const payment = monthlyRate === 0
+        ? principal / months
+        : principal * monthlyRate /
+          (-Math.expm1(-months * Math.log1p(monthlyRate)));
+
+      let balance = principal;
+      let interest = 0;
+
+      for (let month = 1; month <= held; month++) {
+        const monthlyInterest = balance * monthlyRate;
+
+        interest += monthlyInterest;
+
+        balance = Math.max(
+          0,
+          balance + monthlyInterest - payment
+        );
+      }
+
+      if (held === months) {
+        balance = 0;
+      }
+
+      return {
+        payment,
+        interest,
+        balance
+      };
+    }
+
+    // amount：核定金額；received：退出時已收到；clawback：已支付但須追回；
+    // cancelled：未支付但因提前退出而取消；pending：未收到且未取消；
+    // retained：已收並可保留。
+    function calculateAward(
+      amount,
+      payMonth,
+      clawbackMonths,
+      held,
+      early
+    ) {
+      amount = roundMoney(amount);
+
+      const received = payMonth <= held ? amount : 0;
+
+      const exitsInsidePeriod =
+        early &&
+        clawbackMonths > 0 &&
+        held <= clawbackMonths;
+
+      const clawback = exitsInsidePeriod
+        ? received
+        : 0;
+
+      const cancelled =
+        exitsInsidePeriod && received === 0
+          ? amount
+          : 0;
+
+      return {
+        amount,
+        received,
+        clawback,
+        cancelled,
+
+        pending: Math.max(
+          0,
+          amount - received - cancelled
+        ),
+
+        retained: received - clawback
+      };
+    }
+
+    const OFFER_KINDS = {
+      prism: "PRISM 直達",
+      broker: "中介渠道",
+      other: "其他方案／維持原貸款"
+    };
+
+    // 欄位格式：[標籤、最小值、最大值、是否必須為整數]
+    const COMMON_FIELDS = {
+      principal: ["實際取用本金（HK$）", 1, 100000000, false],
+      months: ["供款期（月）", 1, 600, true],
+      horizon: ["預計持有期（月）", 1, 600, true]
+    };
+
+    const OFFER_FIELDS = {
+      rate: ["年利率（%）", 0, 30, false],
+      basic: ["銀行基本回贈（%）", 0, 20, false],
+      fees: ["全部方案費用（HK$）", 0, 10000000, false],
+      extra: ["渠道額外回贈（%）", 0, 20, false],
+      extraCap: ["額外回贈上限；0＝無上限（HK$）", 0, 10000000, false],
+      basicPay: ["基本回贈支付月", 0, 600, true],
+      basicClaw: ["基本回贈追回期（月）", 0, 600, true],
+      extraPay: ["額外回贈支付月", 0, 600, true],
+      extraClaw: ["額外回贈追回期（月）", 0, 600, true],
+      penalty: ["提前清還罰款（%）", 0, 20, false],
+      penaltyMonths: ["罰息期（月）", 0, 600, true]
+    };
+
+    const MAIN_OFFER_KEYS = ["rate", "basic", "fees", "extra", "extraCap"];
+    const TERM_OFFER_KEYS = [
+      "basicPay", "basicClaw", "extraPay", "extraClaw",
+      "penalty", "penaltyMonths"
+    ];
+    const PRISM_LOCKED = {
+      extra: POLICY.extraRate,
+      extraCap: POLICY.extraCap,
+      extraPay: POLICY.extraPayMonth,
+      extraClaw: POLICY.extraClawbackMonths
+    };
+
+    function validateOffer(offer, name) {
+      if (!offer || typeof offer !== "object" || Array.isArray(offer)) {
+        throw new Error(name + "：輸入格式無效。");
+      }
+
+      for (const key of Object.keys(offer)) {
+        if (!has(OFFER_FIELDS, key)) {
+          throw new Error(name + "：輸入包含未支援的欄位。");
+        }
+      }
+
+      for (const key of Object.keys(OFFER_FIELDS)) {
+        const def = OFFER_FIELDS[key];
+        const value = offer[key];
+
+        if (
+          typeof value !== "number" ||
+          !Number.isFinite(value) ||
+          value < def[1] ||
+          value > def[2] ||
+          (def[3] && !Number.isInteger(value))
+        ) {
+          throw new Error(
+            name + "：" + def[0] + "須為 " + def[1] + " 至 " + def[2] +
+            (def[3] ? " 的整數。" : " 之間的數值。")
+          );
+        }
+      }
+    }
+
+    function validateCostInputs(x) {
+      if (!x || typeof x !== "object" || Array.isArray(x)) {
+        throw new Error("輸入格式無效。");
+      }
+
+      for (const key of Object.keys(x)) {
+        if (!has(COMMON_FIELDS, key) && key !== "A" && key !== "B") {
+          throw new Error("輸入包含未支援的欄位。");
+        }
+      }
+
+      for (const key of Object.keys(COMMON_FIELDS)) {
+        const def = COMMON_FIELDS[key];
+        const value = x[key];
+
+        if (
+          typeof value !== "number" ||
+          !Number.isFinite(value) ||
+          value < def[1] ||
+          value > def[2] ||
+          (def[3] && !Number.isInteger(value))
+        ) {
+          throw new Error(
+            def[0] + "須為 " + def[1] + " 至 " + def[2] +
+            (def[3] ? " 的整數。" : " 之間的數值。")
+          );
+        }
+      }
+
+      validateOffer(x.A, "方案 A");
+      validateOffer(x.B, "方案 B");
+
+      if (x.horizon > x.months) {
+        throw new Error("持有期不可超過供款期。");
+      }
+
+      return x;
+    }
+
+    // 單一方案在指定退出月份的成本。
+    function evaluateOffer(o, principal, months, held) {
+      const early = held < months;
+      const result = amortize(principal, o.rate, months, held);
+
+      result.basic = calculateAward(
+        principal * o.basic / 100,
+        o.basicPay,
+        o.basicClaw,
+        held,
+        early
+      );
+
+      const rawExtra = principal * o.extra / 100;
+      const cappedExtra = o.extraCap > 0
+        ? Math.min(rawExtra, o.extraCap)
+        : rawExtra;
+
+      result.extra = calculateAward(
+        cappedExtra,
+        o.extraPay,
+        o.extraClaw,
+        held,
+        early
+      );
+
+      result.fees = o.fees;
+
+      const insidePenaltyPeriod =
+        early &&
+        held <= o.penaltyMonths;
+
+      result.penalty = insidePenaltyPeriod
+        ? result.balance * o.penalty / 100
+        : 0;
+
+      result.received = result.basic.received + result.extra.received;
+      result.clawback = result.basic.clawback + result.extra.clawback;
+      result.cancelled = result.basic.cancelled + result.extra.cancelled;
+      result.pending = result.basic.pending + result.extra.pending;
+      result.retained = result.received - result.clawback;
+
+      result.cost =
+        result.interest +
+        result.fees +
+        result.penalty +
+        result.clawback -
+        result.received;
+
+      result.early = early;
+
+      return result;
+    }
+
+    // 雙方案計算；排名完全按計算結果，不預設任何一方勝出。
+    function calculateOffers(input) {
+      const x = validateCostInputs(input);
+      const held = x.horizon;
+
+      const A = evaluateOffer(x.A, x.principal, x.months, held);
+      const B = evaluateOffer(x.B, x.principal, x.months, held);
+
+      return {
+        A,
+        B,
+        held,
+
+        // 負數：A 成本較低；正數：B 成本較低。
+        difference: A.cost - B.cost
+      };
+    }
+
+    // 條款未知時，哪些結果無法確定（未知不當零）。
+    function unknownImpact(unknown, result) {
+      const early = result.early;
+      const hasAward = result.basic.amount > 0 || result.extra.amount > 0;
+
+      return {
+        penalty: early && unknown.penalty,
+        claw: early && unknown.claw && hasAward,
+        cost: early && (unknown.penalty || (unknown.claw && hasAward))
+      };
+    }
+
+    // =========================================================
+    // 4. 持有期成本：表單
+    // =========================================================
+
+    const cost = {
+      source: "已載入合成示例，並非銀行實際報價",
+      report: null
+    };
+
+    function buildCostForm() {
+      const common = $("cost-common");
+
+      for (const key of Object.keys(COMMON_FIELDS)) {
+        const def = COMMON_FIELDS[key];
+        common.insertAdjacentHTML(
+          "beforeend",
+          '<label for="c-' + key + '">' + esc(def[0]) +
+          '<input id="c-' + key + '" name="' + key + '" type="number" min="' +
+          def[1] + '" max="' + def[2] + '" step="' + (def[3] ? "1" : "any") +
+          '" inputmode="' + (def[3] ? "numeric" : "decimal") + '" required></label>'
+        );
+      }
+
+      ["A", "B"].forEach(side => {
+        const card = $("offer-" + side);
+        const field = key => {
+          const def = OFFER_FIELDS[key];
+          return '<label for="' + side + "-" + key + '">' + esc(def[0]) +
+            '<input id="' + side + "-" + key + '" name="' + key +
+            '" type="number" min="' + def[1] + '" max="' + def[2] +
+            '" step="' + (def[3] ? "1" : "any") + '" inputmode="' +
+            (def[3] ? "numeric" : "decimal") + '" required></label>';
+        };
+
+        let kinds = "";
+        for (const kind of Object.keys(OFFER_KINDS)) {
+          kinds += '<option value="' + kind + '">' + esc(OFFER_KINDS[kind]) + "</option>";
+        }
+
+        card.innerHTML =
+          "<h2>方案 " + side + "</h2>" +
+          '<div class="fields">' +
+          '<label for="' + side + '-name">方案名稱<input id="' + side +
+          '-name" type="text" maxlength="24"></label>' +
+          '<label for="' + side + '-kind">渠道類型<select id="' + side +
+          '-kind">' + kinds + "</select></label>" +
+          MAIN_OFFER_KEYS.map(field).join("") +
+          "</div>" +
+          '<div class="notice" id="' + side + '-policy" style="margin: 14px 0 0" hidden>' +
+          "<strong>擬議 PRISM 加碼：0.20%</strong><br>" +
+          '<span class="small">上限 HK$10,000，銀行基本回贈另計。此月度模型在第 1 月計入加碼，提前全清追回期為 24 個月，包含第 24 月。</span>' +
+          "</div>" +
+          '<details style="margin-top: 14px">' +
+          "<summary>支付、追回及提前清還條款</summary>" +
+          '<div class="fields" style="margin-top: 12px">' +
+          TERM_OFFER_KEYS.map(field).join("") +
+          "</div>" +
+          '<label class="check"><input type="checkbox" id="' + side +
+          '-penaltyUnknown"><span>提前清還罰款條款未知（未提供或未核實）</span></label>' +
+          '<label class="check"><input type="checkbox" id="' + side +
+          '-clawUnknown"><span>回贈追回條款未知（未提供或未核實）</span></label>' +
+          "</details>";
+
+        $(side + "-kind").addEventListener("change", () => applyKind(side));
+        $(side + "-penaltyUnknown").addEventListener("change", () => applyUnknown(side));
+        $(side + "-clawUnknown").addEventListener("change", () => applyUnknown(side));
+      });
+    }
+
+    function applyKind(side) {
+      const prism = $(side + "-kind").value === "prism";
+
+      for (const key of Object.keys(PRISM_LOCKED)) {
+        const input = $(side + "-" + key);
+        if (prism) {
+          input.value = String(PRISM_LOCKED[key]);
+        }
+        input.disabled = prism;
+      }
+
+      $(side + "-policy").hidden = !prism;
+      applyUnknown(side);
+      updateChannelVisibility();
+    }
+
+    function applyUnknown(side) {
+      const prism = $(side + "-kind").value === "prism";
+      const penaltyUnknown = $(side + "-penaltyUnknown").checked;
+      const clawUnknown = $(side + "-clawUnknown").checked;
+
+      $(side + "-penalty").disabled = penaltyUnknown;
+      $(side + "-penaltyMonths").disabled = penaltyUnknown;
+      $(side + "-basicClaw").disabled = clawUnknown;
+      $(side + "-extraClaw").disabled = clawUnknown || prism;
+    }
+
+    function updateChannelVisibility() {
+      $("channel-wrap").hidden =
+        $("A-kind").value !== "prism" && $("B-kind").value !== "prism";
+    }
+
+    function setCostState(state) {
+      for (const key of Object.keys(COMMON_FIELDS)) {
+        $("c-" + key).value = String(state.inputs[key]);
+      }
+
+      ["A", "B"].forEach(side => {
+        $(side + "-name").value = state.names[side];
+        $(side + "-kind").value = state.kinds[side];
+
+        for (const key of Object.keys(OFFER_FIELDS)) {
+          $(side + "-" + key).value = String(state.inputs[side][key]);
+        }
+
+        $(side + "-penaltyUnknown").checked = !!state.unknown[side].penalty;
+        $(side + "-clawUnknown").checked = !!state.unknown[side].claw;
+
+        applyKind(side);
+      });
+
+      $("cost-channel").value = state.channel || "clear";
+    }
+
+    function readCostState() {
+      const inputs = {};
+
+      for (const key of Object.keys(COMMON_FIELDS)) {
+        const def = COMMON_FIELDS[key];
+        inputs[key] = readNumber("c-" + key, def[0], def[1], def[2], def[3]);
+      }
+
+      const names = {};
+      const kinds = {};
+      const unknown = {};
+
+      ["A", "B"].forEach(side => {
+        const label = "方案 " + side + "：";
+        unknown[side] = {
+          penalty: $(side + "-penaltyUnknown").checked,
+          claw: $(side + "-clawUnknown").checked
+        };
+        kinds[side] = $(side + "-kind").value;
+        names[side] = $(side + "-name").value.trim() || ("方案 " + side);
+        inputs[side] = {};
+
+        for (const key of Object.keys(OFFER_FIELDS)) {
+          const def = OFFER_FIELDS[key];
+          const ignored =
+            (unknown[side].penalty && (key === "penalty" || key === "penaltyMonths")) ||
+            (unknown[side].claw && (key === "basicClaw" || key === "extraClaw"));
+
+          if (ignored && $(side + "-" + key).value.trim() === "") {
+            inputs[side][key] = 0;
+          } else {
+            inputs[side][key] = readNumber(
+              side + "-" + key, label + def[0], def[1], def[2], def[3]
+            );
+          }
+        }
+
+        if (kinds[side] === "prism") {
+          for (const key of Object.keys(PRISM_LOCKED)) {
+            inputs[side][key] = PRISM_LOCKED[key];
+          }
+        }
+      });
+
+      return {
+        inputs: validateCostInputs(inputs),
+        names,
+        kinds,
+        unknown,
+        channel: $("cost-channel").value
+      };
+    }
+
+    // ---------- 示例情境 ----------
+
+    function offerTerms(values) {
+      return Object.assign({
+        rate: 3.5,
+        basic: 0,
+        fees: 0,
+        extra: 0,
+        extraCap: 0,
+        basicPay: 1,
+        basicClaw: 0,
+        extraPay: 1,
+        extraClaw: 0,
+        penalty: 0,
+        penaltyMonths: 0
+      }, values);
+    }
+
+    function prismVersusBroker(overrides) {
+      const o = overrides || {};
+
+      const state = {
+        names: { A: "PRISM 直達方案", B: "中介渠道方案" },
+        kinds: { A: "prism", B: "broker" },
+        unknown: { A: {}, B: {} },
+        channel: "clear",
+        inputs: {
+          principal: 4000000,
+          months: 360,
+          horizon: o.horizon || 36,
+          A: offerTerms({
+            rate: o.rateA || 3.5,
+            basic: 0.8,
+            extra: POLICY.extraRate,
+            extraCap: POLICY.extraCap,
+            extraPay: POLICY.extraPayMonth,
+            extraClaw: POLICY.extraClawbackMonths,
+            basicClaw: 24,
+            penalty: 1,
+            penaltyMonths: 24
+          }),
+          B: offerTerms({
+            basic: 0.8,
+            extra: o.extraB === undefined ? 0.23 : o.extraB,
+            extraClaw: 24,
+            basicClaw: 24,
+            penalty: 1,
+            penaltyMonths: 24
+          })
+        }
+      };
+
+      return state;
+    }
+
+    // 立項書第3章教學例子：原貸款500萬元、30年、3.5%，已供36月。
+    const TEACHING_PRINCIPAL = 4701770.78;
+
+    function teachingExample(missingClaw) {
+      return {
+        names: { A: "A 維持原貸款", B: "B 轉按方案" },
+        kinds: { A: "other", B: "other" },
+        unknown: { A: {}, B: { claw: !!missingClaw } },
+        channel: "clear",
+        inputs: {
+          principal: TEACHING_PRINCIPAL,
+          months: 324,
+          horizon: 36,
+          A: offerTerms({ rate: 3.5 }),
+          B: offerTerms({
+            rate: 3.6,
+            fees: 10000,
+            basic: 1,
+            basicPay: 0,
+            basicClaw: 24,
+            penalty: 1,
+            penaltyMonths: 24
+          })
+        }
+      };
+    }
+
+    const COST_PRESETS = {
+      teaching: () => teachingExample(false),
+      missing: () => teachingExample(true),
+      broker: () => prismVersusBroker(),
+      direct: () => prismVersusBroker({ extraB: 0.15 }),
+      rate: () => prismVersusBroker({ rateA: 3.6, extraB: 0 }),
+      early: () => prismVersusBroker({ horizon: 18 })
+    };
+
+    function loadCostPreset(name) {
+      setCostState(COST_PRESETS[name]());
+      cost.source = "已載入合成示例，並非銀行實際報價";
+      $("cost-source").textContent = cost.source;
+      $("cost-confirmed").checked = false;
+      invalidateCost();
+    }
+
+    function invalidateCost() {
+      cost.report = null;
+      $("cost-result").hidden = true;
+      $("cost-export").disabled = true;
+      $("cost-message").textContent = "";
+    }
+
+    // ---------- 計算與顯示 ----------
+
+    function exitMonthsFor(inputs) {
+      const list = [12, 24, 25, 36, inputs.horizon, inputs.months]
+        .filter(m => m >= 1 && m <= inputs.months);
+
+      return list
+        .filter((m, i) => list.indexOf(m) === i)
+        .sort((a, b) => a - b)
+        .slice(0, 8);
+    }
+
+    function runCost(state) {
+      const x = state.inputs;
+      const anyPrism = state.kinds.A === "prism" || state.kinds.B === "prism";
+
+      if (anyPrism) {
+        if (
+          x.principal < POLICY.minimumPrincipal ||
+          x.principal > POLICY.maximumPrincipal
+        ) {
+          throw new Error(
+            "本金超出首期擬議 HK$200萬至500萬範圍。" +
+            "本版不以此加碼政策對超範圍貸款作優劣排名。"
+          );
+        }
+
+        if (state.channel !== "clear") {
+          throw new Error(
+            "直達渠道資格未確認或存在中介轉介衝突，" +
+            "請先由銀行覆核；本版暫停優惠排名。"
+          );
+        }
+      }
+
+      const result = calculateOffers(x);
+
+      const exits = exitMonthsFor(x).map(month => {
+        const input = Object.assign({}, x, { horizon: month });
+        const r = calculateOffers(input);
+        return {
+          month,
+          A: r.A,
+          B: r.B,
+          unknownA: unknownImpact(state.unknown.A, r.A),
+          unknownB: unknownImpact(state.unknown.B, r.B)
+        };
+      });
+
+      const series = [];
+      const chartEnd = Math.min(x.months, Math.max(60, Math.min(120, x.horizon * 2)));
+
+      for (let month = 1; month <= chartEnd; month++) {
+        const input = Object.assign({}, x, { horizon: month });
+        const r = calculateOffers(input);
+        const uA = unknownImpact(state.unknown.A, r.A).cost;
+        const uB = unknownImpact(state.unknown.B, r.B).cost;
+        series.push({ x: month, y: uA || uB ? null : r.B.cost - r.A.cost });
+      }
+
+      return {
+        result,
+        exits,
+        series,
+        unknownA: unknownImpact(state.unknown.A, result.A),
+        unknownB: unknownImpact(state.unknown.B, result.B)
+      };
+    }
+
+    function renderCost(state, run) {
+      const names = state.names;
+      const result = run.result;
+      const stopped = run.unknownA.cost || run.unknownB.cost;
+      const missing = [];
+
+      ["A", "B"].forEach(side => {
+        if (state.unknown[side].penalty) {
+          missing.push(names[side] + "：提前清還罰款條款未知");
+        }
+        if (state.unknown[side].claw) {
+          missing.push(names[side] + "：回贈追回條款未知");
+        }
+      });
+
+      const headline = $("cost-headline");
+      headline.className = stopped ? "card result stopped" : "card result";
+
+      if (stopped) {
+        $("cost-title").textContent = "已停止完整排名：條款不完整";
+        $("cost-difference").textContent = "未能比較";
+        $("cost-description").textContent =
+          missing.join("；") + "。未知不當作零；請向報價方取得並核實條款，或交專員處理。";
+      } else {
+        const difference = result.difference;
+        const equal = Math.abs(difference) < 0.005;
+
+        $("cost-title").textContent = equal
+          ? "按本次輸入，兩方案淨成本相同"
+          : "按本次輸入，" + (difference < 0 ? names.A : names.B) + "淨成本較低";
+
+        $("cost-difference").textContent = money(Math.abs(difference));
+        $("cost-description").textContent =
+          "比較本金 " + money(state.inputs.principal) +
+          "，於第 " + result.held + " 期供款後全數清還。" +
+          "結果只反映輸入條款及本模型假設，不代表全市場最優方案。" +
+          (missing.length ? "（" + missing.join("；") + "，但不影響此退出時間。）" : "");
+      }
+
+      // 按退出時間比較
+      $("exit-head").innerHTML =
+        "<tr><th>退出時間</th><th>" + esc(names.A) + " 淨成本</th><th>" +
+        esc(names.B) + " 淨成本</th><th>B 減 A</th><th>" + esc(names.A) +
+        " 未還本金</th><th>" + esc(names.B) + " 未還本金</th></tr>";
+
+      const exitRows = $("exit-rows");
+      clearChildren(exitRows);
+
+      run.exits.forEach(row => {
+        const unknown = row.unknownA.cost || row.unknownB.cost;
+        const diff = row.B.cost - row.A.cost;
+        const tr = document.createElement("tr");
+
+        if (row.month === state.inputs.horizon) {
+          tr.className = "total";
+        }
+
+        const cells = [
+          ["第 " + row.month + " 個月" + (row.month === state.inputs.months ? "（到期）" : ""), ""],
+          row.unknownA.cost ? ["未知", "unknown"] : [fmt(row.A.cost, 0), ""],
+          row.unknownB.cost ? ["未知", "unknown"] : [fmt(row.B.cost, 0), ""],
+          unknown ? ["未能比較", "unknown"] : [signed(diff, 0), diff > 0.5 ? "neg" : (diff < -0.5 ? "pos" : "")],
+          [fmt(row.A.balance, 2), ""],
+          [fmt(row.B.balance, 2), ""]
+        ];
+
+        cells.forEach(cell => {
+          const td = document.createElement("td");
+          td.textContent = cell[0];
+          if (cell[1]) {
+            td.className = cell[1];
+          }
+          tr.appendChild(td);
+        });
+
+        exitRows.appendChild(tr);
+      });
+
+      // 結論反轉
+      const flips = [];
+      let previous = null;
+
+      run.series.forEach(point => {
+        if (point.y === null || Math.abs(point.y) < 0.5) {
+          return;
+        }
+        const sign = point.y > 0 ? 1 : -1;
+        if (previous !== null && sign !== previous) {
+          flips.push({ month: point.x, cheaper: sign > 0 ? names.A : names.B });
+        }
+        previous = sign;
+      });
+
+      $("crossover-note").textContent = run.series.every(p => p.y === null)
+        ? "條款不完整，未能繪出提前退出的成本差距。"
+        : flips.length
+          ? "結論反轉：" + flips.slice(0, 3).map(f =>
+            "第 " + f.month + " 個月起 " + f.cheaper + " 較低").join("；") +
+            "。退出時仍須清還的本金另列，成本較低不等於所需現金較少。"
+          : "在圖表範圍內，兩方案的高低次序沒有反轉。退出時仍須清還的本金另列。";
+
+      $("cost-chart").innerHTML = lineChart(run.series, {
+        height: 230,
+        xLabel: "退出月份",
+        zero: true
+      });
+      $("chart-legend").textContent =
+        "B 減 A 淨成本（HK$）：高於虛線代表 " + names.A + " 較低；低於虛線代表 " + names.B + " 較低。";
+
+      // 完整成本明細
+      $("breakdown-title").textContent = "完整成本明細：第 " + result.held + " 個月退出";
+      $("breakdown-head").innerHTML =
+        "<tr><th>項目</th><th>" + esc(names.A) + "</th><th>" + esc(names.B) + "</th></tr>";
+
+      const rows = [
+        ["核定銀行基本回贈", v => v.basic.amount],
+        ["核定渠道額外回贈", v => v.extra.amount],
+        ["累計利息", v => v.interest],
+        ["全部方案費用", v => v.fees],
+        ["提前清還罰款", v => v.penalty, "penalty"],
+        ["基本回贈已付追回", v => v.basic.clawback, "claw"],
+        ["額外回贈已付追回", v => v.extra.clawback, "claw"],
+        ["減：實際已收回贈", v => v.received],
+        ["未付而取消；不另計成本", v => v.cancelled, "claw"],
+        ["期末保留的已收回贈", v => v.retained, "claw"],
+        ["淨融資成本", v => v.cost, "cost", true],
+        ["每月供款", v => v.payment],
+        ["期末未還本金；另列", v => v.balance]
+      ];
+
+      const tbody = $("breakdown-rows");
+      clearChildren(tbody);
+
+      rows.forEach(row => {
+        const tr = document.createElement("tr");
+        if (row[3]) {
+          tr.className = "total";
+        }
+
+        const label = document.createElement("td");
+        label.textContent = row[0];
+        tr.appendChild(label);
+
+        [[result.A, run.unknownA], [result.B, run.unknownB]].forEach(pair => {
+          const td = document.createElement("td");
+          const flag = row[2];
+          if (flag && pair[1][flag]) {
+            td.textContent = "未知";
+            td.className = "unknown";
+          } else {
+            td.textContent = money(row[1](pair[0]));
+          }
+          tr.appendChild(td);
+        });
+
+        tbody.appendChild(tr);
+      });
+
+      const pending = result.A.pending + result.B.pending;
+
+      $("pending-note").textContent = pending > 0
+        ? "仍有尚未收到的條件回贈，未在本期成本扣除；退出後是否仍可取得，須向報價方確認。"
+        : "本期成本只扣除指定時點前已實際收到的回贈。";
+
+      $("cost-result").hidden = false;
+      $("cost-export").disabled = false;
+    }
+
+    function calculateCostNow() {
+      invalidateCost();
+
+      try {
+        const state = readCostState();
+
+        if (!$("cost-confirmed").checked) {
+          throw new Error("請先核對本次輸入及計算假設。");
+        }
+
+        const run = runCost(state);
+
+        cost.report = {
+          format: "prism-cost-comparison",
+          version: 2,
+          policy: POLICY.version,
+          generatedAt: new Date().toISOString(),
+          source: cost.source,
+          names: state.names,
+          kinds: state.kinds,
+          unknown: state.unknown,
+          channel: state.channel,
+          inputs: state.inputs,
+          result: run.result,
+          notice: "示例／自填情境，並非銀行報價、審批或優惠承諾。"
+        };
+
+        renderCost(state, run);
+        return true;
+      } catch (error) {
+        $("cost-message").textContent = error.message;
+        return false;
+      }
+    }
+
+    function initCost() {
+      buildCostForm();
+
+      $("cost-form").addEventListener("submit", event => {
+        event.preventDefault();
+        if (calculateCostNow()) {
+          $("cost-result").scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      });
+
+      $("cost-form").addEventListener("input", event => {
+        const target = event.target;
+        if (target.id === "cost-confirmed" || target.id === "cost-import") {
+          return;
+        }
+
+        $("cost-confirmed").checked = false;
+        invalidateCost();
+        cost.source = "自填情境，尚待核對";
+        $("cost-source").textContent = cost.source;
+      });
+
+      $("cost-form").addEventListener("change", event => {
+        if (event.target.tagName === "SELECT" || event.target.type === "checkbox") {
+          if (event.target.id !== "cost-confirmed") {
+            $("cost-confirmed").checked = false;
+            invalidateCost();
+          }
+        }
+      });
+
+      $("cost-confirmed").addEventListener("change", () => {
+        if (!$("cost-confirmed").checked) {
+          invalidateCost();
+        }
+      });
+
+      const presets = document.querySelectorAll("[data-preset]");
+      for (let i = 0; i < presets.length; i++) {
+        presets[i].addEventListener("click", () => {
+          loadCostPreset(presets[i].getAttribute("data-preset"));
+        });
+      }
+
+      $("cost-export").addEventListener("click", () => {
+        if (cost.report) {
+          downloadJson(cost.report, "PRISM_Comparison.json", "cost-message");
+        }
+      });
+
+      $("cost-import").addEventListener("change", event => {
+        const input = event.target;
+        const file = input.files && input.files[0];
+
+        if (!file) {
+          return;
+        }
+
+        readJsonFile(file)
+          .then(data => {
+            setCostState(importedCostState(data));
+            cost.source = "已匯入資料，必須重新核對";
+            $("cost-source").textContent = cost.source;
+            $("cost-confirmed").checked = false;
+            $("cost-channel").value = "unknown";
+            invalidateCost();
+            $("cost-message").textContent =
+              "匯入成功。請重新確認渠道資格及條款，再按計算；程式不會採用檔案內原有排名。";
+          })
+          .catch(error => {
+            $("cost-message").textContent = "匯入失敗：" + error.message;
+          })
+          .then(() => {
+            input.value = "";
+          });
+      });
+
+      loadCostPreset("teaching");
+    }
+
+    // 只採用驗證後的輸入；不信任檔案內的結果、排名及核對狀態。
+    function importedCostState(data) {
+      if (!data || typeof data !== "object") {
+        throw new Error("檔案格式或政策版本不相符。");
+      }
+
+      // 原版 v3（PRISM 對中介）匯出檔
+      if (
+        data.format === "prism-core-comparison" &&
+        data.version === 1 &&
+        data.policy === POLICY.version
+      ) {
+        const v = data.inputs || {};
+        const pick = (suffix, extra) => offerTerms(Object.assign({
+          rate: v["rate" + suffix],
+          fees: v["fees" + suffix],
+          basic: v["basic" + suffix],
+          basicPay: v["basicPay" + suffix],
+          basicClaw: v["basicClaw" + suffix],
+          penalty: v["penalty" + suffix],
+          penaltyMonths: v["penaltyMonths" + suffix]
+        }, extra));
+
+        const state = {
+          names: { A: "PRISM 直達方案", B: "中介渠道方案" },
+          kinds: { A: "prism", B: "broker" },
+          unknown: { A: {}, B: {} },
+          channel: "unknown",
+          inputs: {
+            principal: v.principal,
+            months: v.months,
+            horizon: v.horizon,
+            A: pick("P", PRISM_LOCKED),
+            B: pick("M", {
+              extra: v.extraM,
+              extraCap: v.capM,
+              extraPay: v.extraPayM,
+              extraClaw: v.extraClawM
+            })
+          }
+        };
+
+        validateCostInputs(state.inputs);
+        return state;
+      }
+
+      if (
+        data.format !== "prism-cost-comparison" ||
+        data.version !== 2 ||
+        data.policy !== POLICY.version
+      ) {
+        throw new Error("檔案格式或政策版本不相符。");
+      }
+
+      const kinds = data.kinds || {};
+      const names = data.names || {};
+      const unknown = data.unknown || {};
+
+      ["A", "B"].forEach(side => {
+        if (!has(OFFER_KINDS, kinds[side])) {
+          throw new Error("渠道類型無效。");
+        }
+        if (typeof names[side] !== "string") {
+          names[side] = "方案 " + side;
+        }
+        unknown[side] = unknown[side] || {};
+      });
+
+      return {
+        names: { A: names.A.slice(0, 24), B: names.B.slice(0, 24) },
+        kinds: { A: kinds.A, B: kinds.B },
+        unknown: {
+          A: { penalty: unknown.A.penalty === true, claw: unknown.A.claw === true },
+          B: { penalty: unknown.B.penalty === true, claw: unknown.B.claw === true }
+        },
+        channel: "unknown",
+        inputs: validateCostInputs(data.inputs)
+      };
+    }
+
+    // =========================================================
+    // 5. JSON 匯出／匯入
+    // =========================================================
+
+    function downloadJson(data, filename, messageId) {
+      const content = JSON.stringify(data, null, 2);
+      const blob = new Blob([content], { type: "application/json;charset=utf-8" });
+
+      if (window.navigator.msSaveOrOpenBlob) {
+        window.navigator.msSaveOrOpenBlob(blob, filename);
+        return;
+      }
+
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = filename;
+      document.body.appendChild(anchor);
+      anchor.click();
+      document.body.removeChild(anchor);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+      // 微信等內置瀏覽器通常禁止下載，改為顯示內容讓用戶複製。
+      if (/MicroMessenger|QQ\/|Weibo/i.test(navigator.userAgent)) {
+        $(messageId).textContent =
+          "如果沒有自動下載，請長按或複製以下內容，另存為 .json 檔案：\n\n" + content;
+      }
+    }
+
+    function readJsonFile(file) {
+      return new Promise((resolve, reject) => {
+        if (file.size > 200000) {
+          reject(new Error("檔案過大，請匯入本程式輸出的 JSON。"));
+          return;
+        }
+
+        const reader = new FileReader();
+
+        reader.onload = () => {
+          try {
+            resolve(JSON.parse(reader.result));
+          } catch (error) {
+            reject(new Error("檔案無法讀取，或不是有效的 JSON。"));
+          }
+        };
+        reader.onerror = () => reject(new Error("檔案無法讀取，或不是有效的 JSON。"));
+        reader.readAsText(file, "utf-8");
+      });
+    }
+
+    // =========================================================
+    // 6. 圖表（內嵌 SVG，不依賴外部程式庫）
+    // =========================================================
+
+    function niceStep(range, target) {
+      const raw = range / target;
+      const power = Math.pow(10, Math.floor(Math.log(raw) / Math.LN10));
+      const unit = raw / power;
+      const step = unit >= 5 ? 10 : unit >= 2 ? 5 : unit >= 1 ? 2 : 1;
+      return step * power;
+    }
+
+    function axisLabel(value) {
+      const abs = Math.abs(value);
+      if (abs >= 10000) {
+        return fmt(value / 10000, abs >= 100000 ? 0 : 1) + "萬";
+      }
+      return fmt(value, 0);
+    }
+
+    function lineChart(points, options) {
+      const width = 640;
+      const height = options.height || 220;
+      const pad = { left: 56, right: 14, top: 12, bottom: 34 };
+      const valid = points.filter(p => p.y !== null);
+
+      if (!valid.length) {
+        return "";
+      }
+
+      const xs = points.map(p => p.x);
+      const ys = valid.map(p => p.y).concat(options.zero ? [0] : []);
+      const xMin = Math.min.apply(null, xs);
+      const xMax = Math.max.apply(null, xs);
+      let yMin = Math.min.apply(null, ys);
+      let yMax = Math.max.apply(null, ys);
+
+      if (yMin === yMax) {
+        yMin -= 1;
+        yMax += 1;
+      }
+
+      const step = niceStep(yMax - yMin, 4);
+      yMin = Math.floor(yMin / step) * step;
+      yMax = Math.ceil(yMax / step) * step;
+
+      const sx = x => pad.left + (x - xMin) / Math.max(1, xMax - xMin) * (width - pad.left - pad.right);
+      const sy = y => pad.top + (yMax - y) / (yMax - yMin) * (height - pad.top - pad.bottom);
+
+      let svg = '<svg viewBox="0 0 ' + width + " " + height + '" role="img" aria-label="' +
+        esc(options.xLabel || "") + '">';
+
+      for (let y = yMin; y <= yMax + step / 2; y += step) {
+        svg += '<line class="axis" x1="' + pad.left + '" x2="' + (width - pad.right) +
+          '" y1="' + sy(y) + '" y2="' + sy(y) + '" opacity="0.5"/>';
+        svg += '<text x="' + (pad.left - 6) + '" y="' + (sy(y) + 4) +
+          '" text-anchor="end">' + axisLabel(y) + "</text>";
+      }
+
+      if (options.zero && yMin < 0 && yMax > 0) {
+        svg += '<line class="zero" x1="' + pad.left + '" x2="' + (width - pad.right) +
+          '" y1="' + sy(0) + '" y2="' + sy(0) + '"/>';
+      }
+
+      const xStep = niceStep(xMax - xMin || 1, 6);
+      for (let x = Math.ceil(xMin / xStep) * xStep; x <= xMax; x += xStep) {
+        svg += '<text x="' + sx(x) + '" y="' + (height - 12) + '" text-anchor="middle">' + x + "</text>";
+      }
+
+      let path = "";
+      let open = false;
+
+      points.forEach(p => {
+        if (p.y === null) {
+          open = false;
+          return;
+        }
+        path += (open ? "L" : "M") + sx(p.x).toFixed(1) + " " + sy(p.y).toFixed(1);
+        open = true;
+      });
+
+      svg += '<path class="line" d="' + path + '"/>';
+      svg += '<text x="' + (width - pad.right) + '" y="' + (height - 1) +
+        '" text-anchor="end">' + esc(options.xLabel || "") + "</text>";
+      svg += "</svg>";
+
+      return svg;
+    }
+
+    function barLineChart(bars, line, options) {
+      const width = 640;
+      const height = options.height || 240;
+      const pad = { left: 56, right: 14, top: 12, bottom: 30 };
+      const values = bars.map(b => b.y).concat(line.map(p => p.y)).concat([0]);
+      let yMin = Math.min.apply(null, values);
+      let yMax = Math.max.apply(null, values);
+
+      if (yMin === yMax) {
+        yMax += 1;
+      }
+
+      const step = niceStep(yMax - yMin, 4);
+      yMin = Math.floor(yMin / step) * step;
+      yMax = Math.ceil(yMax / step) * step;
+
+      const slots = line.length;
+      const slotWidth = (width - pad.left - pad.right) / slots;
+      const cx = i => pad.left + slotWidth * (i + 0.5);
+      const sy = y => pad.top + (yMax - y) / (yMax - yMin) * (height - pad.top - pad.bottom);
+
+      let svg = '<svg viewBox="0 0 ' + width + " " + height + '" role="img" aria-label="' +
+        esc(options.label || "") + '">';
+
+      for (let y = yMin; y <= yMax + step / 2; y += step) {
+        svg += '<line class="axis" x1="' + pad.left + '" x2="' + (width - pad.right) +
+          '" y1="' + sy(y) + '" y2="' + sy(y) + '" opacity="0.5"/>';
+        svg += '<text x="' + (pad.left - 6) + '" y="' + (sy(y) + 4) +
+          '" text-anchor="end">' + fmt(y, 0) + "</text>";
+      }
+
+      svg += '<line class="zero" x1="' + pad.left + '" x2="' + (width - pad.right) +
+        '" y1="' + sy(0) + '" y2="' + sy(0) + '"/>';
+
+      bars.forEach(bar => {
+        const i = bar.slot;
+        const top = sy(Math.max(0, bar.y));
+        const h = Math.abs(sy(0) - sy(bar.y));
+        svg += '<rect class="' + (bar.y >= 0 ? "bar-pos" : "bar-neg") + '" x="' +
+          (cx(i) - slotWidth * 0.28) + '" y="' + top + '" width="' + (slotWidth * 0.56) +
+          '" height="' + Math.max(1, h) + '" rx="3"/>';
+      });
+
+      let path = "";
+      line.forEach((p, i) => {
+        path += (i ? "L" : "M") + cx(i).toFixed(1) + " " + sy(p.y).toFixed(1);
+      });
+      svg += '<path class="line-2" d="' + path + '"/>';
+
+      line.forEach((p, i) => {
+        svg += '<circle cx="' + cx(i) + '" cy="' + sy(p.y) + '" r="3.5" fill="#102d46"/>';
+        svg += '<text x="' + cx(i) + '" y="' + (height - 10) + '" text-anchor="middle">' +
+          esc(p.label) + "</text>";
+      });
+
+      svg += "</svg>";
+      return svg;
+    }
+
+    // =========================================================
+    // 7. PRISM 優惠追回及按揭成數
+    // =========================================================
+
+    function prismAward(principal) {
+      return roundMoney(Math.min(
+        principal * POLICY.extraRate / 100,
+        POLICY.extraCap
+      ));
+    }
+
+    // 期內非例行部分還本：追回＝原優惠 × 還本額 ÷ 原本金；
+    // 24個月內全清：追回未曾追回的已付餘額。
+    function calculatePrismClawback(principal, prepayments, exitMonth) {
+      const award = prismAward(principal);
+      const period = POLICY.extraClawbackMonths;
+      const events = [];
+      let clawed = 0;
+      let repaid = 0;
+
+      events.push({
+        label: "取用後30曆日內支付 PRISM 加碼（模型第 1 月）",
+        claw: 0,
+        note: "paid"
+      });
+
+      prepayments
+        .slice()
+        .sort((a, b) => a.month - b.month)
+        .forEach(item => {
+          if (exitMonth !== null && item.month >= exitMonth) {
+            throw new Error("部分還本月份須早於全清月份。");
+          }
+
+          repaid += item.amount;
+
+          if (repaid >= principal) {
+            throw new Error("部分還本合計須少於原本金；全數清還請填「全清月份」。");
+          }
+
+          const share = item.amount / principal;
+          const inside = item.month <= period;
+          const claw = inside
+            ? Math.min(award - clawed, roundMoney(award * share))
+            : 0;
+
+          clawed = roundMoney(clawed + claw);
+
+          events.push({
+            label: "第 " + item.month + " 月部分還本 " + money(item.amount) +
+              "（佔原本金 " + fmt(share * 100, 2) + "%）" +
+              (inside ? "" : "：追回期已屆滿，不調整"),
+            claw
+          });
+        });
+
+      if (exitMonth !== null) {
+        const inside = exitMonth <= period;
+        const claw = inside ? roundMoney(award - clawed) : 0;
+        clawed = roundMoney(clawed + claw);
+
+        events.push({
+          label: "第 " + exitMonth + " 月全清或轉按離行" +
+            (inside ? "：追回未曾追回的已付餘額" : "：24 個月後全清，不追回"),
+          claw
+        });
+      }
+
+      let running = 0;
+      events.forEach(event => {
+        running = roundMoney(running + event.claw);
+        event.total = running;
+        event.kept = roundMoney(award - running);
+      });
+
+      return { award, clawed, kept: roundMoney(award - clawed), events };
+    }
+
+    function calculateLtv(loan, value, basicRate, other, includePrism) {
+      const basic = roundMoney(loan * basicRate / 100);
+      const prism = includePrism ? prismAward(loan) : 0;
+      const total = roundMoney(basic + prism + other);
+      const share = total / loan * 100;
+      const exceeds = total > loan * 0.01 + 0.005;
+      const ltv = (exceeds ? loan + total : loan) / value * 100;
+
+      return { basic, prism, total, share, exceeds, ltv };
+    }
+
+    function addPrepayRow(month, amount) {
+      const list = $("of-prepay");
+
+      if (list.children.length >= 6) {
+        return;
+      }
+
+      const row = document.createElement("div");
+      row.className = "row";
+      row.innerHTML =
+        '<label>還本月份<input type="number" min="1" max="600" step="1" inputmode="numeric" data-role="month"></label>' +
+        '<label>還本金額（HK$）<input type="number" min="1" step="any" inputmode="decimal" data-role="amount"></label>' +
+        '<button type="button" aria-label="刪除">刪除</button>';
+
+      row.querySelector('[data-role="month"]').value = month === undefined ? "" : String(month);
+      row.querySelector('[data-role="amount"]').value = amount === undefined ? "" : String(amount);
+      row.querySelector("button").addEventListener("click", () => {
+        list.removeChild(row);
+        renderOffer();
+      });
+
+      list.appendChild(row);
+    }
+
+    function renderOffer() {
+      const message = $("of-message");
+      message.textContent = "";
+
+      try {
+        const principal = readNumber("of-principal", "實際取用本金", 1, 100000000, false);
+        const exit = readNumber("of-exit", "全清月份", 1, 600, true, true);
+        const prepayments = [];
+        const rows = $("of-prepay").querySelectorAll(".row");
+
+        for (let i = 0; i < rows.length; i++) {
+          const monthInput = rows[i].querySelector('[data-role="month"]');
+          const amountInput = rows[i].querySelector('[data-role="amount"]');
+
+          if (monthInput.value.trim() === "" && amountInput.value.trim() === "") {
+            continue;
+          }
+
+          const month = monthInput.valueAsNumber;
+          const amount = amountInput.valueAsNumber;
+
+          if (!Number.isInteger(month) || month < 1 || month > 600) {
+            throw new Error("還本月份須為 1 至 600 的整數。");
+          }
+          if (!Number.isFinite(amount) || amount <= 0) {
+            throw new Error("還本金額須大於 0。");
+          }
+
+          prepayments.push({ month, amount });
+        }
+
+        const r = calculatePrismClawback(principal, prepayments, exit);
+        const raw = principal * POLICY.extraRate / 100;
+
+        $("of-summary").innerHTML =
+          "<div><dt>PRISM 加碼</dt><dd>" + money(r.award) + "</dd></div>" +
+          "<div><dt>計算</dt><dd>min（" + fmt(principal, 0) + " × 0.20% ＝ " + fmt(raw, 2) +
+          "，上限 10,000）</dd></div>" +
+          "<div><dt>支付</dt><dd>符合資格並取用後30曆日內</dd></div>" +
+          "<div><dt>追回期</dt><dd>取用日起至第 24 個月屆滿當日</dd></div>" +
+          "<div><dt>累計追回</dt><dd>" + money(r.clawed) + "</dd></div>" +
+          "<div><dt>客戶最終保留</dt><dd>" + money(r.kept) + "</dd></div>";
+
+        const tbody = $("of-rows");
+        clearChildren(tbody);
+
+        r.events.forEach(event => {
+          const tr = document.createElement("tr");
+          [
+            event.label,
+            event.note === "paid" ? "支付 " + money(r.award) : money(event.claw),
+            money(event.total),
+            money(event.kept)
+          ].forEach(text => {
+            const td = document.createElement("td");
+            td.textContent = text;
+            tr.appendChild(td);
+          });
+          tbody.appendChild(tr);
+        });
+      } catch (error) {
+        message.textContent = error.message;
+        $("of-summary").innerHTML = "";
+        clearChildren($("of-rows"));
+      }
+    }
+
+    function loadOfferExample() {
+      $("of-principal").value = "4000000";
+      $("of-exit").value = "18";
+      clearChildren($("of-prepay"));
+      addPrepayRow(12, 400000);
+      renderOffer();
+    }
+
+    function renderLtv() {
+      const message = $("ltv-message");
+      message.textContent = "";
+
+      try {
+        const loan = readNumber("ltv-loan", "貸款額", 1, 100000000, false);
+        const value = readNumber("ltv-value", "物業估值", 1, 1000000000, false);
+        const basic = readNumber("ltv-basic", "銀行基本回贈", 0, 20, false);
+        const other = readNumber("ltv-other", "其他現金回贈", 0, 10000000, false);
+        const cap = readNumber("ltv-cap", "適用成數上限", 1, 100, false);
+        const r = calculateLtv(loan, value, basic, other, $("ltv-prism").value === "yes");
+
+        $("ltv-summary").innerHTML =
+          "<div><dt>銀行基本回贈</dt><dd>" + money(r.basic) + "</dd></div>" +
+          "<div><dt>PRISM 加碼</dt><dd>" + money(r.prism) + "</dd></div>" +
+          "<div><dt>其他現金回贈</dt><dd>" + money(other) + "</dd></div>" +
+          "<div><dt>回贈合計</dt><dd>" + money(r.total) + "（佔貸款額 " + fmt(r.share, 2) + "%）</dd></div>" +
+          "<div><dt>成數計算</dt><dd>" + (r.exceeds
+            ? "（" + fmt(loan, 0) + "＋" + fmt(r.total, 0) + "）÷ " + fmt(value, 0)
+            : fmt(loan, 0) + " ÷ " + fmt(value, 0)) + "</dd></div>" +
+          "<div><dt>按揭成數</dt><dd>" + fmt(r.ltv, 2) + "%</dd></div>";
+
+        let verdict;
+        if (r.ltv > cap + 1e-9) {
+          verdict = '<div class="notice danger"><p><strong>超出適用上限 ' + fmt(cap, 2) +
+            "%</strong>：須重新核對本金與首期並取得客戶確認，不靜默減少放款。</p></div>";
+        } else if (cap - r.ltv < 1) {
+          verdict = '<div class="notice warn"><p><strong>接近適用上限</strong>（差距少於 1 個百分點）：重新核對本金與首期並取得客戶確認。</p></div>';
+        } else {
+          verdict = '<div class="notice"><p><strong>未超出適用上限 ' + fmt(cap, 2) + "%</strong>。" +
+            (r.exceeds
+              ? "回贈超過貸款額 1%，已把全部回贈計入貸款額計算成數。"
+              : "回贈未超過貸款額 1%，按貸款額計算成數。") + "</p></div>";
+        }
+        $("ltv-verdict").innerHTML = verdict;
+      } catch (error) {
+        message.textContent = error.message;
+        $("ltv-summary").innerHTML = "";
+        $("ltv-verdict").innerHTML = "";
+      }
+    }
+
+    function loadLtvExample() {
+      $("ltv-loan").value = "4000000";
+      $("ltv-value").value = "6000000";
+      $("ltv-basic").value = "0.9";
+      $("ltv-other").value = "0";
+      $("ltv-cap").value = "70";
+      $("ltv-prism").value = "yes";
+      renderLtv();
+    }
+
+    function initOffer() {
+      $("of-principal").value = "4000000";
+      addPrepayRow();
+
+      $("of-add").addEventListener("click", () => addPrepayRow());
+      $("of-example").addEventListener("click", loadOfferExample);
+      $("ltv-example").addEventListener("click", loadLtvExample);
+
+      const offerSection = document.querySelector('[data-route="offer"]');
+      offerSection.addEventListener("input", event => {
+        if (event.target.id.indexOf("ltv-") === 0) {
+          renderLtv();
+        } else {
+          renderOffer();
+        }
+      });
+      $("ltv-prism").addEventListener("change", renderLtv);
+
+      renderOffer();
+      loadLtvExample();
+    }
+
+    // =========================================================
+    // 8. 銀行財務模型
+    // U＝αPc−R−v−A；NPV＝−T0＋Σ(Qₜ·U−Fₜ)÷(1＋r)ᵗ
+    // =========================================================
+
+    const FIN_DEFAULTS = Object.freeze({
+      P: 400,          // 平均本金（萬元）
+      alpha: 80,       // 有效節佣比例（%）
+      c: 0.45,         // 可避免淨佣金率（%）
+      R: 0.20,         // PRISM 加碼（%）
+      Rcap: 10000,     // 加碼上限（元）
+      v: 1200,         // 每宗處理成本（元）
+      A: 300,          // 每宗獲客成本（元）
+      Q: [100, 250, 500, 800, 1000],
+      F: [80, 85, 90, 95, 100],
+      T0: 300,         // 前置投入（萬元）
+      rate: 10,        // 折現率（%）
+      funnel: [20, 50, 70, 60, 60],
+      balance: 350,    // 續留平均餘額（萬元）
+      margin: 0.60     // 續留風險調整貢獻（%）
+    });
+
+    const FIN_UNIT_FIELDS = [
+      ["P", "平均本金 P（萬元）", 1, 10000, false],
+      ["alpha", "有效節佣比例 α（%）", 0, 100, false],
+      ["c", "可避免淨佣金率 c（%）", 0, 5, false],
+      ["R", "PRISM 加碼（%）", 0, 5, false],
+      ["Rcap", "加碼上限（元）", 0, 1000000, false],
+      ["v", "每宗處理成本 v（元）", 0, 1000000, false],
+      ["A", "每宗獲客成本 A（元）", 0, 1000000, false]
+    ];
+
+    const FUNNEL_LABELS = ["近期有需要", "開始申請", "完成資料", "適合標準流程", "取用"];
+
+    function unitContribution(m) {
+      const P = m.P * 10000;
+      const commission = m.alpha / 100 * P * m.c / 100;
+      const R = m.Rcap > 0 ? Math.min(P * m.R / 100, m.Rcap) : P * m.R / 100;
+      return {
+        commission,
+        R,
+        v: m.v,
+        A: m.A,
+        U: commission - R - m.v - m.A
+      };
+    }
+
+    function annuityFactor(rate, years) {
+      let total = 0;
+      for (let t = 1; t <= years; t++) {
+        total += 1 / Math.pow(1 + rate / 100, t);
+      }
+      return total;
+    }
+
+    function financeModel(m) {
+      const unit = unitContribution(m);
+      const d = t => Math.pow(1 + m.rate / 100, t);
+      const years = [];
+      let cumulative = -m.T0;
+      let discounted = -m.T0;
+      let npv3 = -m.T0;
+      let payback = null;
+      let discPayback = null;
+      let turnPositive = null;
+      let maxGap = Math.min(0, -m.T0);
+
+      for (let t = 1; t <= 5; t++) {
+        const q = m.Q[t - 1];
+        const avoided = q * unit.commission / 10000;
+        const variable = -q * (unit.R + unit.v + unit.A) / 10000;
+        const fixed = -m.F[t - 1];
+        const net = avoided + variable + fixed;
+
+        cumulative += net;
+        discounted += net / d(t);
+        if (t <= 3) {
+          npv3 += net / d(t);
+        }
+
+        if (turnPositive === null && net > 0) {
+          turnPositive = t;
+        }
+        if (payback === null && cumulative >= 0) {
+          payback = t;
+        }
+        if (discPayback === null && discounted >= 0) {
+          discPayback = t;
+        }
+        maxGap = Math.min(maxGap, cumulative);
+
+        years.push({ q, avoided, variable, fixed, net, cumulative });
+      }
+
+      // 投資門檻：使五年淨現值為零的每宗貢獻。
+      let qDisc = 0;
+      let fDisc = 0;
+      for (let t = 1; t <= 5; t++) {
+        qDisc += m.Q[t - 1] / d(t);
+        fDisc += m.F[t - 1] / d(t);
+      }
+
+      const breakevenU = qDisc > 0 ? (m.T0 + fDisc) * 10000 / qDisc : null;
+      const P = m.P * 10000;
+      const costs = unit.R + unit.v + unit.A;
+      const alphaMin = breakevenU !== null && P * m.c > 0
+        ? (breakevenU + costs) / (P * m.c / 100) * 100
+        : null;
+      const cMin = breakevenU !== null && P * m.alpha > 0
+        ? (breakevenU + costs) / (P * m.alpha / 100) * 100
+        : null;
+
+      return {
+        unit,
+        years,
+        npv: discounted,
+        npv3,
+        payback,
+        discPayback,
+        turnPositive,
+        maxGap,
+        breakevenU,
+        alphaMin,
+        cMin
+      };
+    }
+
+    function scenarioList(m) {
+      const with_ = changes => Object.assign({}, m, changes);
+      const conservative = [100, 200, 300, 400, 500];
+
+      return [
+        ["當前輸入的假設", m, true],
+        ["淨佣金降至0.40%", with_({ c: 0.40 })],
+        ["平均本金降至300萬元", with_({ P: 300 })],
+        ["取用量減半", with_({ Q: m.Q.map(q => q / 2) })],
+        ["取用量改為100／200／300／400／500宗", with_({ Q: conservative })],
+        ["上項保守取用量且前置投入降至180萬元", with_({ Q: conservative, T0: 180 })],
+        ["PRISM加碼提高至0.25%", with_({ R: 0.25 })],
+        ["佣金0.40%且有效節佣比例60%", with_({ c: 0.40, alpha: 60 })],
+        ["PRISM加碼提高至0.23%", with_({ R: 0.23 })],
+        ["加碼0.23%且每宗再增加1小時人手（300元）", with_({ R: 0.23, v: m.v + 300 })]
+      ];
+    }
+
+    function buildFinanceForm() {
+      const numberField = (id, label, min, max, integer) =>
+        '<label for="' + id + '">' + esc(label) + '<input id="' + id +
+        '" type="number" min="' + min + '" max="' + max + '" step="' +
+        (integer ? "1" : "any") + '" inputmode="' + (integer ? "numeric" : "decimal") + '"></label>';
+
+      $("fin-unit").innerHTML = FIN_UNIT_FIELDS.map(f =>
+        numberField("fin-" + f[0], f[1], f[2], f[3], f[4])).join("");
+
+      let years = "";
+      for (let t = 1; t <= 5; t++) {
+        years += numberField("fin-Q" + t, "Y" + t + " 取用宗數", 0, 1000000, false);
+      }
+      for (let t = 1; t <= 5; t++) {
+        years += numberField("fin-F" + t, "Y" + t + " 固定營運（萬）", 0, 100000, false);
+      }
+      $("fin-years").innerHTML = years;
+
+      $("fin-global").innerHTML =
+        numberField("fin-T0", "前置投入 T0（萬元）", 0, 100000, false) +
+        numberField("fin-rate", "折現率（%）", 0, 99, false);
+
+      $("fin-funnel").innerHTML = FUNNEL_LABELS.map((label, i) =>
+        numberField("fin-funnel" + i, label + "（%）", 0.01, 100, false)).join("");
+
+      $("fin-retain").innerHTML =
+        numberField("fin-balance", "續留平均餘額（萬元）", 0, 100000, false) +
+        numberField("fin-margin", "風險調整貢獻（%）", 0, 20, false);
+    }
+
+    function setFinance(m) {
+      FIN_UNIT_FIELDS.forEach(f => {
+        $("fin-" + f[0]).value = String(m[f[0]]);
+      });
+      for (let t = 1; t <= 5; t++) {
+        $("fin-Q" + t).value = String(m.Q[t - 1]);
+        $("fin-F" + t).value = String(m.F[t - 1]);
+      }
+      $("fin-T0").value = String(m.T0);
+      $("fin-rate").value = String(m.rate);
+      m.funnel.forEach((v, i) => {
+        $("fin-funnel" + i).value = String(v);
+      });
+      $("fin-balance").value = String(m.balance);
+      $("fin-margin").value = String(m.margin);
+    }
+
+    function readFinance() {
+      const m = { Q: [], F: [], funnel: [] };
+
+      FIN_UNIT_FIELDS.forEach(f => {
+        m[f[0]] = readNumber("fin-" + f[0], f[1], f[2], f[3], f[4]);
+      });
+      for (let t = 1; t <= 5; t++) {
+        m.Q.push(readNumber("fin-Q" + t, "Y" + t + " 取用宗數", 0, 1000000, false));
+        m.F.push(readNumber("fin-F" + t, "Y" + t + " 固定營運", 0, 100000, false));
+      }
+      m.T0 = readNumber("fin-T0", "前置投入 T0", 0, 100000, false);
+      m.rate = readNumber("fin-rate", "折現率", 0, 99, false);
+      FUNNEL_LABELS.forEach((label, i) => {
+        m.funnel.push(readNumber("fin-funnel" + i, label, 0.01, 100, false));
+      });
+      m.balance = readNumber("fin-balance", "續留平均餘額", 0, 100000, false);
+      m.margin = readNumber("fin-margin", "風險調整貢獻", 0, 20, false);
+
+      return m;
+    }
+
+    function yearText(t) {
+      return t === null ? "五年內未達" : "Y" + t;
+    }
+
+    function renderFinance() {
+      const message = $("fin-message");
+      message.textContent = "";
+
+      let m;
+      try {
+        m = readFinance();
+      } catch (error) {
+        message.textContent = error.message;
+        $("fin-result").style.opacity = "0.4";
+        return;
+      }
+      $("fin-result").style.opacity = "";
+
+      const r = financeModel(m);
+      const u = r.unit;
+      const kpi = (value, label, tone) =>
+        '<div class="kpi' + (tone ? " " + tone : "") + '"><b>' + value + "</b><span>" + label + "</span></div>";
+
+      $("fin-kpis").innerHTML =
+        kpi(fmt(u.U, 2) + " 元", "每宗淨變動貢獻 U", u.U >= 0 ? "good" : "bad") +
+        kpi(signed(r.npv, 2) + " 萬", "五年淨現值（" + fmt(m.rate, 1) + "%）", r.npv >= 0 ? "good" : "bad") +
+        kpi(signed(r.npv3, 2) + " 萬", "只計首三個營運年的淨現值", r.npv3 >= 0 ? "good" : "bad") +
+        kpi(yearText(r.turnPositive), "年度營運淨額轉正") +
+        kpi(yearText(r.payback) + "／" + yearText(r.discPayback), "回本（未折現／折現）") +
+        kpi(fmt(-r.maxGap, 1) + " 萬", "按年末計最大累計資金缺口");
+
+      $("fin-unit-rows").innerHTML = [
+        ["平均避免佣金", trim(m.P, 2) + "萬 × " + trim(m.c, 4) + "% × " + trim(m.alpha, 2) + "%", u.commission],
+        ["基礎加碼", "min（" + trim(m.P, 2) + "萬 × " + trim(m.R, 4) + "%，" + fmt(m.Rcap, 0) + "）", -u.R],
+        ["新增處理", "包含未取用及撤回個案分攤", -u.v],
+        ["增量獲客", "包含未轉化線索分攤", -u.A],
+        ["淨變動貢獻", "未扣固定營運及前置投入", u.U]
+      ].map((row, i) =>
+        "<tr" + (i === 4 ? ' class="total"' : "") + "><td>" + esc(row[0]) + "</td><td>" +
+        esc(row[1]) + "</td><td>" + fmt(row[2], 2) + "</td></tr>").join("");
+
+      const yr = key => r.years.map(y => "<td>" + fmt(y[key], 2) + "</td>").join("");
+      $("fin-year-rows").innerHTML =
+        "<tr><td>受惠取用 宗</td>" + r.years.map(y => "<td>" + fmt(y.q, 0) + "</td>").join("") + "</tr>" +
+        "<tr><td>避免佣金</td>" + yr("avoided") + "</tr>" +
+        "<tr><td>變動成本</td>" + yr("variable") + "</tr>" +
+        "<tr><td>固定營運</td>" + yr("fixed") + "</tr>" +
+        "<tr><td>年度營運淨額</td>" + yr("net") + "</tr>" +
+        '<tr class="total"><td>含T0累計淨額</td>' + yr("cumulative") + "</tr>";
+
+      const line = [{ label: "T0", y: -m.T0 }].concat(r.years.map((y, i) => ({
+        label: "Y" + (i + 1),
+        y: y.cumulative
+      })));
+      const bars = r.years.map((y, i) => ({ slot: i + 1, y: y.net }));
+      $("fin-chart").innerHTML = barLineChart(bars, line, { label: "五年現金流（萬港元）" });
+
+      $("fin-threshold").innerHTML =
+        "<div><dt>五年淨現值不低於零所需的每宗淨變動貢獻</dt><dd>" +
+        (r.breakevenU === null ? "—" : fmt(r.breakevenU, 2) + " 元") + "</dd></div>" +
+        "<div><dt>佣金維持 " + fmt(m.c, 2) + "% 時，有效節佣比例至少</dt><dd>" +
+        (r.alphaMin === null ? "—" : fmt(r.alphaMin, 2) + "%") + "</dd></div>" +
+        "<div><dt>比例維持 " + fmt(m.alpha, 0) + "% 時，佣金至少</dt><dd>" +
+        (r.cMin === null ? "—" : fmt(r.cMin, 5) + "%") + "</dd></div>" +
+        "<div><dt>目前每宗貢獻與門檻差距</dt><dd>" +
+        (r.breakevenU === null ? "—" : signed(u.U - r.breakevenU, 2) + " 元") + "</dd></div>";
+
+      const scenarios = scenarioList(m).map(s => {
+        const result = financeModel(s[1]);
+        return { label: s[0], U: result.unit.U, npv: result.npv, current: s[2] };
+      });
+
+      $("fin-sens-rows").innerHTML = scenarios.map(s =>
+        "<tr" + (s.current ? ' class="total"' : "") + "><td>" + esc(s.label) + "</td><td>" +
+        fmt(s.U, 0) + '</td><td class="' + (s.npv < 0 ? "neg" : "pos") + '">' +
+        signed(s.npv, 2) + "</td></tr>").join("");
+
+      // 漏斗
+      const conversion = m.funnel.reduce((acc, p) => acc * p / 100, 1);
+      $("fin-funnel-rows").innerHTML =
+        "<tr><td>合計轉化率</td><td colspan=\"5\">" + fmt(conversion * 100, 2) + "%</td></tr>" +
+        "<tr><td>取用目標 宗</td>" + m.Q.map(q => "<td>" + fmt(q, 0) + "</td>").join("") + "</tr>" +
+        "<tr><td>約需可觸達人數</td>" + m.Q.map(q => {
+          const reach = q / conversion;
+          const approx = reach >= 1000 ? Math.round(reach / 1000) * 1000 : Math.ceil(reach);
+          return "<td>" + fmt(approx, 0) + '<br><span class="muted small">（' + fmt(Math.ceil(reach), 0) + "）</span></td>";
+        }).join("") + "</tr>";
+
+      // 附加情境：到期續留
+      const factor = annuityFactor(m.rate, 5);
+      const perAccount = m.balance * 10000 * m.margin / 100;
+      const negatives = scenarios.filter(s => s.npv < 0);
+
+      $("fin-retain-rows").innerHTML =
+        '<tr><td colspan="3" class="small muted">年金因子 ' + fmt(factor, 4) +
+        "；每帳戶年貢獻約 " + fmt(perAccount, 0) + " 元</td></tr>" +
+        (negatives.length
+          ? negatives.map(s => {
+            const need = perAccount > 0 ? -s.npv * 10000 / factor / perAccount : null;
+            return "<tr><td>" + esc(s.label) + "</td><td>" + fmt(-s.npv, 2) + "</td><td>" +
+              (need === null ? "—" : "約" + fmt(Math.round(need), 0) + "（" + fmt(need, 1) + "）") +
+              "</td></tr>";
+          }).join("")
+          : '<tr><td colspan="3">目前各情境淨現值均不低於零，毋須以續留抵消。</td></tr>');
+    }
+
+    function initFinance() {
+      buildFinanceForm();
+      setFinance(FIN_DEFAULTS);
+      $("fin-form").addEventListener("input", renderFinance);
+      $("fin-form").addEventListener("submit", event => event.preventDefault());
+      $("fin-reset").addEventListener("click", () => {
+        setFinance(FIN_DEFAULTS);
+        renderFinance();
+      });
+      renderFinance();
+    }
+
+    // =========================================================
+    // 9. 原型 App（5 步流程，全部為合成資料）
+    // =========================================================
+
+    const APP_OFFER_TERMS = {
+      rate: 3.5,
+      basic: 0.8,
+      fees: 0,
+      extra: POLICY.extraRate,
+      extraCap: POLICY.extraCap,
+      basicPay: 1,
+      basicClaw: 24,
+      extraPay: POLICY.extraPayMonth,
+      extraClaw: POLICY.extraClawbackMonths,
+      penalty: 1,
+      penaltyMonths: 24
+    };
+
+    const app = {};
+
+    function resetApp() {
+      app.step = 0;
+      app.type = "purchase";
+      app.need = {
+        property: "private",
+        value: 6000000,
+        amount: 4000000,
+        years: 30,
+        horizon: 36,
+        referral: "no",
+        consent: false
+      };
+      app.docs = null;
+      app.offerIssued = false;
+      app.version = 1;
+      app.rate = APP_OFFER_TERMS.rate;
+      app.versionNote = "";
+      app.offerRead = false;
+      app.applyConfirmed = false;
+      app.progress = 1;
+      app.message = "";
+      renderApp();
+    }
+
+    function appDocs(type) {
+      const docs = [
+        {
+          id: "id",
+          name: "身份證明文件",
+          detail: "來源：行內 KYC 記錄；有效至 2031年5月",
+          status: "valid"
+        },
+        {
+          id: "payroll",
+          name: "出糧記錄（近 6 個月）",
+          detail: "來源：本行出糧帳戶；入帳不自動等同合資格收入，由專員核實",
+          status: "valid"
+        },
+        {
+          id: "address",
+          name: "住址證明",
+          detail: "行內記錄日期 2025年2月，已超過有效期",
+          status: "expired",
+          actions: [["上載新住址證明（模擬）", "已更新"]]
+        },
+        {
+          id: "income",
+          name: "職位及月入申報",
+          detail: "申報月入 HK$85,000，與出糧記錄平均 HK$82,300 不一致",
+          status: "conflict",
+          actions: [["以出糧記錄為準", "已確認以出糧記錄為準"], ["補交收入證明（模擬）", "已補交收入證明"]]
+        },
+        type === "purchase"
+          ? {
+            id: "contract",
+            name: "臨時買賣合約",
+            detail: "行內沒有此文件",
+            status: "missing",
+            actions: [["上載（模擬）", "已上載"]]
+          }
+          : {
+            id: "mortgage",
+            name: "現有按揭結欠及還款記錄",
+            detail: "他行轉入須提供；行內沒有此文件",
+            status: "missing",
+            actions: [["上載（模擬）", "已上載"]]
+          },
+        {
+          id: "tax",
+          name: "最近一年稅單",
+          detail: "行內沒有此文件",
+          status: "missing",
+          actions: [["上載（模擬）", "已上載"]]
+        }
+      ];
+
+      return docs;
+    }
+
+    const DOC_STATUS = {
+      valid: ["有效・重用", "done"],
+      expired: ["過期・需更新", "bad"],
+      conflict: ["矛盾・請確認", "bad"],
+      missing: ["待補", "sim"],
+      resolved: ["已確認", "done"]
+    };
+
+    function appOfferTerms() {
+      return Object.assign({}, APP_OFFER_TERMS, { rate: app.rate });
+    }
+
+    function renderAppSteps() {
+      const steps = $("app-steps");
+      let html = "";
+      for (let i = 1; i <= 5; i++) {
+        html += '<li class="' + (app.step >= i ? "on" : "") + '"></li>';
+      }
+      steps.innerHTML = html;
+      steps.setAttribute("aria-label", app.step ? "第 " + app.step + " 步，共 5 步" : "入口");
+    }
+
+    function screenHeader(step, title) {
+      return '<p class="small muted" style="margin: 0">第 ' + step + " 步／共 5 步</p><h2>" + esc(title) + "</h2>";
+    }
+
+    function renderApp() {
+      renderAppSteps();
+      const screen = $("app-screen");
+      const render = [appEntry, appNeed, appDocsScreen, appOfferScreen, appCostScreen, appCaseScreen][app.step];
+      screen.innerHTML = render();
+      bindApp(screen);
+    }
+
+    function appEntry() {
+      return (
+        '<p class="small muted" style="margin-top: 0">你好，陳先生（合成客戶）</p>' +
+        '<div class="tile"><b>PRISM 直達按揭</b><br><span class="small muted">本行出糧客戶 ✓ · 出糧帳戶已連續 26 個月（合成資料）</span></div>' +
+        '<button class="tile big" type="button" data-act="start" data-type="purchase"><b>申請本行按揭</b><span>新買樓，按揭本金 200萬至500萬元</span></button>' +
+        '<button class="tile big" type="button" data-act="start" data-type="refinance"><b>評估轉按成本</b><span>由他行轉入，先看持有期成本再決定</span></button>' +
+        '<p class="small muted">取得其他銀行報價屬自選功能；沒有外部報價，你仍可完成本行申請。</p>' +
+        '<p class="small muted"><span class="tag sim">模擬</span> 非真實銀行畫面，不會提交任何申請。</p>'
+      );
+    }
+
+    function appNeed() {
+      const n = app.need;
+      return (
+        screenHeader(1, "確認需要") +
+        '<p class="small muted">交易類型：' + (app.type === "purchase" ? "新按（新買樓）" : "他行轉入") + "</p>" +
+        '<div class="fields" style="grid-template-columns: 1fr">' +
+        '<label>物業類型<select id="ap-property">' +
+        '<option value="private"' + (n.property === "private" ? " selected" : "") + ">香港標準私人住宅</option>" +
+        '<option value="subsidised"' + (n.property === "subsidised" ? " selected" : "") + ">資助房屋</option>" +
+        "</select></label>" +
+        '<label>物業估值（HK$）<input id="ap-value" type="number" inputmode="decimal" value="' + n.value + '"></label>' +
+        '<label>融資額（HK$）<input id="ap-amount" type="number" inputmode="decimal" value="' + n.amount + '"></label>' +
+        '<label>年期（年）<input id="ap-years" type="number" inputmode="numeric" value="' + n.years + '"></label>' +
+        '<label>預計持有期（月）<input id="ap-horizon" type="number" inputmode="numeric" value="' + n.horizon + '"></label>' +
+        '<label>是否已有中介就這宗交易向本行提交轉介？<select id="ap-referral">' +
+        '<option value="no"' + (n.referral === "no" ? " selected" : "") + ">沒有</option>" +
+        '<option value="yes"' + (n.referral === "yes" ? " selected" : "") + ">有</option>" +
+        "</select></label>" +
+        "</div>" +
+        '<label class="check"><input id="ap-consent" type="checkbox"' + (n.consent ? " checked" : "") +
+        '><span class="small">我同意本行為「按揭申請及成本核對」這個指定用途，使用我的行內資料。</span></label>' +
+        '<p class="message small">' + esc(app.message) + "</p>" +
+        '<div class="actions"><button type="button" data-act="back">返回</button>' +
+        '<button type="button" class="primary" data-act="need-next">下一步</button></div>'
+      );
+    }
+
+    function appDocsScreen() {
+      const docs = app.docs;
+      const outstanding = docs.filter(d => d.status !== "valid" && d.status !== "resolved").length;
+
+      return (
+        screenHeader(2, "整理資料") +
+        '<p class="small muted">用途：按揭申請及成本核對（指定用途授權）。已重用行內有效資料，只列出需要你處理的項目。</p>' +
+        docs.map(d => {
+          const status = DOC_STATUS[d.status];
+          return (
+            '<div class="tile doc-item"><div class="info"><b>' + esc(d.name) + "</b><small>" +
+            esc(d.resolvedNote || d.detail) + "</small>" +
+            (d.actions && d.status !== "resolved"
+              ? '<div class="ops">' + d.actions.map((a, i) =>
+                '<button type="button" data-act="doc" data-doc="' + d.id + '" data-i="' + i + '">' + esc(a[0]) + "</button>").join("") + "</div>"
+              : "") +
+            '</div><span class="tag ' + status[1] + '">' + status[0] + "</span></div>"
+          );
+        }).join("") +
+        '<p class="small"><strong>' + (outstanding ? "尚餘 " + outstanding + " 項待處理" : "資料已齊備") + "</strong></p>" +
+        '<div class="actions"><button type="button" data-act="back">返回</button>' +
+        '<button type="button" class="primary" data-act="docs-next"' + (outstanding ? " disabled" : "") +
+        ">提交予專員出具方案</button></div>"
+      );
+    }
+
+    function appOfferScreen() {
+      if (!app.offerIssued) {
+        return (
+          screenHeader(3, "取得方案") +
+          '<div class="notice"><p class="small">資料已提交予按揭專員（模擬）。<br>人工試點目標：1工作日首次聯絡、1工作日初次資料審查，以及資料齊備後1工作日出具條件方案。補件通知不算出價完成。</p></div>' +
+          '<div class="actions"><button type="button" data-act="back">返回</button>' +
+          '<button type="button" class="primary" data-act="issue">查看條件方案（模擬出具）</button></div>'
+        );
+      }
+
+      const n = app.need;
+      const today = new Date();
+      const expiry = new Date(today.getTime() + 14 * 86400000);
+      const basic = roundMoney(n.amount * APP_OFFER_TERMS.basic / 100);
+      const extra = prismAward(n.amount);
+      const ltv = calculateLtv(n.amount, n.value, APP_OFFER_TERMS.basic, 0, true);
+
+      return (
+        screenHeader(3, "取得方案") +
+        (app.versionNote ? '<div class="notice warn"><p class="small">' + esc(app.versionNote) + "</p></div>" : "") +
+        '<div class="tile"><dl class="kv">' +
+        "<div><dt>方案編號</dt><dd>PRISM-CO-2026-00128 · v" + app.version + "</dd></div>" +
+        "<div><dt>出具者</dt><dd>按揭專員（授權職員，模擬）</dd></div>" +
+        "<div><dt>資料日期</dt><dd>" + isoDate(today) + "</dd></div>" +
+        "<div><dt>有效期至</dt><dd>" + isoDate(expiry) + "</dd></div>" +
+        "<div><dt>本金</dt><dd>" + money(n.amount) + "</dd></div>" +
+        "<div><dt>年期</dt><dd>" + n.years + " 年</dd></div>" +
+        "<div><dt>年利率</dt><dd>" + fmt(app.rate, 2) + "%（合成示例）</dd></div>" +
+        "<div><dt>封頂</dt><dd>示例為固定利率教學模型</dd></div>" +
+        "<div><dt>方案費用</dt><dd>HK$0.00</dd></div>" +
+        "<div><dt>銀行基本回贈</dt><dd>0.80%（" + money(basic) + "）</dd></div>" +
+        "<div><dt>PRISM 擬議加碼</dt><dd>0.20%（" + money(extra) + "）</dd></div>" +
+        "<div><dt>回贈支付</dt><dd>基本第 1 月；PRISM 取用後30曆日內</dd></div>" +
+        "<div><dt>提前清還</dt><dd>24 個月內全清按未還本金 1%</dd></div>" +
+        "<div><dt>回贈追回</dt><dd>24 個月內全清追回已付回贈</dd></div>" +
+        "<div><dt>按揭成數</dt><dd>" + fmt(ltv.ltv, 2) + "%" + (ltv.exceeds ? "（回贈計入）" : "") + "</dd></div>" +
+        "</dl></div>" +
+        '<div class="tile"><b>待完成核驗</b><ul class="small" style="margin: 6px 0 0">' +
+        "<li>物業估值</li><li>正式信貸審批</li><li>收入最終核實</li><li>律師文件及簽署</li></ul>" +
+        '<p class="small muted" style="margin-bottom: 0">條件方案不等於最終批核。收入、估值、信貸或產品條件變更時，銀行重新審核；系統保留前後版本及你的確認記錄。</p></div>' +
+        (app.version === 1
+          ? '<button type="button" data-act="revise" style="width: 100%; margin-bottom: 12px">模擬條款改動（估值後利率調整）</button>'
+          : "") +
+        '<label class="check"><input id="ap-read" type="checkbox"' + (app.offerRead ? " checked" : "") +
+        '><span class="small">我已閱讀尚待核驗事項及條款（v' + app.version + "）。</span></label>" +
+        '<div class="actions"><button type="button" data-act="back">返回</button>' +
+        '<button type="button" class="primary" data-act="offer-next"' + (app.offerRead ? "" : " disabled") +
+        ">核對成本</button></div>"
+      );
+    }
+
+    function appCostScreen() {
+      const n = app.need;
+      const months = n.years * 12;
+      const terms = appOfferTerms();
+      const exits = [12, 24, 25, 36, n.horizon]
+        .filter((m, i, list) => m <= months && list.indexOf(m) === i)
+        .sort((a, b) => a - b);
+
+      const rows = exits.map(m => {
+        const r = evaluateOffer(terms, n.amount, months, m);
+        return "<tr" + (m === n.horizon ? ' class="total"' : "") + "><td>第 " + m + " 月</td><td>" +
+          fmt(r.cost, 0) + "</td><td>" + fmt(r.balance, 0) + "</td></tr>";
+      }).join("");
+
+      const atHorizon = evaluateOffer(terms, n.amount, months, n.horizon);
+
+      return (
+        screenHeader(4, "核對成本") +
+        '<p class="small">按預計持有期 <strong>' + n.horizon + " 個月</strong>，本方案（v" + app.version +
+        "，年利率 " + fmt(app.rate, 2) + "%）淨融資成本約 <strong>" + money(atHorizon.cost) + "</strong>，每月供款 " +
+        money(atHorizon.payment) + "。</p>" +
+        '<div class="table-wrap"><table class="num"><thead><tr><th>退出</th><th>淨成本</th><th>未還本金</th></tr></thead><tbody>' +
+        rows + "</tbody></table></div>" +
+        '<p class="small muted">淨融資成本＝利息＋費用＋清還罰款＋回贈追回－已收回贈。退出時仍須清還的本金另列。24 個月內全清須付罰款並退回回贈，所以第 24 與 25 月差距明顯。</p>' +
+        '<button type="button" data-act="compare" style="width: 100%; margin-bottom: 8px">與其他報價比較（自選）</button>' +
+        '<label class="check"><input id="ap-apply" type="checkbox"' + (app.applyConfirmed ? " checked" : "") +
+        '><span class="small">我確認以此方案提交正式申請（模擬，不會真的提交）。</span></label>' +
+        '<div class="actions"><button type="button" data-act="back">返回</button>' +
+        '<button type="button" class="primary" data-act="apply"' + (app.applyConfirmed ? "" : " disabled") +
+        ">提交正式申請</button></div>"
+      );
+    }
+
+    const CASE_STAGES = [
+      ["提交正式申請", "客戶", "已完成"],
+      ["首次聯絡", "按揭專員", "目標 1 工作日"],
+      ["初次資料審查", "按揭專員", "目標 1 工作日"],
+      ["物業估值", "估值及信貸", "逾時須列原因、責任人和下一期限"],
+      ["正式信貸審批", "信貸", "另行計時"],
+      ["律師文件及簽署", "客戶及律師", "完成法定確認及簽署"],
+      ["取用（貸款正式發放）", "營運", "按實際週期追蹤"],
+      ["PRISM 優惠支付", "財務", "取用後 30 曆日內"],
+      ["追回期屆滿", "系統", "取用起 24 個月"]
+    ];
+
+    function appCaseScreen() {
+      const n = app.need;
+      const p = app.progress;
+      const award = prismAward(n.amount);
+      const offerStatus =
+        p < 6 ? "預算已預留 · 雙人覆核完成 · 待取用"
+          : p === 6 ? "已取用，待支付（30 曆日內）"
+            : p === 7 ? "已支付 " + money(award) + " · 追回期中（至第 24 個月）"
+              : p === 8 ? "已支付 " + money(award) + " · 追回期中（至第 24 個月）"
+                : "追回期已屆滿 · 優惠完成";
+      const next = CASE_STAGES[Math.min(p, CASE_STAGES.length - 1)];
+
+      return (
+        screenHeader(5, "跟進取用") +
+        '<div class="tile"><dl class="kv">' +
+        "<div><dt>案件編號</dt><dd>PRISM-CASE-2026-0412</dd></div>" +
+        "<div><dt>負責人</dt><dd>按揭專員 李小姐（合成）</dd></div>" +
+        "<div><dt>方案</dt><dd>PRISM-CO-2026-00128 · v" + app.version + "</dd></div>" +
+        "<div><dt>補件</dt><dd>" + (p === 3 ? "估值報告待出（模擬）" : "暫無") + "</dd></div>" +
+        "<div><dt>優惠狀態</dt><dd>" + esc(offerStatus) + "</dd></div>" +
+        "</dl></div>" +
+        (p < CASE_STAGES.length
+          ? '<div class="notice"><p class="small"><strong>下一步：</strong>' + esc(next[0]) + "<br>責任人：" +
+            esc(next[1]) + "　期限：" + esc(next[2]) + "</p></div>"
+          : '<div class="notice"><p class="small"><strong>案件已完成。</strong>同一案件編號貫穿申請、補件、取用和優惠。</p></div>') +
+        '<ol class="timeline">' +
+        CASE_STAGES.map((s, i) =>
+          '<li class="' + (i < p ? "done" : i === p ? "current" : "") + '">' + esc(s[0]) +
+          "<small>" + esc(s[1]) + " · " + esc(s[2]) + "</small></li>").join("") +
+        "</ol>" +
+        '<div class="actions">' +
+        (p < CASE_STAGES.length
+          ? '<button type="button" class="primary" data-act="advance">模擬下一步</button>'
+          : "") +
+        '<button type="button" data-act="restart">重新開始演示</button></div>'
+      );
+    }
+
+    function bindApp(screen) {
+      const buttons = screen.querySelectorAll("[data-act]");
+
+      for (let i = 0; i < buttons.length; i++) {
+        buttons[i].addEventListener("click", () => appAction(buttons[i]));
+      }
+
+      const read = $("ap-read");
+      if (read) {
+        read.addEventListener("change", () => {
+          app.offerRead = read.checked;
+          renderApp();
+        });
+      }
+
+      const apply = $("ap-apply");
+      if (apply) {
+        apply.addEventListener("change", () => {
+          app.applyConfirmed = apply.checked;
+          renderApp();
+        });
+      }
+    }
+
+    function saveNeedForm() {
+      const n = app.need;
+      n.property = $("ap-property").value;
+      n.value = $("ap-value").valueAsNumber;
+      n.amount = $("ap-amount").valueAsNumber;
+      n.years = $("ap-years").valueAsNumber;
+      n.horizon = $("ap-horizon").valueAsNumber;
+      n.referral = $("ap-referral").value;
+      n.consent = $("ap-consent").checked;
+    }
+
+    function validateNeed() {
+      const n = app.need;
+
+      if (n.property !== "private") {
+        return "資助房屋不在首期範圍，另行評估；已為你轉交一般人工服務（模擬）。";
+      }
+      if (n.referral === "yes") {
+        return "按試點規則，已有有效中介轉介的交易維持原渠道處理，不改標為直接客戶。你仍可經一般服務申請。";
+      }
+      if (!Number.isFinite(n.value) || n.value <= 0) {
+        return "請填寫物業估值。";
+      }
+      if (!Number.isFinite(n.amount) || n.amount < POLICY.minimumPrincipal || n.amount > POLICY.maximumPrincipal) {
+        return "首期只處理 200萬至500萬元的標準按揭；超出範圍由一般人工服務承接。";
+      }
+      if (n.amount >= n.value) {
+        return "融資額須低於物業估值。";
+      }
+      if (!Number.isInteger(n.years) || n.years < 1 || n.years > 30) {
+        return "年期須為 1 至 30 年的整數。";
+      }
+      if (!Number.isInteger(n.horizon) || n.horizon < 1 || n.horizon > n.years * 12) {
+        return "預計持有期須為 1 至 " + (n.years * 12) + " 個月的整數。";
+      }
+      if (!n.consent) {
+        return "請先同意指定用途授權。";
+      }
+      return "";
+    }
+
+    function appAction(button) {
+      const act = button.getAttribute("data-act");
+      app.message = "";
+
+      if (act === "start") {
+        app.type = button.getAttribute("data-type");
+        app.step = 1;
+      } else if (act === "back") {
+        if (app.step === 1) {
+          saveNeedForm();
+        }
+        app.step = Math.max(0, app.step - 1);
+      } else if (act === "need-next") {
+        saveNeedForm();
+        app.message = validateNeed();
+        if (!app.message) {
+          if (!app.docs || app.docs.type !== app.type) {
+            app.docs = appDocs(app.type);
+            app.docs.type = app.type;
+          }
+          app.step = 2;
+        }
+      } else if (act === "doc") {
+        const doc = app.docs.filter(d => d.id === button.getAttribute("data-doc"))[0];
+        const action = doc.actions[Number(button.getAttribute("data-i"))];
+        doc.status = "resolved";
+        doc.resolvedNote = action[1] + " · " + isoDate(new Date());
+      } else if (act === "docs-next") {
+        app.step = 3;
+      } else if (act === "issue") {
+        app.offerIssued = true;
+      } else if (act === "revise") {
+        app.version = 2;
+        app.rate = 3.55;
+        app.offerRead = false;
+        app.applyConfirmed = false;
+        app.versionNote =
+          "條款已由 v1 改為 v2：年利率 3.50% → 3.55%（估值後調整，模擬）。舊核驗已失效，成本已重新計算，請重新確認。";
+      } else if (act === "offer-next") {
+        app.step = 4;
+      } else if (act === "compare") {
+        prefillCostFromApp();
+        location.hash = "#cost";
+        return;
+      } else if (act === "apply") {
+        app.step = 5;
+        app.progress = 1;
+      } else if (act === "advance") {
+        app.progress = Math.min(CASE_STAGES.length, app.progress + 1);
+      } else if (act === "restart") {
+        resetApp();
+        return;
+      }
+
+      renderApp();
+      if (window.innerWidth < 900) {
+        $("app-screen").scrollIntoView({ block: "start" });
+      }
+    }
+
+    function prefillCostFromApp() {
+      const n = app.need;
+      const state = prismVersusBroker({ horizon: n.horizon });
+      state.names.A = "PRISM 條件方案 v" + app.version;
+      state.inputs.principal = n.amount;
+      state.inputs.months = n.years * 12;
+      state.inputs.A = appOfferTerms();
+      setCostState(state);
+      cost.source = "由原型 App 條件方案帶入；中介方案為合成示例，請改為你的外部報價";
+      $("cost-source").textContent = cost.source;
+      $("cost-confirmed").checked = false;
+      invalidateCost();
+    }
+
+    // ---------- 解釋服務（固定核准說明） ----------
+
+    const FAQ = [
+      {
+        q: "甚麼是淨融資成本？",
+        a: "淨融資成本＝累計利息＋方案特有費用＋清還罰款＋回贈追回－已收回贈。退出時仍須清還的本金另列，避免把成本較低誤解為所需現金較少。",
+        src: "立項書第3章「持有期成本」；附錄「按揭模型」",
+        keys: ["淨融資成本", "成本", "計算", "利息", "怎樣計"]
+      },
+      {
+        q: "為甚麼要看預計持有期？",
+        a: "同一組條款，在不同退出時間結論可以相反。立項書教學例子中，轉按方案若在24個月內全清，須付1%罰款並退回全部回贈，較貴約6萬元；第25月起罰款及追回不適用，反而較省約2.3萬至2.7萬元。",
+        src: "立項書第3章「持有期成本」",
+        keys: ["持有期", "持有", "退出", "12", "36", "轉按", "結論"]
+      },
+      {
+        q: "條件方案是否等於批核？",
+        a: "不等於。條件方案列明本金、年期、利率及封頂、費用、回贈、提前清還和追回條款，以及出具者、資料日期、有效期及待完成核驗。收入、估值、信貸或產品條件變更時，銀行會重新審核；AI 輸出不作批准。",
+        src: "立項書第3章「方案內容」；第6章「授信誤導」",
+        keys: ["批核", "批准", "審批", "條件方案", "保證", "一定"]
+      },
+      {
+        q: "PRISM 優惠何時支付？",
+        a: "擬議加碼為實際取用本金0.20%，每宗上限10,000元，於符合資格並取用後30曆日內支付；銀行基本回贈另列。全部屬待批准政策。",
+        src: "立項書第3章「直達優惠」",
+        keys: ["支付", "何時", "幾時", "甚麼時候", "加碼", "0.20", "發放", "入帳"]
+      },
+      {
+        q: "甚麼情況會追回優惠？",
+        a: "取用日起至24個月屆滿當日全清或轉按離行，追回未曾追回的已付PRISM餘額，取消未付部分。期內非例行部分還本按原優惠乘以還本額佔原本金比例調整，正常供款不調整。例：400萬元貸款第12月額外還本40萬元，追回800元；第18月全清，再追回7,200元。",
+        src: "立項書第3章「直達優惠」；附錄「優惠及日期」",
+        keys: ["追回", "被追回", "收回", "退回", "全清", "還本", "離行", "24"]
+      },
+      {
+        q: "為甚麼系統有時停止排名？",
+        a: "罰息或回贈追回條款缺失時，系統不把未知當作零，停止完整排名；未支援的浮息重設、部分還本或特殊條款亦停止自動排名，交專員處理。",
+        src: "立項書第1章；第4章「故障處理」",
+        keys: ["停止", "排名", "未知", "缺", "條款", "不完整"]
+      },
+      {
+        q: "如果其他銀行或中介較便宜？",
+        a: "系統按相同持有期口徑照實顯示差距，由你自行選擇；同條款換品牌結果須相同，外行較省亦照實顯示。本案不設按中介報價補差；未確認個人資格的公開優惠只可列為參考。",
+        src: "立項書第3章「直達優惠」；第6章「比較偏向本行」",
+        keys: ["中介", "其他銀行", "外行", "便宜", "較省", "補差", "比較", "偏向"]
+      },
+      {
+        q: "我的資料會如何使用？",
+        a: "比較、貸款申請及推廣用途分開，最少取數、加密及最小權限；不用客戶文件默認訓練模型，並提供人工處理及更正渠道。本演示只用合成資料。",
+        src: "立項書第6章「資料及AI風險」「資料與責任」",
+        keys: ["資料", "私隱", "隱私", "用途", "訓練", "刪除", "安全"]
+      },
+      {
+        q: "可以轉真人專員嗎？",
+        a: "可以。解釋服務可隨時轉人工；模型沒有出價或付款權限。人工試點目標為1工作日首次聯絡。",
+        src: "立項書第3章「服務時限」；第4章「系統架構」",
+        keys: ["真人", "專員", "人工", "聯絡", "客服"]
+      },
+      {
+        q: "回贈會否影響按揭成數？",
+        a: "回贈超過貸款額1%時，須把該筆回贈計入貸款額計算按揭成數，而非只計超出部分。例：貸款400萬元、估值600萬元、回贈合計44,000元，成數為67.40%。接近適用上限時，會重新核對本金與首期並取得你的確認，不靜默減少放款。",
+        src: "立項書第6章「回贈處理」",
+        keys: ["成數", "1%", "估值", "現金回贈", "上限"]
+      }
+    ];
+
+    function showFaq(item) {
+      const box = $("faq-answer");
+
+      if (!item) {
+        box.innerHTML =
+          '<div class="faq-answer"><strong>未有核准說明涵蓋此問題。</strong><br>' +
+          "按「無來源不補寫」原則，本服務不會自行編寫答案；已為你轉交按揭專員跟進（模擬）。" +
+          '<span class="src">來源：立項書第4章「解釋服務」控制</span></div>';
+        return;
+      }
+
+      box.innerHTML =
+        '<div class="faq-answer"><strong>' + esc(item.q) + "</strong><br>" + esc(item.a) +
+        '<span class="src">來源：' + esc(item.src) + "</span></div>";
+    }
+
+    function askFaq() {
+      const query = $("faq-query").value.trim().toLowerCase();
+
+      if (!query) {
+        return;
+      }
+
+      let best = null;
+      let bestScore = 0;
+
+      FAQ.forEach(item => {
+        let score = 0;
+        item.keys.forEach(key => {
+          if (query.indexOf(key.toLowerCase()) >= 0) {
+            score += key.length;
+          }
+        });
+        if (score > bestScore) {
+          best = item;
+          bestScore = score;
+        }
+      });
+
+      showFaq(best);
+    }
+
+    function initApp() {
+      const list = $("faq-list");
+      FAQ.forEach(item => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.textContent = item.q;
+        button.addEventListener("click", () => showFaq(item));
+        list.appendChild(button);
+      });
+
+      $("faq-ask").addEventListener("click", askFaq);
+      $("faq-query").addEventListener("keydown", event => {
+        if (event.key === "Enter") {
+          askFaq();
+        }
+      });
+
+      resetApp();
+    }
+
+    // =========================================================
+    // 10. 首頁案例捷徑
+    // =========================================================
+
+    const DEMOS = {
+      "app-start": () => resetApp(),
+      "cost-teaching": () => {
+        loadCostPreset("teaching");
+        $("cost-confirmed").checked = true;
+        calculateCostNow();
+      },
+      "cost-missing": () => {
+        loadCostPreset("missing");
+        $("cost-confirmed").checked = true;
+        calculateCostNow();
+      },
+      "offer-example": () => loadOfferExample(),
+      "ltv-example": () => loadLtvExample()
+    };
+
+    (function () {
+      const links = document.querySelectorAll("[data-demo]");
+      for (let i = 0; i < links.length; i++) {
+        links[i].addEventListener("click", () => {
+          const demo = DEMOS[links[i].getAttribute("data-demo")];
+          if (demo) {
+            demo();
+          }
+        });
+      }
+    })();
+
+    // =========================================================
+    // 11. 啟動
+    // =========================================================
+
+    initCost();
+    initOffer();
+    initFinance();
+    initApp();
+    showRoute();
+  </script>
+</body>
+</html>

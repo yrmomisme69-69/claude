@@ -1,0 +1,4615 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="renderer" content="webkit">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="PRISM 直达按揭：银行内嵌的按揭申请与成本核对服务。2026 工行杯参赛项目的立项书与可操作原型（合成资料演示）。">
+  <title>PRISM 直达按揭｜银行内嵌的按揭申请与成本核对服务</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23102d46'/%3E%3Cpath d='M16 6 26 25H6z' fill='none' stroke='%238bd8c9' stroke-width='3' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <script>
+    // 记住使用者选择的语言：若与本页不同，转到另一语言版本。
+    (function () {
+      try {
+        var saved = localStorage.getItem("prism-lang");
+        if ((saved === "hans" || saved === "hant") && saved !== "hans") {
+          location.replace("hant/index.html" + location.hash);
+        }
+      } catch (error) {}
+    })();
+  </script>
+  <style>
+    :root {
+      --navy: #102d46;
+      --navy-2: #1b4263;
+      --teal: #087c72;
+      --teal-soft: #e9f5f2;
+      --background: #f3f6f7;
+      --surface: #ffffff;
+      --text: #183247;
+      --muted: #607584;
+      --border: #dae4e8;
+      --danger: #a12f32;
+      --danger-soft: #fbeeee;
+      --warn: #8a5a00;
+      --warn-soft: #fff5e0;
+      --good: #1f7a3f;
+      --good-soft: #e7f5ec;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      margin: 0;
+      background: #f3f6f7;
+      background: var(--background);
+      color: #183247;
+      color: var(--text);
+      font-family:
+        -apple-system, BlinkMacSystemFont, "Segoe UI",
+        "PingFang SC", "Microsoft YaHei", "Noto Sans SC",
+        "PingFang TC", "Microsoft JhengHei", sans-serif;
+      line-height: 1.65;
+    }
+
+    html:lang(zh-Hant) body {
+      font-family:
+        -apple-system, BlinkMacSystemFont, "Segoe UI",
+        "PingFang TC", "Microsoft JhengHei", "Noto Sans TC",
+        "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+
+    a {
+      color: var(--teal);
+    }
+
+    /* ---------- 页首及导览 ---------- */
+
+    .site-header {
+      background: var(--navy);
+      color: white;
+    }
+
+    .site-header .bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 1100px;
+      margin: auto;
+      padding: 16px 16px 10px;
+    }
+
+    .brand {
+      color: white;
+      text-decoration: none;
+    }
+
+    .brand strong {
+      display: block;
+      font-size: 24px;
+      letter-spacing: 3px;
+      line-height: 1.2;
+    }
+
+    .brand span {
+      color: #c8dce8;
+      font-size: 13px;
+    }
+
+    #lang-toggle {
+      flex: 0 0 auto;
+      margin-left: 16px;
+      padding: 6px 14px;
+      border: 1px solid rgba(255, 255, 255, 0.45);
+      border-radius: 8px;
+      color: white;
+      text-decoration: none;
+      font-size: 15px;
+    }
+
+    .site-nav {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: var(--navy);
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .site-nav .tabs {
+      display: flex;
+      width: 100%;
+      max-width: 1100px;
+      margin: auto;
+      padding: 0 8px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      white-space: nowrap;
+    }
+
+    .site-nav a {
+      flex: 0 0 auto;
+      padding: 11px 12px;
+      border-bottom: 3px solid transparent;
+      color: #c8dce8;
+      text-decoration: none;
+      font-size: 15px;
+    }
+
+    .site-nav a.active {
+      border-bottom-color: #8bd8c9;
+      color: white;
+      font-weight: 700;
+    }
+
+    main {
+      width: 100%;
+      max-width: 1100px;
+      margin: auto;
+      padding: 24px 16px 60px;
+    }
+
+    footer {
+      padding: 24px 16px 40px;
+      color: var(--muted);
+      font-size: 13px;
+      text-align: center;
+    }
+
+    /* ---------- 基本排版 ---------- */
+
+    h1 {
+      margin: 0 0 12px;
+      font-size: 28px;
+      font-size: clamp(25px, 4vw, 34px);
+      line-height: 1.3;
+    }
+
+    h2 {
+      margin: 0 0 14px;
+      font-size: 21px;
+      line-height: 1.4;
+    }
+
+    h3 {
+      margin: 20px 0 8px;
+      font-size: 17px;
+    }
+
+    p {
+      margin: 8px 0 14px;
+    }
+
+    ul,
+    ol {
+      padding-left: 22px;
+    }
+
+    li {
+      margin-bottom: 6px;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .small {
+      font-size: 14px;
+    }
+
+    .lead {
+      font-size: 17px;
+    }
+
+    .card {
+      margin-bottom: 20px;
+      padding: 24px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: var(--surface);
+    }
+
+    .notice {
+      margin-bottom: 20px;
+      padding: 14px 18px;
+      border-left: 4px solid var(--teal);
+      border-radius: 8px;
+      background: var(--teal-soft);
+    }
+
+    .notice.warn {
+      border-left-color: #d49a1a;
+      background: var(--warn-soft);
+    }
+
+    .notice.danger {
+      border-left-color: var(--danger);
+      background: var(--danger-soft);
+    }
+
+    .notice p:last-child {
+      margin-bottom: 0;
+    }
+
+    .page-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .page-head h1 {
+      margin: 0 12px 6px 0;
+    }
+
+    .columns {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-gap: 20px;
+      gap: 20px;
+    }
+
+    /* 让格线内的卡片可以收窄，宽表格改在卡片内滚动。 */
+    .columns > *,
+    .grid-3 > *,
+    .grid-4 > *,
+    .fields > *,
+    .kpis > *,
+    .app-layout > * {
+      min-width: 0;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-gap: 16px;
+      gap: 16px;
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-gap: 16px;
+      gap: 16px;
+    }
+
+    /* ---------- 状态标签 ---------- */
+
+    .tag {
+      display: inline-block;
+      padding: 1px 9px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.8;
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+
+    .tag.done {
+      background: var(--good-soft);
+      color: var(--good);
+    }
+
+    .tag.sim {
+      background: var(--warn-soft);
+      color: var(--warn);
+    }
+
+    .tag.plan {
+      background: #edf0f2;
+      color: #52606b;
+    }
+
+    .tag.bad {
+      background: var(--danger-soft);
+      color: var(--danger);
+    }
+
+    /* ---------- 表单 ---------- */
+
+    label {
+      display: block;
+      font-size: 15px;
+    }
+
+    input,
+    select,
+    button,
+    textarea {
+      font: inherit;
+    }
+
+    input[type="number"],
+    input[type="text"],
+    select {
+      width: 100%;
+      margin-top: 6px;
+      padding: 10px 12px;
+      border: 1px solid #b9cbd4;
+      border-radius: 8px;
+      background: white;
+      color: var(--text);
+    }
+
+    input:disabled,
+    select:disabled {
+      background: #eef2f4;
+      color: var(--muted);
+    }
+
+    input:focus,
+    select:focus,
+    button:focus-visible,
+    a:focus-visible,
+    summary:focus-visible {
+      outline: 3px solid #8bd8c9;
+      outline-offset: 2px;
+    }
+
+    .fields {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-gap: 14px;
+      gap: 14px;
+    }
+
+    .fields.three {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .fields.four {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .fields.five {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+
+    button,
+    .button,
+    .file-button {
+      display: inline-block;
+      padding: 10px 16px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: white;
+      color: var(--text);
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+      line-height: 1.5;
+    }
+
+    button.primary,
+    .button.primary {
+      border-color: var(--teal);
+      background: var(--teal);
+      color: white;
+    }
+
+    button.link {
+      padding: 0;
+      border: 0;
+      background: none;
+      color: var(--teal);
+      text-decoration: underline;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* 以外边距代替 flex gap，兼容较旧的手机浏览器。 */
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      margin: 0 -10px -10px 0;
+    }
+
+    .actions > * {
+      margin: 0 10px 10px 0;
+    }
+
+    .check {
+      display: flex;
+      align-items: flex-start;
+      margin: 12px 0;
+    }
+
+    .check input {
+      width: 20px;
+      height: 20px;
+      flex: 0 0 auto;
+      margin: 3px 10px 0 0;
+    }
+
+    .message {
+      color: var(--danger);
+      white-space: pre-line;
+    }
+
+    .message:empty {
+      display: none;
+    }
+
+    /* ---------- 表格 ---------- */
+
+    .table-wrap {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      margin: 8px 0 14px;
+    }
+
+    table {
+      width: 100%;
+      min-width: 520px;
+      border-collapse: collapse;
+      font-size: 15px;
+    }
+
+    .phone table,
+    table.fit {
+      min-width: 0;
+    }
+
+    th,
+    td {
+      padding: 10px 10px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    thead th {
+      background: #f6f9fa;
+      font-size: 14px;
+    }
+
+    table.num td,
+    table.num th {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    table.num td:first-child,
+    table.num th:first-child {
+      text-align: left;
+      white-space: normal;
+    }
+
+    tr.total {
+      background: var(--teal-soft);
+      font-weight: 750;
+    }
+
+    td.neg {
+      color: var(--danger);
+    }
+
+    td.pos {
+      color: var(--good);
+    }
+
+    td.unknown {
+      color: var(--warn);
+      font-weight: 700;
+    }
+
+    /* ---------- 首页 ---------- */
+
+    .hero {
+      padding: 28px 24px;
+      border-radius: 18px;
+      background: var(--navy);
+      background: linear-gradient(135deg, #102d46 0%, #1b4263 60%, #0c5c5a 100%);
+      color: white;
+    }
+
+    .hero .eyebrow {
+      margin: 0 0 12px;
+      color: #a9d9cf;
+      font-size: 14px;
+    }
+
+    .hero h1 {
+      margin-bottom: 4px;
+      font-size: 34px;
+      font-size: clamp(30px, 6vw, 46px);
+      letter-spacing: 1px;
+    }
+
+    .hero .sub {
+      margin: 0 0 16px;
+      color: #d9e8f0;
+      font-size: 19px;
+    }
+
+    .hero p {
+      color: #d9e8f0;
+    }
+
+    .hero .button {
+      border-color: rgba(255, 255, 255, 0.5);
+      background: transparent;
+      color: white;
+    }
+
+    .hero .button.primary {
+      border-color: #8bd8c9;
+      background: #8bd8c9;
+      color: var(--navy);
+      font-weight: 700;
+    }
+
+    .facts {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-gap: 8px 20px;
+      gap: 8px 20px;
+      margin: 0;
+    }
+
+    .facts div {
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .facts dt {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .facts dd {
+      margin: 0;
+      font-weight: 600;
+    }
+
+    .stat {
+      padding: 18px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--surface);
+    }
+
+    .stat b {
+      display: block;
+      color: var(--navy);
+      font-size: 26px;
+      line-height: 1.3;
+    }
+
+    .stat span {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .case-card {
+      display: flex;
+      flex-direction: column;
+      padding: 18px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--surface);
+    }
+
+    .case-card h3 {
+      margin: 6px 0 6px;
+    }
+
+    .case-card p {
+      flex: 1 1 auto;
+      margin: 0 0 12px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .case-card .num {
+      color: var(--teal);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    /* ---------- 立项书 ---------- */
+
+    .doc {
+      font-size: 16px;
+    }
+
+    .doc h2 {
+      margin-top: 8px;
+      padding-top: 8px;
+    }
+
+    .doc .chapter {
+      scroll-margin-top: 60px;
+    }
+
+    .toc {
+      columns: 2;
+      column-gap: 32px;
+      padding-left: 0;
+      list-style: none;
+    }
+
+    .toc li {
+      break-inside: avoid;
+    }
+
+    .refs li {
+      margin-bottom: 12px;
+      word-break: break-word;
+    }
+
+    .formula {
+      padding: 10px 14px;
+      border-radius: 8px;
+      background: #f6f9fa;
+      font-family: "SFMono-Regular", Menlo, Consolas, monospace;
+      font-size: 14px;
+      overflow-x: auto;
+    }
+
+    /* ---------- 原型 App ---------- */
+
+    .app-layout {
+      display: grid;
+      grid-template-columns: 400px minmax(0, 1fr);
+      grid-gap: 28px;
+      gap: 28px;
+      align-items: start;
+    }
+
+    .phone {
+      overflow: hidden;
+      border: 10px solid var(--navy);
+      border-radius: 34px;
+      background: #f7f9fa;
+      box-shadow: 0 18px 40px rgba(16, 45, 70, 0.18);
+    }
+
+    .phone-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      background: var(--navy);
+      color: white;
+      font-size: 14px;
+    }
+
+    .phone-top b {
+      letter-spacing: 1px;
+    }
+
+    .phone-body {
+      min-height: 620px;
+      padding: 16px;
+    }
+
+    .steps {
+      display: flex;
+      margin: 0 0 14px;
+      padding: 0;
+      list-style: none;
+    }
+
+    .steps li {
+      flex: 1 1 0;
+      height: 6px;
+      margin: 0 2px;
+      border-radius: 3px;
+      background: var(--border);
+    }
+
+    .steps li.on {
+      background: var(--teal);
+    }
+
+    .screen h2 {
+      font-size: 19px;
+    }
+
+    .tile {
+      margin-bottom: 12px;
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: white;
+    }
+
+    .tile.big {
+      display: block;
+      width: 100%;
+      text-align: left;
+    }
+
+    .tile.big b {
+      display: block;
+      font-size: 17px;
+    }
+
+    .tile.big span {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .doc-item {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+    }
+
+    .doc-item .info {
+      flex: 1 1 auto;
+      margin-right: 8px;
+    }
+
+    .doc-item .info b {
+      display: block;
+    }
+
+    .doc-item .info small {
+      display: block;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .doc-item .ops {
+      margin-top: 8px;
+    }
+
+    .doc-item .ops button {
+      margin: 0 6px 6px 0;
+      padding: 5px 10px;
+      font-size: 13px;
+    }
+
+    .kv {
+      margin: 0;
+    }
+
+    .kv div {
+      display: flex;
+      justify-content: space-between;
+      padding: 7px 0;
+      border-bottom: 1px dashed var(--border);
+      font-size: 14px;
+    }
+
+    .kv dt {
+      color: var(--muted);
+      margin-right: 12px;
+    }
+
+    .kv dd {
+      margin: 0;
+      font-weight: 600;
+      text-align: right;
+    }
+
+    .timeline {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .timeline li {
+      position: relative;
+      margin: 0;
+      padding: 0 0 14px 26px;
+      font-size: 14px;
+    }
+
+    .timeline li::before {
+      content: "";
+      position: absolute;
+      top: 5px;
+      left: 4px;
+      width: 11px;
+      height: 11px;
+      border: 2px solid #b9cbd4;
+      border-radius: 50%;
+      background: white;
+    }
+
+    .timeline li.done::before {
+      border-color: var(--teal);
+      background: var(--teal);
+    }
+
+    .timeline li.current::before {
+      border-color: var(--teal);
+      box-shadow: 0 0 0 4px rgba(8, 124, 114, 0.18);
+    }
+
+    .timeline li small {
+      display: block;
+      color: var(--muted);
+    }
+
+    .faq-answer {
+      padding: 12px 14px;
+      border-radius: 10px;
+      background: var(--teal-soft);
+      font-size: 14px;
+    }
+
+    .faq-answer .src {
+      display: block;
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .faq-list button {
+      display: block;
+      width: 100%;
+      margin-bottom: 8px;
+      text-align: left;
+      font-size: 14px;
+    }
+
+    /* ---------- 结果 ---------- */
+
+    .result {
+      background: var(--navy);
+      color: white;
+    }
+
+    .result p {
+      color: #cfdee8;
+    }
+
+    .result.stopped {
+      background: #5b3a0c;
+    }
+
+    .amount {
+      margin: 8px 0;
+      font-size: 38px;
+      font-size: clamp(30px, 6vw, 46px);
+      font-weight: 750;
+      line-height: 1.2;
+    }
+
+    .kpis {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-gap: 12px;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .kpi {
+      padding: 14px;
+      border-radius: 12px;
+      background: #f6f9fa;
+    }
+
+    .kpi b {
+      display: block;
+      font-size: 22px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .kpi span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .kpi.good b {
+      color: var(--good);
+    }
+
+    .kpi.bad b {
+      color: var(--danger);
+    }
+
+    .chart svg {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .chart .axis {
+      stroke: #b9cbd4;
+      stroke-width: 1;
+    }
+
+    .chart .zero {
+      stroke: #607584;
+      stroke-width: 1;
+      stroke-dasharray: 4 3;
+    }
+
+    .chart .line {
+      fill: none;
+      stroke: var(--teal);
+      stroke-width: 2.5;
+    }
+
+    .chart .line-2 {
+      fill: none;
+      stroke: var(--navy);
+      stroke-width: 2.5;
+    }
+
+    .chart .bar-pos {
+      fill: #7cc8bb;
+    }
+
+    .chart .bar-neg {
+      fill: #e3a3a5;
+    }
+
+    .chart text {
+      fill: #607584;
+      font-size: 12px;
+    }
+
+    .legend {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .legend i {
+      display: inline-block;
+      width: 14px;
+      height: 4px;
+      margin: 0 6px 3px 0;
+      border-radius: 2px;
+      vertical-align: middle;
+    }
+
+    .row-list .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      grid-gap: 10px;
+      gap: 10px;
+      align-items: end;
+      margin-bottom: 10px;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    /* ---------- 响应式 ---------- */
+
+    @media (max-width: 900px) {
+      .app-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .phone {
+        max-width: 420px;
+        margin: auto;
+      }
+
+      .grid-4 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .fields.five {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 700px) {
+      .columns,
+      .grid-3,
+      .fields.three,
+      .kpis {
+        grid-template-columns: 1fr;
+      }
+
+      .fields.four {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .facts {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .card {
+        padding: 20px 16px;
+      }
+
+      .toc {
+        columns: 1;
+      }
+
+      .hero {
+        padding: 22px 18px;
+      }
+    }
+
+    @media (max-width: 460px) {
+      .phone {
+        border-width: 0;
+        border-radius: 14px;
+        box-shadow: none;
+      }
+
+      .phone-body {
+        padding: 12px;
+      }
+
+      .fields,
+      .fields.five,
+      .grid-4 {
+        grid-template-columns: 1fr;
+      }
+
+      .fields.four {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .facts {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media print {
+      .site-header,
+      .site-nav,
+      .actions,
+      footer {
+        display: none !important;
+      }
+
+      body {
+        background: white;
+      }
+
+      .card {
+        break-inside: avoid;
+      }
+
+      .result,
+      .hero {
+        background: white;
+        color: black;
+      }
+
+      .result p,
+      .hero p {
+        color: black;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="site-header">
+    <div class="bar">
+      <a class="brand" href="#home">
+        <strong>PRISM</strong>
+        <span>直达按揭 · 银行内嵌的按揭申请与成本核对服务</span>
+      </a>
+      <a id="lang-toggle" href="hant/index.html" lang="zh-Hant" data-lang="hant">繁體</a>
+    </div>
+  </header>
+
+  <nav class="site-nav" aria-label="主选单">
+    <div class="tabs">
+      <a href="#home" data-nav="home">首页</a>
+      <a href="#proposal" data-nav="proposal">立项书</a>
+      <a href="#app" data-nav="app">原型 App</a>
+      <a href="#cost" data-nav="cost">持有期成本</a>
+      <a href="#offer" data-nav="offer">优惠与成数</a>
+      <a href="#finance" data-nav="finance">财务模型</a>
+    </div>
+  </nav>
+
+  <main>
+    <noscript>
+      <div class="notice danger">
+        本网站的计算及原型需要启用 JavaScript。
+      </div>
+    </noscript>
+
+    <!-- =====================================================
+         首页
+         ===================================================== -->
+    <section data-route="home">
+      <div class="hero">
+        <p class="eyebrow">2026 工行杯 · 第一届香港大学生金融科技创新大赛 · 第十七届全国大学生金融科技创新大赛</p>
+        <h1>PRISM 直达按揭</h1>
+        <p class="sub">银行内嵌的按揭申请与成本核对服务</p>
+        <p>
+          让尚未决定办理渠道的本行出粮标准按揭客户，重用有效资料、取得银行条件方案、看清持有期成本，并由同一案件跟进至放款及回赠。客户毋须先自行找齐外部报价。
+        </p>
+        <div class="actions">
+          <a class="button primary" href="#app">试用原型 App</a>
+          <a class="button" href="#cost">持有期成本比较</a>
+          <a class="button" href="#proposal">阅读立项书</a>
+        </div>
+      </div>
+
+      <div class="notice warn" style="margin-top: 20px">
+        <p>
+          <strong>参赛示范网站：</strong>本提案建议先以60万港元进行受控验证。银行合作、优惠政策及系统接驳仍待确认；本网站不代表工银亚洲已批准或推出相关服务。演示站只用合成资料，不取得真实报价、不作信贷审批，亦不提交申请。文内金额均为港元。
+        </p>
+      </div>
+
+      <div class="card">
+        <dl class="facts">
+          <div><dt>学校</dt><dd>香港恒生大学</dd></div>
+          <div><dt>拟选方向</dt><dd>数字金融</dd></div>
+          <div><dt>应用场景</dt><dd>工银亚洲香港住宅按揭</dd></div>
+          <div><dt>团队名称</dt><dd>待确认正式报名名称</dd></div>
+          <div><dt>版本</dt><dd>v14 整合修订稿</dd></div>
+          <div><dt>日期</dt><dd>2026年10月1日</dd></div>
+        </dl>
+      </div>
+
+      <div class="grid-4" style="margin-bottom: 20px">
+        <div class="stat"><b>200万–500万</b><span>首期聚焦的标准私人住宅新按及他行转入本金</span></div>
+        <div class="stat"><b>0.20%</b><span>拟议 PRISM 加码，每宗上限 HK$10,000（待批准）</span></div>
+        <div class="stat"><b>60万</b><span>建议银行先审批的封顶验证额</span></div>
+        <div class="stat"><b>最多 20 宗</b><span>首期受惠取用的银行试点</span></div>
+      </div>
+
+      <div class="card">
+        <h2>核心创新</h2>
+        <p>把条款原文、核对结果、成本计算及案件状态连在同一流程。条款改动后，系统重新计算并提示重新确认；缺少罚息或回赠追回条款时，停止完整排名。AI负责抽取与解释，固定程序负责计算，银行保留定价与授信权限。</p>
+        <div class="grid-3">
+          <div>
+            <h3>① 条款可追溯</h3>
+            <p class="small muted">条款字段附带来源及核对状态，修改关键条款会使旧核验失效，减少旧报价被继续引用。</p>
+          </div>
+          <div>
+            <h3>② 持有期同一口径</h3>
+            <p class="small muted">把罚息和回赠追回纳入同一口径，明确显示结论反转的原因。</p>
+          </div>
+          <div>
+            <h3>③ 资料延续</h3>
+            <p class="small muted">计算所用资料延续至申请和优惠跟进，减少客户再次输入和转交。</p>
+          </div>
+        </div>
+      </div>
+
+      <h2>四个展示案例</h2>
+      <p class="muted">按立项书「展示安排」，每个案例都可以直接操作。</p>
+      <div class="grid-4" style="margin-bottom: 20px">
+        <div class="case-card">
+          <span class="num">案例 1 <span class="tag sim">模拟</span></span>
+          <h3>零外部报价也能开始申请</h3>
+          <p>由手机银行入口开始，重用行内资料、补交缺件，取得本行条件方案。</p>
+          <a class="button" href="#app" data-demo="app-start">开始</a>
+        </div>
+        <div class="case-card">
+          <span class="num">案例 2 <span class="tag done">已实作</span></span>
+          <h3>持有 12 月与 36 月结论不同</h3>
+          <p>立项书教学例子：转按方案在 24 月内较贵，第 25 月起反转为较省。</p>
+          <a class="button" href="#cost" data-demo="cost-teaching">查看</a>
+        </div>
+        <div class="case-card">
+          <span class="num">案例 3 <span class="tag done">已实作</span></span>
+          <h3>24 个月内全清按比例追回</h3>
+          <p>400万贷款：第12月额外还本40万追回800元，第18月全清再追回7,200元。</p>
+          <a class="button" href="#offer" data-demo="offer-example">查看</a>
+        </div>
+        <div class="case-card">
+          <span class="num">案例 4 <span class="tag done">已实作</span></span>
+          <h3>缺少追回条款时停止排名</h3>
+          <p>条款未知不当作零；系统停止完整排名，列出缺项并交专员处理。</p>
+          <a class="button" href="#cost" data-demo="cost-missing">查看</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>功能状态</h2>
+        <p class="small muted">画面逐项标示已实作、模拟及规划，避免用示意画面代替银行接口。</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>功能</th><th>状态</th><th>说明</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>持有期成本引擎</td><td><span class="tag done">已实作</span></td><td>在浏览器内按固定程序计算月供、利息、罚息、回赠支付及追回；可导入导出。</td></tr>
+              <tr><td>缺项停止排名</td><td><span class="tag done">已实作</span></td><td>罚息或回赠追回条款未知时，不当作零，停止完整排名。</td></tr>
+              <tr><td>PRISM 优惠追回与成数检查</td><td><span class="tag done">已实作</span></td><td>0.20%／上限 10,000 元、24 个月按比例追回、回赠超过 1% 的成数处理。</td></tr>
+              <tr><td>银行财务模型</td><td><span class="tag done">已实作</span></td><td>每宗贡献、五年净现值、不利情境及投资门槛，可自行修改假设。</td></tr>
+              <tr><td>申请流程、条件方案、案件跟进</td><td><span class="tag sim">模拟</span></td><td>以合成客户及合成方案演示 5 步流程；不连接银行系统。</td></tr>
+              <tr><td>解释服务</td><td><span class="tag sim">模拟</span></td><td>以固定核准说明回答；无来源不补写，可转人工。</td></tr>
+              <tr><td>行内资料重用、信贷及定价接口</td><td><span class="tag plan">规划</span></td><td>待银行整合，逐模组安全及业务验收后才称上线。</td></tr>
+              <tr><td>AI 条款抽取（OCR＋语言模型）</td><td><span class="tag plan">规划</span></td><td>先与人工及规则方式对照验证，不能减少全程工时则沿用人工流程。</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="small muted">
+          <span class="tag done">已实作</span> 在本网站真实运算
+          <span class="tag sim">模拟</span> 以合成资料演示流程
+          <span class="tag plan">规划</span> 待银行协作及整合
+        </p>
+      </div>
+    </section>
+
+    <!-- =====================================================
+         立项书
+         ===================================================== -->
+    <section data-route="proposal" hidden>
+      <article class="doc">
+        <div class="page-head">
+          <h1>PRISM 直达按揭 项目立项书</h1>
+          <span class="tag plan">v14 整合修订稿</span>
+        </div>
+        <p class="muted">银行内嵌的按揭申请与成本核对服务 · 香港恒生大学 · 2026年10月1日</p>
+
+        <div class="card">
+          <h2>项目定位</h2>
+          <p>让尚未决定办理渠道的本行出粮标准按揭客户，重用有效资料、取得银行条件方案、看清持有期成本，并由同一案件跟进至放款及回赠。客户毋须先自行找齐外部报价。</p>
+          <p>本提案建议先以60万港元进行受控验证。银行合作、优惠政策及系统接驳仍待确认；本稿不代表工银亚洲已批准或推出相关服务。</p>
+        </div>
+
+        <div class="card">
+          <h2>目录</h2>
+          <ol class="toc">
+            <li><button class="link" type="button" data-scroll="ch1">1 项目摘要</button></li>
+            <li><button class="link" type="button" data-scroll="ch2">2 客户与需求</button></li>
+            <li><button class="link" type="button" data-scroll="ch3">3 产品方案</button></li>
+            <li><button class="link" type="button" data-scroll="ch3b">3 产品方案：成本与优惠</button></li>
+            <li><button class="link" type="button" data-scroll="ch4">4 技术设计</button></li>
+            <li><button class="link" type="button" data-scroll="ch5">5 商业模式</button></li>
+            <li><button class="link" type="button" data-scroll="ch5b">5 商业模式：财务结果</button></li>
+            <li><button class="link" type="button" data-scroll="ch6">6 风险管理</button></li>
+            <li><button class="link" type="button" data-scroll="ch7">7 实施与验证</button></li>
+            <li><button class="link" type="button" data-scroll="ch7b">7 实施与验证：验证方法</button></li>
+            <li><button class="link" type="button" data-scroll="ch8">8 团队与成果</button></li>
+            <li><button class="link" type="button" data-scroll="appendix">附录 计算口径</button></li>
+            <li><button class="link" type="button" data-scroll="refs">参考资料</button></li>
+          </ol>
+        </div>
+
+        <!-- 1 -->
+        <div class="card chapter" id="ch1">
+          <h2>1 项目摘要</h2>
+          <p>我们建议把PRISM嵌入现有手机银行和按揭工作台，服务在本行出粮、有按揭需要但尚未决定办理渠道的既有关系客户。系统整理资料与条款，银行负责出价、审批及跟进，客户只需确认事实、补交必要文件及签署。</p>
+          <p>核心创新是把条款原文、核对结果、成本计算及案件状态连在同一流程。条款改动后，系统重新计算并提示重新确认；缺少罚息或回赠追回条款时，停止完整排名。AI负责抽取与解释，固定程序负责计算，银行保留定价与授信权限。</p>
+          <p>客户收益是少重填、少追问及更容易理解费用；银行收益须来自可证明的渠道成本节省。现有资料未能证明实际节佣率，因此只建议分段验证，不把正净现值当作已实现收益。</p>
+          <p>首期聚焦200万至500万元的标准私人住宅新按及他行转入。先做同价流程测试，再开展最多20宗受惠取用的银行试点。资助房屋及跨行代申请另行评估；本行到期续留只列附加情境，不计入主情境净现值。</p>
+          <p class="small muted">文内金额均为港元；市场事实附来源，财务数字与服务时限均为明示假设或拟议目标。取用指贷款正式发放。</p>
+        </div>
+
+        <!-- 2 -->
+        <div class="card chapter" id="ch2">
+          <h2>2 客户与需求</h2>
+          <h3>客户问题</h3>
+          <p>按揭客户需要知道可申请的融资额、尚欠哪些文件，以及利率、回赠和提前清还条款如何影响实际支出。单纯增加一个上载报价的入口，仍把搜集和整理工作留给客户。PRISM由银行承接文件清单、条件方案与进度跟进。</p>
+          <p>例如，一名本行出粮客户准备申请400万元按揭。PRISM先列出银行已有且仍有效的资料、需要更新的项目及剩余缺件，让专员据此取得本行条件方案。客户可以较早发现资料或融资缺口，但条件方案不等于最终批核，也不能保证避免交易损失。</p>
+
+          <h3>目标客群</h3>
+          <p>首期客户须为本行出粮客户，具可核实的固定收入、拟购或持有香港标准私人住宅，尚未决定办理渠道，且未有中介就该宗交易向本行提交有效转介。这是试点范围，不是银行实际信贷政策；不适合标准流程者由一般人工服务承接。</p>
+
+          <h3>需求证据</h3>
+          <p>金管局公布的2026年7月统计显示，当月新申请9,212宗，新批贷款448亿元，其中转按73亿元。[1] 8月新批贷款回落至322亿元，但转按贷款按月增6.8%至78亿元，是唯一上升的类别。[9] 业界按官方数据整理，8月新批转按1,586宗，约占新批6,090宗的26%，宗数及金额均创33个月新高。[10] 转按升温支持首期纳入他行转入客户，但月度流量不能直接推算PRISM可取得的客户数。</p>
+          <p>现有研究材料记载两次探索访谈，反映受访者关注融资不确定性、重交资料及熟悉的银行关系。原始录音、书面记录和引用许可尚待整理；两人经验不代表市场比例，也不能证明各渠道息率必定相同。问卷尚未取得一致的完成纪录，本稿不列调查结果。提交前拟补充8至10名近期置业或转按者（兼顾曾用及未用中介者）及2至3名从业者访谈，重点了解渠道选择原因、直接办理所需的最低优惠及对银行比较立场的顾虑；未完成前不列结论。</p>
+
+          <h3>替代选择</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>选择</th><th>既有能力</th><th>PRISM须证明的改善</th></tr></thead>
+              <tbody>
+                <tr><td>按揭中介</td><td>经络明示免费服务，并可协助多行申请。[2]</td><td>本行条件合适时，直接办理是否更省力；不能以节省客户中介费作卖点。</td></tr>
+                <tr><td>银行数码按揭</td><td>DBS称约10分钟填申请，提交后约1分钟有结果，仍须文件核验。[3]</td><td>速度已是竞争要求；须展示条款可追溯及案件承接的新增价值。</td></tr>
+                <tr><td>本行现有服务</td><td>预填、申请及专员功能须向银行盘点。</td><td>以相同任务量度重填、补件、处理时间；已有功能直接重用。</td></tr>
+                <tr><td>一般AI工具</td><td>可解释条款及处理客户提供的资料。</td><td>须取得银行授权方案，连接可追踪的申请与责任人。</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 3 -->
+        <div class="card chapter" id="ch3">
+          <h2>3 产品方案</h2>
+          <h3>申请流程</h3>
+          <p>入口提供「申请本行按揭」及「评估转按成本」。取得其他银行报价属自选功能；没有外部报价，客户仍可完成本行申请。<a href="#app">在原型 App 试用 →</a></p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>步骤</th><th>系统及银行工作</th><th>客户工作</th></tr></thead>
+              <tbody>
+                <tr><td>1 确认需要</td><td>辨识新按或转入，取得指定用途授权。</td><td>确认物业、融资额、年期及预计持有期。</td></tr>
+                <tr><td>2 整理资料</td><td>重用有效资料；列出过期、矛盾及待补项。</td><td>确认事实并补交必要文件。</td></tr>
+                <tr><td>3 取得方案</td><td>由授权系统或职员出具带编号、有效期及条件的方案。</td><td>阅读尚待核验事项，决定是否继续。</td></tr>
+                <tr><td>4 核对成本</td><td>按持有期计算成本，列优惠、支付及追回条件。</td><td>查看情境并确认正式申请。</td></tr>
+                <tr><td>5 跟进取用</td><td>同一案件显示负责人、下一步、补件及优惠状态。</td><td>完成法定确认、签署及必要补件。</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>方案内容</h3>
+          <p>条件方案须列本金、年期、利率及封顶、费用、回赠、提前清还和追回条款，并显示出具者、资料日期、有效期及待完成核验。收入、估值、信贷或产品条件变更时，银行重新审核；系统保留前后版本及客户确认记录。</p>
+
+          <h3>资料来源</h3>
+          <p>本行方案以银行授权来源为准。公开市场资料只作参考，显示来源、查核日和缺项；首期最多维护5家银行的官方资料，营运人员每日查核，过期项目停止用于比较。外部个人报价只有在资格、有效期及关键条款核实后才进入可比结果。</p>
+
+          <h3>服务时限</h3>
+          <p>人工试点目标为1工作日首次联络、1工作日初次资料审查，以及资料齐备后1工作日出具条件方案。补件通知不算出价完成；逾时须列原因、责任人和下一期限，等待期间每2工作日更新。</p>
+          <p>银行整合后，再验证标准数码路径90%的个案能否于10分钟内取得条件结果，由开始申请计时，包含登入、同意及资料补充，并披露适用比例、转人工及未完成个案。首期不宣称已达十分快批，正式审批、律师文件及放款另行计时。</p>
+        </div>
+
+        <!-- 3b -->
+        <div class="card chapter" id="ch3b">
+          <h2>3 产品方案：成本与优惠</h2>
+          <h3>持有期成本</h3>
+          <p>净融资成本为利息、方案特有费用、清还罚款及回赠追回之和，再减已收回赠。比较须固定本金、年期、比较日及利率情境；退出时仍须清还的本金另列，避免把成本较低误解为所需现金较少。</p>
+          <p>以下为教学例子：原贷款500万元、30年、年息3.5%，已供36月，剩余本金4,701,770.78元及324月。A维持3.5%，原退出限制已届满；B转按3.6%，费用10,000元、回赠1%。B于第1至24月月末全清须支付当时余额1%罚款并退回全部回赠，第25月起不适用。</p>
+          <div class="table-wrap">
+            <table class="num">
+              <thead><tr><th>退出时间</th><th>A净成本 元</th><th>B净成本 元</th><th>B减A 元</th></tr></thead>
+              <tbody>
+                <tr><td>12个月</td><td>162,863</td><td>223,511</td><td>+60,648</td></tr>
+                <tr><td>24个月</td><td>321,936</td><td>386,124</td><td>+64,188</td></tr>
+                <tr><td>25个月</td><td>335,017</td><td>307,690</td><td>−27,327</td></tr>
+                <tr><td>36个月</td><td>477,085</td><td>453,945</td><td>−23,140</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>36月时B成本较低23,140元，但退出仍须清还本金A 4,370,575.05元或B 4,375,196.83元。本例固定利率且假设交易完成已收回赠，只用于展示持有期影响；正式服务按实际付款日及合约计息，另列浮息情境。<a href="#cost" data-demo="cost-teaching">用计算器重算 →</a></p>
+
+          <h3>直达优惠</h3>
+          <p>建议PRISM加码为实际取用本金0.20%，每宗上限10,000元；银行基本回赠另列，全部属待批准政策。本案不设按中介报价补差：核实外部中介报价即表示客户已接触中介，容易引起转介归属争议，亦增加渠道误标风险。</p>
+          <p>例如400万元贷款，PRISM加码为8,000元。若中介或其他银行提供较高优惠，系统按相同持有期口径照实显示差距，由客户自行选择；未确认个人资格的公开优惠，只可列为参考。</p>
+          <p>拟议优惠于符合资格并取用后30历日内支付；取用日起至24个月届满当日全清或转按离行，追回未曾追回的已付PRISM余额，取消未付部分。期内非例行部分还本按原优惠乘以还本额占原本金比例调整，正常供款不调整。正式截止日期及例外由银行合约列明。<a href="#offer" data-demo="offer-example">试算追回 →</a></p>
+          <p>发出有效优惠前须完成预算预留及双人复核。不得改写有效转介来源、重复付奖，或藉降低基本回赠抵销加码。已接受且有效的优惠不因事后预算不足而减少；现金回赠的成数处理见第6章。</p>
+        </div>
+
+        <!-- 4 -->
+        <div class="card chapter" id="ch4">
+          <h2>4 技术设计</h2>
+          <h3>系统架构</h3>
+          <p>PRISM沿用银行登入、案件及信贷流程，新增条款资料结构、成本服务及优惠状态记录。首期由授权职员输入核准方案；待流程与计算通过验收，再接银行接口及启用AI辅助抽取。</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>模组</th><th>输入及输出</th><th>控制</th></tr></thead>
+              <tbody>
+                <tr><td>资料重用</td><td>行内有效资料形成预填内容、矛盾及缺件清单。</td><td>每项记用途、有效期及确认状态；入账不自动等同合资格收入。</td></tr>
+                <tr><td>条款核对</td><td>OCR及语言模型产生字段草稿，连回原文页码或段落。</td><td>利率、费用、罚息和追回由职员核实；未知不当零。</td></tr>
+                <tr><td>成本引擎</td><td>按核实条款计月供、利息、退出成本及余额。</td><td>固定程序计算；保存输入、规则版本及计算时间。</td></tr>
+                <tr><td>案件及优惠</td><td>唯一案件编号贯穿申请、补件、取用和优惠。</td><td>定价、审批与付款权限分开；同一事件重送只处理一次。</td></tr>
+                <tr><td>解释服务</td><td>以核准条款库和已核实结果回答问题。</td><td>无来源不补写；可转人工；模型没有出价或付款权限。</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>创新内容</h3>
+          <p>第一，条款字段附带来源及核对状态，修改关键条款会使旧核验失效，减少旧报价被继续引用。第二，持有期计算把罚息和回赠追回纳入同一口径，明确显示结论反转的原因。第三，计算所用资料能延续至申请和优惠跟进，减少客户再次输入和转交。</p>
+          <p>这属银行流程与应用整合创新。界面和计算器可被复制，竞争力须由银行实际导入、可核验结果及处理效率证明。首期不自行训练信贷模型，不假设已取得跨行按揭报价接口。</p>
+
+          <h3>AI验证</h3>
+          <p>以同一组匿名或合成报价，比较人工、OCR加规则及OCR加语言模型三种方式，记录关键字段正确率、漏读、转人工率及复核时间。若加入AI不能减少全程工时，或错误难以拦截，先沿用受控人工流程。RAG提供来源约束，不保证零错误。</p>
+
+          <h3>故障处理</h3>
+          <p>未支持的浮息重设、部分还本或特殊条款停止自动排名，交专员处理。接口失败保留案件，避免重复信贷查询；解释服务失效时显示核准固定说明。真实文件只在银行核准环境处理，演示站只用合成资料。</p>
+        </div>
+
+        <!-- 5 -->
+        <div class="card chapter" id="ch5">
+          <h2>5 商业模式</h2>
+          <h3>效益来源</h3>
+          <p>营运及收益主体为银行，客户不另付平台费。主模型只衡量「本来仍会在本行取用，但由转介改为直接申请」的渠道替代效益。经核实的可避免净佣金，先支付新增优惠和服务成本，余额才是项目贡献。</p>
+          <p>本来已会直接申请的客户没有节佣，但仍计全数优惠和服务成本。真正新增贷款须另建模型，计入基本回赠、资金、信贷损失、资本及服务成本；本行续留只列附加情境，交叉销售不计入，避免擡高回报。</p>
+
+          <h3>每宗收支</h3>
+          <p>以下为待验证的管理情境：平均本金400万元，可避免净佣金率0.45%，全体受惠取用中有效替代本行转介成交的比例为80%。这些数字不是市场平均或银行已确认条件。<a href="#finance">在财务模型页修改假设 →</a></p>
+          <div class="table-wrap">
+            <table class="num">
+              <thead><tr><th>项目</th><th>计算</th><th>每宗 港元</th></tr></thead>
+              <tbody>
+                <tr><td>平均避免佣金</td><td>400万 × 0.45% × 80%</td><td>14,400</td></tr>
+                <tr><td>基础加码</td><td>400万 × 0.20%</td><td>−8,000</td></tr>
+                <tr><td>新增处理</td><td>包含未取用及撤回个案分摊</td><td>−1,200</td></tr>
+                <tr><td>增量获客</td><td>包含未转化线索分摊</td><td>−300</td></tr>
+                <tr class="total"><td>净变动贡献</td><td>未扣固定营运及前置投入</td><td>4,900</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>1,200元处理成本假设包括全体新增工时分摊至每宗取用后3小时、全负担时薪300元，以及300元资料与查询费。双人复核、未成交者及申诉工时均须记录；固定管理与逐宗工时不可重复计薪。</p>
+
+          <h3>客户来源</h3>
+          <p>初期透过手机银行、分行及客户主动查询接触，不购入外部地产名单。年度漏斗假设为：合法可触达客户中20%近期有需要、50%开始、70%完成资料、60%适合标准流程、60%取用，合计2.52%。</p>
+          <div class="table-wrap">
+            <table class="num">
+              <thead><tr><th>营运年</th><th>Y1</th><th>Y2</th><th>Y3</th><th>Y4</th><th>Y5</th></tr></thead>
+              <tbody>
+                <tr><td>取用目标 宗</td><td>100</td><td>250</td><td>500</td><td>800</td><td>1,000</td></tr>
+                <tr><td>约需可触达人数</td><td>4,000</td><td>10,000</td><td>20,000</td><td>32,000</td><td>40,000</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>各比例尚待CRM名单与试点证明。每年须去重，跨年度重复接触另行披露；可触达客户不等于有按揭意向者。名单不足即下修取用目标。</p>
+        </div>
+
+        <!-- 5b -->
+        <div class="card chapter" id="ch5b">
+          <h2>5 商业模式：财务结果</h2>
+          <h3>五年情境</h3>
+          <p>前置投入按300万元计算，Y1为正式上线后第一个营运年。全部前置试点成本及优惠计入T0，不重入正式取用宗数。下表单位为万港元，宗数除外。</p>
+          <div class="table-wrap">
+            <table class="num">
+              <thead><tr><th>项目</th><th>Y1</th><th>Y2</th><th>Y3</th><th>Y4</th><th>Y5</th></tr></thead>
+              <tbody>
+                <tr><td>受惠取用 宗</td><td>100</td><td>250</td><td>500</td><td>800</td><td>1,000</td></tr>
+                <tr><td>避免佣金</td><td>144.00</td><td>360.00</td><td>720.00</td><td>1,152.00</td><td>1,440.00</td></tr>
+                <tr><td>变动成本</td><td>−95.00</td><td>−237.50</td><td>−475.00</td><td>−760.00</td><td>−950.00</td></tr>
+                <tr><td>固定营运</td><td>−80.00</td><td>−85.00</td><td>−90.00</td><td>−95.00</td><td>−100.00</td></tr>
+                <tr><td>年度营运净额</td><td>−31.00</td><td>37.50</td><td>155.00</td><td>297.00</td><td>390.00</td></tr>
+                <tr class="total"><td>含T0累计净额</td><td>−331.00</td><td>−293.50</td><td>−138.50</td><td>158.50</td><td>548.50</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>上述假设下，Y2年度营运转正，Y4未折现累计回本；10%折现率下五年净现值为正264.28万元，折现回本在Y4。若只计首三个营运年，净现值为负180.74万元，即正值依赖Y4及Y5的规模，须在扩大前以实际取用量验证。这是税前增量现金流，没有终值或追回回赠收入，不等于会计净利。</p>
+
+          <h3>不利情境</h3>
+          <div class="table-wrap">
+            <table class="num">
+              <thead><tr><th>改变的假设</th><th>每宗贡献 元</th><th>五年净现值 万</th></tr></thead>
+              <tbody>
+                <tr><td>管理情境（不设补差）</td><td>4,900</td><td>+264.28</td></tr>
+                <tr><td>净佣金降至0.40%</td><td>3,300</td><td>−30.20</td></tr>
+                <tr><td>平均本金降至300万元</td><td>3,300</td><td>−30.20</td></tr>
+                <tr><td>取用量减半</td><td>4,900</td><td>−186.65</td></tr>
+                <tr><td>取用量改为100／200／300／400／500宗</td><td>4,900</td><td>−115.60</td></tr>
+                <tr><td>上项保守取用量且前置投入降至180万元</td><td>4,900</td><td>+4.40</td></tr>
+                <tr><td>PRISM加码提高至0.25%</td><td>2,900</td><td>−103.82</td></tr>
+                <tr><td>佣金0.40%且有效节佣比例60%</td><td>100</td><td>−619.17</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>除列明变数外，其余维持管理情境。若PRISM加码提高至0.23%，净现值只剩正43.42万元；每宗再增加1小时人手、即300元，便转为负11.80万元。取用规模、节佣及人手成本均是立项关键；若后期取用量未达管理情境，须相应缩减前置投入或加入经验证的其他效益。</p>
+
+          <h3>投资门槛</h3>
+          <p>在同一宗数及成本下，每宗净变动贡献须至少3,464.10元，五年净现值才不低于零。佣金维持0.45%时，有效节佣比例须至少72.02%；比例维持80%时，佣金须至少0.40513%。门槛必须以对照及实付资料验证；有效节佣比例的上限以本行过去12至24个月出粮客户按揭经中介办理的比例为锚，不应高于该历史比例。</p>
+          <p>固定营运包含平台、资料、安全、管理及每年10至20万元渠道影响预留；实际超支照计。300万元只是前置额，按年末计最大累计资金缺口至少331.0万元，另须安排月度周转。</p>
+
+          <h3>附加情境：到期续留</h3>
+          <p>主情境不计本行续留。为说明节佣不足时的补充价值，另列附加情境：每个增量留存账户年指相对对照组多留一年的贷款，按平均余额350万元及0.60%风险调整贡献计约21,000元，未扣续留优惠。下表列出抵消各不利情境所需的增量留存量。</p>
+          <div class="table-wrap">
+            <table class="num">
+              <thead><tr><th>需抵消的情境</th><th>净现值缺口 万</th><th>每年所需账户年</th></tr></thead>
+              <tbody>
+                <tr><td>净佣金降至0.40%</td><td>30.20</td><td>约4</td></tr>
+                <tr><td>取用量改为100至500宗</td><td>115.60</td><td>约15</td></tr>
+                <tr><td>佣金0.40%且节佣比例60%</td><td>619.17</td><td>约78</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>计算方法为缺口除以五年10%年金因子3.7908，再除以每账户年2.1万元。若另计续留报价优惠，所需账户年相应增加。续留客户已是本行借款人，不涉中介佣金争夺，但增量留存必须以随机对照的到期客户验证；对照结果成立前，不并入主情境。</p>
+        </div>
+
+        <!-- 6 -->
+        <div class="card chapter" id="ch6">
+          <h2>6 风险管理</h2>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>主要风险</th><th>控制与处理</th><th>负责职能</th></tr></thead>
+              <tbody>
+                <tr><td>比较偏向本行</td><td>披露银行销售立场；成本结果与推广分开。同条款换品牌结果须相同，外行较省亦照实显示。</td><td>产品及合规</td></tr>
+                <tr><td>错读或错算</td><td>关键字段逐项复核，缺项停止完整排名。保存来源及版本，错误发现后停用受影响模板并更正。</td><td>营运及独立验证</td></tr>
+                <tr><td>资料及AI风险</td><td>用途分开、最少取数、加密及最小权限；不用客户文件默认训练模型，提供人工处理及更正渠道。</td><td>私隐及资安</td></tr>
+                <tr><td>授信误导</td><td>条件方案清楚列未完成核验及失效情况；沿用银行信贷政策，不以AI输出作批准。</td><td>信贷及法务</td></tr>
+                <tr><td>渠道与付款争议</td><td>有效转介不改标直客；优惠先预留后承诺，支付及追回逐宗对账。</td><td>渠道及财务</td></tr>
+                <tr><td>成本或渠道流失</td><td>同时计PRISM及银行整体取用、渠道贡献和补救成本。调整未来活动，不削减已接受有效优惠。</td><td>业务及财务</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>回赠处理</h3>
+          <p>金管局2005年公布的处理原则并非一律把现金回赠限制在1%。回赠超过贷款额1%时，须把该笔回赠计入贷款额计算按揭成数，而非只计超出部分。[4] 试点前由银行合规确认优惠分类、合并计算及现行适用要求，不能透过改名或拆笔回避。</p>
+          <p>例如贷款400万元、估值600万元，基本回赠0.90%加PRISM0.20%，合计44,000元，超过贷款额1%；若全部按该规则处理，成数为（4,000,000＋44,000）÷6,000,000＝67.40%。接近适用上限时，重新核对本金与首期并取得客户确认，不静默减少放款。<a href="#offer" data-demo="ltv-example">试算成数 →</a></p>
+
+          <h3>资料与责任</h3>
+          <p>生成式AI治理参照金管局消费者保障通告及私隐专员公署框架。[5][6] 比较、贷款申请及推广用途分开，保留期限按资料用途和法定责任制定；不以统一30日删除承诺取代银行纪录要求。</p>
+          <p>上线前由业务确认价格、信贷确认条件方案、合规和私隐确认披露及用途、IT与资安完成安全验收、财务确认优惠责任。上述是拟议责任安排，现阶段未取得银行或监管批准。</p>
+        </div>
+
+        <!-- 7 -->
+        <div class="card chapter" id="ch7">
+          <h2>7 实施与验证</h2>
+          <h3>分段投入</h3>
+          <p>本计划建议银行先审批60万元封顶验证，并非向赛事评判申请资助。先确认现行流程和客户需求，再以银行正常授信流程承接最多20宗受惠取用。</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>首期用途</th><th style="text-align:right">万港元</th><th>交付</th></tr></thead>
+              <tbody>
+                <tr><td>流程与计算</td><td style="text-align:right">12.0</td><td>无外部报价旅程、成本引擎及案件交接</td></tr>
+                <tr><td>条款与公开资料</td><td style="text-align:right">6.0</td><td>1至2类报价模板及最多5行官方参考</td></tr>
+                <tr><td>安全及独立验证</td><td style="text-align:right">8.0</td><td>资料、计算、渠道与优惠控制</td></tr>
+                <tr><td>客户与基线研究</td><td style="text-align:right">6.0</td><td>访谈、现行流程、CRM范围及渠道历史比例</td></tr>
+                <tr><td>优惠预留</td><td style="text-align:right">20.0</td><td>20宗 × 每宗最高10,000元</td></tr>
+                <tr><td>增量处理</td><td style="text-align:right">2.4</td><td>含未取用分摊的成本目标</td></tr>
+                <tr><td>支持与备用</td><td style="text-align:right">5.6</td><td>获客、协调及修正</td></tr>
+                <tr class="total"><td>合计</td><td style="text-align:right">60.0</td><td>包含于前置300万元</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>完整前置额分为首期60万、扩大验证及基本整合100万、安全上线及必要自动化100万、备用40万。后240万元按证据释放，全部金额均待银行范围评估及报价。</p>
+          <p>第二段100万元内，可另设最多75万元的对照验证额，涵盖最多50宗受惠取用。若用尽，该段只余25万元作整合；须相应缩小建置范围，不能把试点视为免费附加项。</p>
+
+          <h3>工作安排</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>阶段</th><th>工作</th><th>决策</th></tr></thead>
+              <tbody>
+                <tr><td>第1至4周</td><td>盘点现有流程、价格、佣金、名单及银行协作条件。</td><td>核心资料不足，先补研究，不承诺真实优惠。</td></tr>
+                <tr><td>第5至8周</td><td>20人同价流程测试；独立重算及安全设计。</td><td>流程可用且责任批准后，才进银行试点。</td></tr>
+                <tr><td>第9至12周起</td><td>最多20宗受惠取用试点及工时记录。</td><td>这不是12周全部放款承诺；按实际周期追踪。</td></tr>
+                <tr><td>其后按证据</td><td>较大对照、银行整合及分模组上线。</td><td>样本不足或经济不成立，不全面放量。</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 7b -->
+        <div class="card chapter" id="ch7b">
+          <h2>7 实施与验证：验证方法</h2>
+          <h3>先测流程 再测优惠</h3>
+          <p>第一轮在相同价格下比较现行流程与PRISM，记录客户实际工作；第二轮在银行批准后，测试PRISM连同固定优惠政策的完整效果。这样才能区分功能改善与补贴吸引力。</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>验证项目</th><th>方法</th><th>通过条件或决策用途</th></tr></thead>
+              <tbody>
+                <tr><td>客户选择</td><td>访谈12名近期置业或转按者及3至5名从业者；记录不选PRISM的原因。</td><td>确认愿意直接办理的具体客群，探索样本不推算全港比例。</td></tr>
+                <tr><td>客户工作量</td><td>20人完成相同任务；量度主动操作分钟、重填字段、补件及追问次数。</td><td>在正式试点前按基线锁定改善门槛；不得省略必要核验或降低资料质量。</td></tr>
+                <tr><td>服务能力</td><td>分别记首次联络、资料齐备、条件方案及正式批核时间。</td><td>检查第3章工作日目标；数码整合后另测P90十分钟及适用比例。</td></tr>
+                <tr><td>计算与AI</td><td>独立摊还表、品牌对调、缺项、到期前后、重送及AI对照。</td><td>已支持案例同口径差额不超过1元；严重未修正错算为零；未支持正确转人工。</td></tr>
+                <tr><td>银行增量效益</td><td>佣金实付、全体受邀者取用、全部工时、优惠及渠道变动。</td><td>采较审慎估计重算全案和剩余投入，支持下一段支出才扩大。</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>对照设计</h3>
+          <p>在同意参与且无渠道冲突的客群内随机分组，按原分组分析所有受邀者，包括未申请或未取用者。无法随机时采配对或分期推出，披露选择偏差，不把高意向成交者直接与所有普通客户比较。</p>
+          <p>财务先取12至24个月渠道合约和实付资料，扣除不会消失的费用及本可追回佣金。有效节佣比例须结合对照取用与银行整体业务变化估计，不能由App来源标签或客户自述直接代替。其上限以本行过去12至24个月出粮客户按揭经中介办理的比例为锚；若历史比例低于模型假设，须先下调后重算。</p>
+
+          <h3>放量条件</h3>
+          <p>20宗试点主要检验流程、成本和控制；追加50宗也不保证足以验证80%有效节佣比例。银行研究人员须按基线波动、目标差异和追踪期估计样本；如果证据不足，就延长验证或停止扩张。</p>
+          <p>重大错算或资料事故先停受影响功能并补救；财务不成立则重新设计未来客群、价格或投入。若只有服务改善，须另以服务项目审批，不能继续宣称已证明盈利。</p>
+        </div>
+
+        <!-- 8 -->
+        <div class="card chapter" id="ch8">
+          <h2>8 团队与成果</h2>
+          <h3>成果状态</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>状态</th><th>内容</th><th>提交证据</th></tr></thead>
+              <tbody>
+                <tr><td>原型演示</td><td>App v3成本及回赠试算、持有期结果、缺项提示、导入导出与离线版。</td><td>提交前附实机演示及测试记录；仅用合成或手动资料。</td></tr>
+                <tr><td>研究材料</td><td>两次探索访谈；问卷尚未有可核实的完成结果。</td><td>整理匿名原始记录及引用许可；未核实前不列调查统计。</td></tr>
+                <tr><td>首期拟验证</td><td>资料清单、本行职员出价、案件交接及优惠复核。</td><td>银行协作、试点批准、工时与客户选择记录。</td></tr>
+                <tr><td>待银行整合</td><td>行内资料重用、信贷及定价接口、正式案件及付款台账。</td><td>逐模组安全及业务验收后才称上线。</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>团队分工</h3>
+          <p>学校为香港恒生大学。两稿的正式队名和成员资料未一致，以下先列需配置的工作，不虚填成员经历。提交前以报名页补齐，团队人数须符合最多3人的要求。[7]</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>角色</th><th>姓名</th><th>主要工作</th></tr></thead>
+              <tbody>
+                <tr><td>队长</td><td>待确认</td><td>需求研究、银行访谈、项目协调及答辩</td></tr>
+                <tr><td>成员</td><td>待确认</td><td>原型、条款资料结构与计算验证</td></tr>
+                <tr><td>成员</td><td>待确认</td><td>财务模型、对照设计、资料及引用整理</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>指导老师及正式队伍名称待确认。银行业务、信贷、营运、IT、合规及财务属拟议协作职能，并非已加入团队的合作方。</p>
+
+          <h3>展示安排</h3>
+          <p>展示四个案例：零外部报价也能开始申请；持有12月与36月时成本结论不同；24个月内全清时PRISM优惠如何按比例追回；缺少追回条款时停止排名。画面逐项标示已实作、模拟及规划，避免用示意画面代替银行接口。<a href="#home">回首页查看案例 →</a></p>
+          <p>拟提供立项书、原型及短片作参赛材料，具体文件种类以报名页要求为准。主办方2026年9月20日通知列港澳台作品截止为2026年10月19日24时；队长须在期限前完成成员维护及上载。[8]</p>
+
+          <h3>立项建议</h3>
+          <p>在指定银行协作窗口、核定资料用途和试点优惠后，启动60万元封顶验证。先交付可重算的原型、真实客户工作量和全成本证据，再决定是否接入银行并扩张。</p>
+        </div>
+
+        <!-- 附录 -->
+        <div class="card chapter" id="appendix">
+          <h2>附录 计算口径</h2>
+          <h3>按揭模型</h3>
+          <p>P为本金，年利率r，月利率i＝r÷12，n为剩余月数，M为月供，Bₜ为第t次供款后本金，Iₜ为累计利息。教学模型假设月末等额本息及固定利率。</p>
+          <p class="formula">M ＝ P × i ÷ [1 − (1＋i)^(−n)]　　Bₜ ＝ Bₜ₋₁ × (1＋i) − M　　Iₜ ＝ Iₜ₋₁ ＋ Bₜ₋₁ × i</p>
+          <p>i＝0时，月供为P÷n。净融资成本＝累计利息＋费用＋清还罚款＋回赠追回−已收回赠；期末本金另列。正式服务另按合约日数、利率重设、封顶及取整规则验证。</p>
+
+          <h3>银行模型</h3>
+          <p>每宗净变动贡献U＝αPc−R−v−A。α是全体受惠取用中有效替代本行转介成交的比例，c是可避免净佣金率，R是PRISM加码，v是处理成本，A是获客成本。Q是年度取用宗数，F是年度固定营运，T0是前置投入。</p>
+          <p class="formula">U ＝ α·P·c − R − v − A　　NPV ＝ −T0 ＋ Σₜ (Qₜ·U − Fₜ) ÷ (1＋10%)ᵗ</p>
+          <p>管理情境：P＝400万元，α＝80%，c＝0.45%；R＝min（P×0.20%，10,000）；v＝1,200元；A＝300元。Q为100／250／500／800／1,000；F为80／85／90／95／100万元；T0为300万元。折现率10%属管理假设。</p>
+
+          <h3>优惠及日期</h3>
+          <p>PRISM加码上限10,000元，本案不设按中介报价补差。敏感度分析中的0.23%及0.25%只指PRISM额外优惠，不包括银行基本回赠。附加续留情境的每年所需账户年＝净现值缺口÷3.7908÷2.1万元。每份优惠书须列确切有效日、预计支付日、追回截止日及部分还本安排。</p>
+          <p>例：400万元贷款已付PRISM优惠8,000元，第12月额外还本40万元，按比例追回800元；第18月全清，再追回余额7,200元。原银行基本回赠及清还罚款另计，不得重复追回同一优惠。</p>
+
+          <h3>必留资料</h3>
+          <p>每宗方案保存本金、年期、利率与重设、封顶、费用、各笔回赠、支付及追回日期、来源、核对人、版本和未解决项目。每宗案件记录全部工时、查询、获客、优惠、佣金及补救成本，未取用个案也纳入分摊。</p>
+        </div>
+
+        <!-- 参考资料 -->
+        <div class="card chapter" id="refs">
+          <h2>参考资料</h2>
+          <p class="small muted">查核日期为2026年10月1日。市场数据主表采2026年7月官方原文；8月数据按金管局9月30日公布的媒体报道及业界整理补充，正式提交前应以官方附件核对。业者网页只支持其自述服务，不用于推定全行业成效；文内全部财务及服务目标均为本提案假设。</p>
+          <ol class="refs small">
+            <li>香港金融管理局 2026年7月住宅按揭统计。2026年8月31日公布。用于月度申请及批出规模。<br><a href="https://www.info.gov.hk/gia/general/202608/31/P2026083100508.htm" target="_blank" rel="noopener">https://www.info.gov.hk/gia/general/202608/31/P2026083100508.htm</a></li>
+            <li>经络按揭转介 常见问题。用于免费服务及协助多行申请的业者自述。<br><a href="https://www.mreferral.com/faq/" target="_blank" rel="noopener">https://www.mreferral.com/faq/</a></li>
+            <li>DBS Hong Kong One Minute Instant Approval。区分填写申请、初步结果和其后文件核验。<br><a href="https://www.dbs.com.hk/personal/loans/home-loans/one-min-approval" target="_blank" rel="noopener">https://www.dbs.com.hk/personal/loans/home-loans/one-min-approval</a></li>
+            <li>香港政府新闻网 现金回赠与按揭成数。2005年3月3日。说明没有一律回赠上限及超过1%的成数处理；现行适用须银行确认。<br><a href="https://www.news.gov.hk/isd/ebulletin/en/category/businessandfinance/050303/html/050303en03004.htm" target="_blank" rel="noopener">https://www.news.gov.hk/isd/ebulletin/en/category/businessandfinance/050303/html/050303en03004.htm</a></li>
+            <li>香港金融管理局 生成式AI消费者保障通告。正文日期2024年8月19日。支持问责、公平、人工介入及资料保障设计。<br><a href="https://brdr.hkma.gov.hk/eng/doc-ldg/docId/getPdf/20241107-1-EN/20241107-1-EN.pdf" target="_blank" rel="noopener">https://brdr.hkma.gov.hk/eng/doc-ldg/docId/getPdf/20241107-1-EN/20241107-1-EN.pdf</a></li>
+            <li>私隐专员公署 人工智能个人资料保障模范框架。2024年6月11日。支持风险评估、资料管理及持续监察。<br><a href="https://www.pcpd.org.hk/english/news_events/media_statements/press_20240611.html" target="_blank" rel="noopener">https://www.pcpd.org.hk/english/news_events/media_statements/press_20240611.html</a></li>
+            <li>工行杯 参赛指引。确认最多3名队员等规则；香港赛区细节以主办方通知及报名页为准。<br><a href="https://www.gonghangbei.com/sszy.html" target="_blank" rel="noopener">https://www.gonghangbei.com/sszy.html</a></li>
+            <li>工行杯 作品提交截止通知。2026年9月20日。港澳台作品截止2026年10月19日24时。<br><a href="https://www.gonghangbei.com/index/Details/index.html?id=131" target="_blank" rel="noopener">https://www.gonghangbei.com/index/Details/index.html?id=131</a></li>
+            <li>香港电台 金管局2026年8月住宅按揭统计报道。2026年9月30日。用于8月新批贷款额及转按贷款额变化；正式提交前以金管局原文核对。<br><a href="https://news.rthk.hk/rthk/ch/component/k2/1872158-20260930.htm" target="_blank" rel="noopener">https://news.rthk.hk/rthk/ch/component/k2/1872158-20260930.htm</a></li>
+            <li>香港经济日报 经络按揭转介分析。2026年9月30日。业界按金管局数据整理的8月转按宗数；属二手整理，不作官方统计。<br><a href="https://ps.hket.com/article/4202507/" target="_blank" rel="noopener">https://ps.hket.com/article/4202507/</a></li>
+          </ol>
+        </div>
+      </article>
+    </section>
+
+    <!-- =====================================================
+         原型 App
+         ===================================================== -->
+    <section data-route="app" hidden>
+      <div class="page-head">
+        <h1>原型 App</h1>
+        <span class="tag sim">模拟</span>
+      </div>
+      <p class="muted">模拟 PRISM 嵌入本行手机银行后的 5 步流程。客户、资料及方案全部为合成示例，不连接任何银行系统；非真实银行画面。</p>
+
+      <div class="app-layout">
+        <div class="phone">
+          <div class="phone-top">
+            <b>本行手机银行 · PRISM</b>
+            <span>示意</span>
+          </div>
+          <div class="phone-body">
+            <ol class="steps" id="app-steps"></ol>
+            <div id="app-screen" class="screen" aria-live="polite"></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="card">
+            <h2>解释服务 <span class="tag sim">固定核准说明</span></h2>
+            <p class="small muted">以核准条款库和已核实结果回答问题；无来源不补写，可转人工。本演示不接入生成式 AI，相当于立项书「解释服务失效时显示核准固定说明」的模式。</p>
+            <label>
+              输入你的问题
+              <input id="faq-query" type="text" placeholder="例如：优惠什么时候会被追回？">
+            </label>
+            <div class="actions" style="margin-top: 10px">
+              <button id="faq-ask" type="button" class="primary">查询</button>
+            </div>
+            <div id="faq-answer" style="margin-top: 14px"></div>
+            <h3>常见问题</h3>
+            <div id="faq-list" class="faq-list"></div>
+          </div>
+
+          <div class="card">
+            <h2>本流程对应的立项书要求</h2>
+            <ul class="small">
+              <li>没有外部报价也能完成本行申请；外部报价属自选。</li>
+              <li>每项资料记用途、有效期及确认状态；入账不自动等同合资格收入。</li>
+              <li>条件方案带编号、有效期、出具者及待完成核验；不等于最终批核。</li>
+              <li>条款改动后旧核验失效，须重新计算并重新确认。</li>
+              <li>同一案件显示负责人、下一步、补件及优惠状态。</li>
+              <li>已有有效中介转介的交易不改标直客；资助房屋另行评估。</li>
+            </ul>
+            <p class="small muted">
+              <span class="tag plan">规划</span> 行内资料重用接口、信贷及定价接口、AI 条款抽取，待银行整合后才上线。
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================
+         持有期成本
+         ===================================================== -->
+    <section data-route="cost" hidden>
+      <div class="page-head">
+        <h1>持有期成本比较</h1>
+        <span class="tag done">已实作</span>
+      </div>
+      <p class="muted">用相同本金及年期，比较两份方案在不同退出时间的净融资成本。净融资成本＝累计利息＋方案费用＋清还罚款＋已付回赠追回－实际已收回赠；未还本金另列。</p>
+
+      <div class="actions" style="margin: 16px 0 20px">
+        <button type="button" data-preset="teaching">立项书教学例子</button>
+        <button type="button" data-preset="missing">缺少追回条款</button>
+        <button type="button" data-preset="broker">PRISM vs 中介加码 0.23%</button>
+        <button type="button" data-preset="direct">PRISM vs 中介加码 0.15%</button>
+        <button type="button" data-preset="rate">PRISM 利率较高</button>
+        <button type="button" data-preset="early">第 18 月退出</button>
+      </div>
+
+      <form id="cost-form" novalidate>
+        <section class="card">
+          <h2>共同条件</h2>
+          <div id="cost-common" class="fields three"></div>
+          <div id="channel-wrap" style="margin-top: 14px">
+            <label>
+              直达渠道资格情境
+              <select id="cost-channel">
+                <option value="clear">示例／已确认：没有有效中介转介冲突</option>
+                <option value="unknown">尚未确认资格</option>
+                <option value="conflict">已有有效中介转介</option>
+              </select>
+            </label>
+            <p class="small muted">只在其中一份方案为「PRISM 直达」时适用。首期拟议本金范围为 HK$200万至500万。</p>
+          </div>
+        </section>
+
+        <div class="columns">
+          <section class="card" id="offer-A"></section>
+          <section class="card" id="offer-B"></section>
+        </div>
+
+        <section class="card">
+          <h2>核对输入</h2>
+          <p id="cost-source" class="small muted"></p>
+          <label class="check">
+            <input id="cost-confirmed" type="checkbox">
+            <span>我已核对本次输入及条款；如使用示例，我理解其并非实际银行报价。此勾选不代表银行已核实或批准。</span>
+          </label>
+          <div class="actions">
+            <button class="primary" type="submit">计算两方案总成本</button>
+            <button id="cost-export" type="button" disabled>导出比较 JSON</button>
+            <label class="file-button">
+              导入比较 JSON
+              <input id="cost-import" type="file" accept=".json,application/json" hidden>
+            </label>
+          </div>
+          <p id="cost-message" class="message" role="alert"></p>
+        </section>
+      </form>
+
+      <section id="cost-result" hidden>
+        <div id="cost-headline" class="card result" aria-live="polite">
+          <h2 id="cost-title"></h2>
+          <div id="cost-difference" class="amount"></div>
+          <p id="cost-description"></p>
+        </div>
+
+        <div class="card">
+          <h2>按退出时间比较</h2>
+          <div class="table-wrap">
+            <table class="num">
+              <thead id="exit-head"></thead>
+              <tbody id="exit-rows"></tbody>
+            </table>
+          </div>
+          <p id="crossover-note" class="small"></p>
+          <div class="chart" id="cost-chart"></div>
+          <p class="legend"><i style="background: var(--teal)"></i><span id="chart-legend"></span></p>
+        </div>
+
+        <div class="card">
+          <h2 id="breakdown-title">完整成本明细</h2>
+          <div class="table-wrap">
+            <table class="num">
+              <thead id="breakdown-head"></thead>
+              <tbody id="breakdown-rows"></tbody>
+            </table>
+          </div>
+          <p id="pending-note" class="small muted"></p>
+        </div>
+      </section>
+
+      <details class="card">
+        <summary><strong>计算假设与范围</strong></summary>
+        <ul class="small">
+          <li>固定年利率、按月等额供款，于指定月份供款后全清。金额未折现，不预测 HIBOR 或未来浮动利率。</li>
+          <li>第 0 月代表取用时支付；第 1 月代表首期供款后支付。模型假设当月支付先于当月退出。PRISM「30 日内支付」以第 1 月近似。</li>
+          <li>罚款按退出时未还本金计算。回赠在各自追回期内提前全清时，按全数追回处理；0 个月代表没有该追回／罚息期。正常到期还款不属提前清还。</li>
+          <li>尚未收到的回赠不提前扣减成本；未付而被取消的回赠，不当作现金追回重复计算。</li>
+          <li>条款未知不当作零：罚息或回赠追回条款未知时，停止完整排名。</li>
+          <li>本版不计算部分还款后的利息、供款及余额变化（PRISM 优惠的部分还本追回见「优惠与成数」页）。</li>
+          <li>数据只在本页内存处理，不会上传；刷新前请自行导出。</li>
+        </ul>
+      </details>
+    </section>
+
+    <!-- =====================================================
+         优惠与成数
+         ===================================================== -->
+    <section data-route="offer" hidden>
+      <div class="page-head">
+        <h1>PRISM 优惠与按揭成数</h1>
+        <span class="tag done">已实作</span>
+      </div>
+      <p class="muted">拟议政策：PRISM 加码为实际取用本金 0.20%，每宗上限 HK$10,000；银行基本回赠另列。全部属待批准政策。</p>
+
+      <div class="columns">
+        <section class="card">
+          <h2>加码支付与追回</h2>
+          <div class="fields">
+            <label>实际取用本金（HK$）<input id="of-principal" type="number" min="1" step="any" inputmode="decimal"></label>
+            <label>全清或转按离行月份（留空＝未全清）<input id="of-exit" type="number" min="1" max="600" step="1" inputmode="numeric"></label>
+          </div>
+          <h3>期内非例行部分还本</h3>
+          <div id="of-prepay" class="row-list"></div>
+          <div class="actions">
+            <button id="of-add" type="button">＋ 加一笔部分还本</button>
+            <button id="of-example" type="button">载入立项书例子</button>
+          </div>
+          <p id="of-message" class="message" role="alert"></p>
+        </section>
+
+        <section class="card">
+          <h2>结果</h2>
+          <dl class="kv" id="of-summary"></dl>
+          <div class="table-wrap">
+            <table class="num fit">
+              <thead><tr><th>事件</th><th>追回</th><th>累计追回</th><th>客户保留</th></tr></thead>
+              <tbody id="of-rows"></tbody>
+            </table>
+          </div>
+          <p class="small muted">取用后30历日内支付；取用日起至24个月届满当日全清或转按离行，追回未曾追回的已付PRISM余额，取消未付部分。期内非例行部分还本按原优惠乘以还本额占原本金比例调整，正常供款不调整。原银行基本回赠及清还罚款另计，不得重复追回同一优惠。</p>
+        </section>
+      </div>
+
+      <div class="columns">
+        <section class="card">
+          <h2>现金回赠与按揭成数</h2>
+          <div class="fields">
+            <label>贷款额（HK$）<input id="ltv-loan" type="number" min="1" step="any" inputmode="decimal"></label>
+            <label>物业估值（HK$）<input id="ltv-value" type="number" min="1" step="any" inputmode="decimal"></label>
+            <label>银行基本回赠（%）<input id="ltv-basic" type="number" min="0" max="20" step="any" inputmode="decimal"></label>
+            <label>其他现金回赠（HK$）<input id="ltv-other" type="number" min="0" step="any" inputmode="decimal"></label>
+            <label>适用成数上限（%）<input id="ltv-cap" type="number" min="1" max="100" step="any" inputmode="decimal"></label>
+            <label>是否计入 PRISM 加码
+              <select id="ltv-prism">
+                <option value="yes">计入（0.20%，上限 10,000）</option>
+                <option value="no">不计入</option>
+              </select>
+            </label>
+          </div>
+          <p class="small muted">适用成数上限按物业类型、价格及借款人情况而定，须由银行确认；此处只作试算输入。</p>
+          <div class="actions">
+            <button id="ltv-example" type="button">载入立项书例子</button>
+          </div>
+          <p id="ltv-message" class="message" role="alert"></p>
+        </section>
+
+        <section class="card">
+          <h2>成数结果</h2>
+          <dl class="kv" id="ltv-summary"></dl>
+          <div id="ltv-verdict" style="margin-top: 14px"></div>
+          <p class="small muted">金管局2005年公布的处理原则并非一律把现金回赠限制在1%。回赠超过贷款额1%时，须把该笔回赠计入贷款额计算按揭成数，而非只计超出部分。试点前由银行合规确认优惠分类、合并计算及现行适用要求，不能透过改名或拆笔回避。</p>
+        </section>
+      </div>
+
+      <div class="card">
+        <h2>优惠规则</h2>
+        <ul>
+          <li>本案不设按中介报价补差：核实外部中介报价即表示客户已接触中介，容易引起转介归属争议，亦增加渠道误标风险。</li>
+          <li>若中介或其他银行提供较高优惠，系统按相同持有期口径照实显示差距，由客户自行选择；未确认个人资格的公开优惠，只可列为参考。</li>
+          <li>发出有效优惠前须完成预算预留及双人复核。不得改写有效转介来源、重复付奖，或藉降低基本回赠抵销加码。</li>
+          <li>已接受且有效的优惠不因事后预算不足而减少。</li>
+          <li>每份优惠书须列确切有效日、预计支付日、追回截止日及部分还本安排。</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- =====================================================
+         财务模型
+         ===================================================== -->
+    <section data-route="finance" hidden>
+      <div class="page-head">
+        <h1>银行财务模型</h1>
+        <span class="tag done">已实作</span>
+        <span class="tag sim">管理情境假设</span>
+      </div>
+      <p class="muted">主模型只衡量「本来仍会在本行取用，但由转介改为直接申请」的渠道替代效益。以下全部为待验证的管理情境假设，不是市场平均或银行已确认条件。修改任何数字，结果即时更新。</p>
+
+      <form id="fin-form" novalidate>
+        <section class="card">
+          <h2>每宗假设　U＝αPc−R−v−A</h2>
+          <div id="fin-unit" class="fields four"></div>
+        </section>
+        <section class="card">
+          <h2>年度假设</h2>
+          <div id="fin-years" class="fields five"></div>
+          <div id="fin-global" class="fields three" style="margin-top: 14px"></div>
+          <div class="actions" style="margin-top: 16px">
+            <button id="fin-reset" type="button">恢复管理情境</button>
+          </div>
+          <p id="fin-message" class="message" role="alert"></p>
+        </section>
+      </form>
+
+      <section id="fin-result">
+        <div class="kpis" id="fin-kpis"></div>
+
+        <div class="card">
+          <h2>每宗收支</h2>
+          <div class="table-wrap">
+            <table class="num">
+              <thead><tr><th>项目</th><th>计算</th><th>每宗 港元</th></tr></thead>
+              <tbody id="fin-unit-rows"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>五年情境（万港元，宗数除外）</h2>
+          <div class="table-wrap">
+            <table class="num">
+              <thead><tr><th>项目</th><th>Y1</th><th>Y2</th><th>Y3</th><th>Y4</th><th>Y5</th></tr></thead>
+              <tbody id="fin-year-rows"></tbody>
+            </table>
+          </div>
+          <div class="chart" id="fin-chart"></div>
+          <p class="legend">
+            <i style="background: #7cc8bb"></i>年度营运净额（正）
+            <i style="background: #e3a3a5; margin-left: 12px"></i>年度营运净额（负）
+            <i style="background: var(--navy); margin-left: 12px"></i>含T0累计净额
+          </p>
+          <p class="small muted">税前增量现金流，没有终值或追回回赠收入，不等于会计净利。</p>
+        </div>
+
+        <div class="card">
+          <h2>投资门槛</h2>
+          <dl class="kv" id="fin-threshold"></dl>
+          <p class="small muted">门槛必须以对照及实付资料验证；有效节佣比例的上限以本行过去12至24个月出粮客户按揭经中介办理的比例为锚，不应高于该历史比例。</p>
+        </div>
+
+        <div class="card">
+          <h2>不利情境</h2>
+          <p class="small muted">除列明变数外，其余维持你在上方输入的假设（预设即立项书管理情境）。</p>
+          <div class="table-wrap">
+            <table class="num">
+              <thead><tr><th>改变的假设</th><th>每宗贡献 元</th><th>五年净现值 万</th></tr></thead>
+              <tbody id="fin-sens-rows"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div>
+          <div class="card">
+            <h2>客户来源漏斗</h2>
+            <div id="fin-funnel" class="fields five"></div>
+            <div class="table-wrap">
+              <table class="num">
+                <thead><tr><th>营运年</th><th>Y1</th><th>Y2</th><th>Y3</th><th>Y4</th><th>Y5</th></tr></thead>
+                <tbody id="fin-funnel-rows"></tbody>
+              </table>
+            </div>
+            <p class="small muted">各比例尚待CRM名单与试点证明；可触达客户不等于有按揭意向者。名单不足即下修取用目标。</p>
+          </div>
+
+          <div class="card">
+            <h2>附加情境：到期续留</h2>
+            <div id="fin-retain" class="fields"></div>
+            <div class="table-wrap">
+              <table class="num">
+                <thead><tr><th>需抵消的情境</th><th>净现值缺口 万</th><th>每年所需账户年</th></tr></thead>
+                <tbody id="fin-retain-rows"></tbody>
+              </table>
+            </div>
+            <p class="small muted">主情境不计本行续留。所需账户年＝净现值缺口÷五年年金因子÷每账户年贡献；未扣续留优惠。对照结果成立前，不并入主情境。</p>
+          </div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <footer>
+    PRISM 直达按揭 · 2026 工行杯参赛项目示范网站 · 香港恒生大学<br>
+    全部为合成示例及待验证假设，不构成银行报价、审批、优惠承诺或财务建议。
+  </footer>
+
+  <script>
+    "use strict";
+
+    // =========================================================
+    // PRISM 直达按揭 示范网站
+    //
+    // 兼容性：只使用 ES2015–ES2017 语法（不用 ?.、Object.hasOwn、
+    // 物件展开等较新写法），让较旧的手机、微信及国产浏览器也能运行。
+    // 全部计算在浏览器内完成，不上传任何资料。
+    // =========================================================
+
+    // =========================================================
+    // 0. 通用工具
+    // =========================================================
+
+    const $ = id => document.getElementById(id);
+
+    const has = (object, key) =>
+      Object.prototype.hasOwnProperty.call(object, key);
+
+    const esc = value => String(value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+
+    const roundMoney = value => {
+      return Math.round((value + Number.EPSILON) * 100) / 100;
+    };
+
+    // 与原版 v3 相同的金额格式。
+    const money = value => {
+      return "HK$" + value.toLocaleString("en-HK", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+    };
+
+    function fmt(value, digits) {
+      const d = digits === undefined ? 0 : digits;
+      const text = Math.abs(value).toLocaleString("en-US", {
+        minimumFractionDigits: d,
+        maximumFractionDigits: d
+      });
+      const zero = Number(text.replace(/,/g, "")) === 0;
+
+      return (value < 0 && !zero ? "−" : "") + text;
+    }
+
+    // 最多保留 digits 位小数，去掉尾部的 0（例如 0.450 → 0.45）。
+    function trim(value, digits) {
+      return fmt(value, digits).replace(/(\.\d*?)0+$/, "$1").replace(/\.$/, "");
+    }
+
+    function signed(value, digits) {
+      const text = fmt(value, digits);
+      return value > 0 && Number(text.replace(/[^\d.]/g, "")) !== 0
+        ? "+" + text
+        : text;
+    }
+
+    function clearChildren(node) {
+      while (node.firstChild) {
+        node.removeChild(node.firstChild);
+      }
+    }
+
+    function isoDate(date) {
+      const pad = n => (n < 10 ? "0" : "") + n;
+      return date.getFullYear() + "-" + pad(date.getMonth() + 1) + "-" + pad(date.getDate());
+    }
+
+    function readNumber(id, label, min, max, integer, allowEmpty) {
+      const input = $(id);
+      const text = input.value.trim();
+
+      if (text === "") {
+        if (allowEmpty) {
+          return null;
+        }
+        throw new Error("请填写：" + label);
+      }
+
+      const value = input.valueAsNumber;
+
+      if (
+        !Number.isFinite(value) ||
+        value < min ||
+        value > max ||
+        (integer && !Number.isInteger(value))
+      ) {
+        throw new Error(
+          label + "须为 " + min + " 至 " + max +
+          (integer ? " 的整数。" : " 之间的数值。")
+        );
+      }
+
+      return value;
+    }
+
+    // =========================================================
+    // 1. 页面路由（#home、#proposal …）
+    // =========================================================
+
+    const ROUTES = ["home", "proposal", "app", "cost", "offer", "finance"];
+    let currentRoute = null;
+
+    function showRoute() {
+      let route = location.hash.replace(/^#/, "");
+
+      if (ROUTES.indexOf(route) < 0) {
+        route = "home";
+      }
+
+      const sections = document.querySelectorAll("[data-route]");
+
+      for (let i = 0; i < sections.length; i++) {
+        sections[i].hidden = sections[i].getAttribute("data-route") !== route;
+      }
+
+      const links = document.querySelectorAll("[data-nav]");
+
+      for (let i = 0; i < links.length; i++) {
+        const active = links[i].getAttribute("data-nav") === route;
+        links[i].className = active ? "active" : "";
+        if (active) {
+          links[i].setAttribute("aria-current", "page");
+        } else {
+          links[i].removeAttribute("aria-current");
+        }
+      }
+
+      if (route !== currentRoute) {
+        currentRoute = route;
+        window.scrollTo(0, 0);
+      }
+    }
+
+    window.addEventListener("hashchange", showRoute);
+
+    // 立项书目录：在页内滚动，不改变路由。
+    (function () {
+      const buttons = document.querySelectorAll("[data-scroll]");
+
+      for (let i = 0; i < buttons.length; i++) {
+        buttons[i].addEventListener("click", () => {
+          const target = $(buttons[i].getAttribute("data-scroll"));
+          if (target) {
+            target.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
+        });
+      }
+    })();
+
+    // 语言切换：记住选择并保留目前页面。
+    $("lang-toggle").addEventListener("click", event => {
+      const target = event.currentTarget;
+
+      try {
+        localStorage.setItem("prism-lang", target.getAttribute("data-lang"));
+      } catch (error) {
+        // 私密模式等情况下无法储存，仍可切换。
+      }
+
+      target.href = target.getAttribute("href").split("#")[0] + location.hash;
+    });
+
+    // =========================================================
+    // 2. 拟议政策
+    // 百分比采一般输入方式：0.20 代表 0.20%，不是 20%。
+    // =========================================================
+
+    const POLICY = Object.freeze({
+      version: "PRISM-v3-core",
+      extraRate: 0.20,
+      extraCap: 10000,
+      extraPayMonth: 1,
+      extraClawbackMonths: 24,
+      minimumPrincipal: 2000000,
+      maximumPrincipal: 5000000
+    });
+
+    // =========================================================
+    // 3. 持有期成本引擎（与原版 v3 计算完全相同）
+    // =========================================================
+
+    // 月供：P × i / [1 - (1+i)^(-n)]，i = 年利率 / 1200
+    function amortize(principal, annualRate, months, held) {
+      const monthlyRate = annualRate / 1200;
+
+      const payment = monthlyRate === 0
+        ? principal / months
+        : principal * monthlyRate /
+          (-Math.expm1(-months * Math.log1p(monthlyRate)));
+
+      let balance = principal;
+      let interest = 0;
+
+      for (let month = 1; month <= held; month++) {
+        const monthlyInterest = balance * monthlyRate;
+
+        interest += monthlyInterest;
+
+        balance = Math.max(
+          0,
+          balance + monthlyInterest - payment
+        );
+      }
+
+      if (held === months) {
+        balance = 0;
+      }
+
+      return {
+        payment,
+        interest,
+        balance
+      };
+    }
+
+    // amount：核定金额；received：退出时已收到；clawback：已支付但须追回；
+    // cancelled：未支付但因提前退出而取消；pending：未收到且未取消；
+    // retained：已收并可保留。
+    function calculateAward(
+      amount,
+      payMonth,
+      clawbackMonths,
+      held,
+      early
+    ) {
+      amount = roundMoney(amount);
+
+      const received = payMonth <= held ? amount : 0;
+
+      const exitsInsidePeriod =
+        early &&
+        clawbackMonths > 0 &&
+        held <= clawbackMonths;
+
+      const clawback = exitsInsidePeriod
+        ? received
+        : 0;
+
+      const cancelled =
+        exitsInsidePeriod && received === 0
+          ? amount
+          : 0;
+
+      return {
+        amount,
+        received,
+        clawback,
+        cancelled,
+
+        pending: Math.max(
+          0,
+          amount - received - cancelled
+        ),
+
+        retained: received - clawback
+      };
+    }
+
+    const OFFER_KINDS = {
+      prism: "PRISM 直达",
+      broker: "中介渠道",
+      other: "其他方案／维持原贷款"
+    };
+
+    // 字段格式：[标签、最小值、最大值、是否必须为整数]
+    const COMMON_FIELDS = {
+      principal: ["实际取用本金（HK$）", 1, 100000000, false],
+      months: ["供款期（月）", 1, 600, true],
+      horizon: ["预计持有期（月）", 1, 600, true]
+    };
+
+    const OFFER_FIELDS = {
+      rate: ["年利率（%）", 0, 30, false],
+      basic: ["银行基本回赠（%）", 0, 20, false],
+      fees: ["全部方案费用（HK$）", 0, 10000000, false],
+      extra: ["渠道额外回赠（%）", 0, 20, false],
+      extraCap: ["额外回赠上限；0＝无上限（HK$）", 0, 10000000, false],
+      basicPay: ["基本回赠支付月", 0, 600, true],
+      basicClaw: ["基本回赠追回期（月）", 0, 600, true],
+      extraPay: ["额外回赠支付月", 0, 600, true],
+      extraClaw: ["额外回赠追回期（月）", 0, 600, true],
+      penalty: ["提前清还罚款（%）", 0, 20, false],
+      penaltyMonths: ["罚息期（月）", 0, 600, true]
+    };
+
+    const MAIN_OFFER_KEYS = ["rate", "basic", "fees", "extra", "extraCap"];
+    const TERM_OFFER_KEYS = [
+      "basicPay", "basicClaw", "extraPay", "extraClaw",
+      "penalty", "penaltyMonths"
+    ];
+    const PRISM_LOCKED = {
+      extra: POLICY.extraRate,
+      extraCap: POLICY.extraCap,
+      extraPay: POLICY.extraPayMonth,
+      extraClaw: POLICY.extraClawbackMonths
+    };
+
+    function validateOffer(offer, name) {
+      if (!offer || typeof offer !== "object" || Array.isArray(offer)) {
+        throw new Error(name + "：输入格式无效。");
+      }
+
+      for (const key of Object.keys(offer)) {
+        if (!has(OFFER_FIELDS, key)) {
+          throw new Error(name + "：输入包含未支持的字段。");
+        }
+      }
+
+      for (const key of Object.keys(OFFER_FIELDS)) {
+        const def = OFFER_FIELDS[key];
+        const value = offer[key];
+
+        if (
+          typeof value !== "number" ||
+          !Number.isFinite(value) ||
+          value < def[1] ||
+          value > def[2] ||
+          (def[3] && !Number.isInteger(value))
+        ) {
+          throw new Error(
+            name + "：" + def[0] + "须为 " + def[1] + " 至 " + def[2] +
+            (def[3] ? " 的整数。" : " 之间的数值。")
+          );
+        }
+      }
+    }
+
+    function validateCostInputs(x) {
+      if (!x || typeof x !== "object" || Array.isArray(x)) {
+        throw new Error("输入格式无效。");
+      }
+
+      for (const key of Object.keys(x)) {
+        if (!has(COMMON_FIELDS, key) && key !== "A" && key !== "B") {
+          throw new Error("输入包含未支持的字段。");
+        }
+      }
+
+      for (const key of Object.keys(COMMON_FIELDS)) {
+        const def = COMMON_FIELDS[key];
+        const value = x[key];
+
+        if (
+          typeof value !== "number" ||
+          !Number.isFinite(value) ||
+          value < def[1] ||
+          value > def[2] ||
+          (def[3] && !Number.isInteger(value))
+        ) {
+          throw new Error(
+            def[0] + "须为 " + def[1] + " 至 " + def[2] +
+            (def[3] ? " 的整数。" : " 之间的数值。")
+          );
+        }
+      }
+
+      validateOffer(x.A, "方案 A");
+      validateOffer(x.B, "方案 B");
+
+      if (x.horizon > x.months) {
+        throw new Error("持有期不可超过供款期。");
+      }
+
+      return x;
+    }
+
+    // 单一方案在指定退出月份的成本。
+    function evaluateOffer(o, principal, months, held) {
+      const early = held < months;
+      const result = amortize(principal, o.rate, months, held);
+
+      result.basic = calculateAward(
+        principal * o.basic / 100,
+        o.basicPay,
+        o.basicClaw,
+        held,
+        early
+      );
+
+      const rawExtra = principal * o.extra / 100;
+      const cappedExtra = o.extraCap > 0
+        ? Math.min(rawExtra, o.extraCap)
+        : rawExtra;
+
+      result.extra = calculateAward(
+        cappedExtra,
+        o.extraPay,
+        o.extraClaw,
+        held,
+        early
+      );
+
+      result.fees = o.fees;
+
+      const insidePenaltyPeriod =
+        early &&
+        held <= o.penaltyMonths;
+
+      result.penalty = insidePenaltyPeriod
+        ? result.balance * o.penalty / 100
+        : 0;
+
+      result.received = result.basic.received + result.extra.received;
+      result.clawback = result.basic.clawback + result.extra.clawback;
+      result.cancelled = result.basic.cancelled + result.extra.cancelled;
+      result.pending = result.basic.pending + result.extra.pending;
+      result.retained = result.received - result.clawback;
+
+      result.cost =
+        result.interest +
+        result.fees +
+        result.penalty +
+        result.clawback -
+        result.received;
+
+      result.early = early;
+
+      return result;
+    }
+
+    // 双方案计算；排名完全按计算结果，不预设任何一方胜出。
+    function calculateOffers(input) {
+      const x = validateCostInputs(input);
+      const held = x.horizon;
+
+      const A = evaluateOffer(x.A, x.principal, x.months, held);
+      const B = evaluateOffer(x.B, x.principal, x.months, held);
+
+      return {
+        A,
+        B,
+        held,
+
+        // 负数：A 成本较低；正数：B 成本较低。
+        difference: A.cost - B.cost
+      };
+    }
+
+    // 条款未知时，哪些结果无法确定（未知不当零）。
+    function unknownImpact(unknown, result) {
+      const early = result.early;
+      const hasAward = result.basic.amount > 0 || result.extra.amount > 0;
+
+      return {
+        penalty: early && unknown.penalty,
+        claw: early && unknown.claw && hasAward,
+        cost: early && (unknown.penalty || (unknown.claw && hasAward))
+      };
+    }
+
+    // =========================================================
+    // 4. 持有期成本：表单
+    // =========================================================
+
+    const cost = {
+      source: "已载入合成示例，并非银行实际报价",
+      report: null
+    };
+
+    function buildCostForm() {
+      const common = $("cost-common");
+
+      for (const key of Object.keys(COMMON_FIELDS)) {
+        const def = COMMON_FIELDS[key];
+        common.insertAdjacentHTML(
+          "beforeend",
+          '<label for="c-' + key + '">' + esc(def[0]) +
+          '<input id="c-' + key + '" name="' + key + '" type="number" min="' +
+          def[1] + '" max="' + def[2] + '" step="' + (def[3] ? "1" : "any") +
+          '" inputmode="' + (def[3] ? "numeric" : "decimal") + '" required></label>'
+        );
+      }
+
+      ["A", "B"].forEach(side => {
+        const card = $("offer-" + side);
+        const field = key => {
+          const def = OFFER_FIELDS[key];
+          return '<label for="' + side + "-" + key + '">' + esc(def[0]) +
+            '<input id="' + side + "-" + key + '" name="' + key +
+            '" type="number" min="' + def[1] + '" max="' + def[2] +
+            '" step="' + (def[3] ? "1" : "any") + '" inputmode="' +
+            (def[3] ? "numeric" : "decimal") + '" required></label>';
+        };
+
+        let kinds = "";
+        for (const kind of Object.keys(OFFER_KINDS)) {
+          kinds += '<option value="' + kind + '">' + esc(OFFER_KINDS[kind]) + "</option>";
+        }
+
+        card.innerHTML =
+          "<h2>方案 " + side + "</h2>" +
+          '<div class="fields">' +
+          '<label for="' + side + '-name">方案名称<input id="' + side +
+          '-name" type="text" maxlength="24"></label>' +
+          '<label for="' + side + '-kind">渠道类型<select id="' + side +
+          '-kind">' + kinds + "</select></label>" +
+          MAIN_OFFER_KEYS.map(field).join("") +
+          "</div>" +
+          '<div class="notice" id="' + side + '-policy" style="margin: 14px 0 0" hidden>' +
+          "<strong>拟议 PRISM 加码：0.20%</strong><br>" +
+          '<span class="small">上限 HK$10,000，银行基本回赠另计。此月度模型在第 1 月计入加码，提前全清追回期为 24 个月，包含第 24 月。</span>' +
+          "</div>" +
+          '<details style="margin-top: 14px">' +
+          "<summary>支付、追回及提前清还条款</summary>" +
+          '<div class="fields" style="margin-top: 12px">' +
+          TERM_OFFER_KEYS.map(field).join("") +
+          "</div>" +
+          '<label class="check"><input type="checkbox" id="' + side +
+          '-penaltyUnknown"><span>提前清还罚款条款未知（未提供或未核实）</span></label>' +
+          '<label class="check"><input type="checkbox" id="' + side +
+          '-clawUnknown"><span>回赠追回条款未知（未提供或未核实）</span></label>' +
+          "</details>";
+
+        $(side + "-kind").addEventListener("change", () => applyKind(side));
+        $(side + "-penaltyUnknown").addEventListener("change", () => applyUnknown(side));
+        $(side + "-clawUnknown").addEventListener("change", () => applyUnknown(side));
+      });
+    }
+
+    function applyKind(side) {
+      const prism = $(side + "-kind").value === "prism";
+
+      for (const key of Object.keys(PRISM_LOCKED)) {
+        const input = $(side + "-" + key);
+        if (prism) {
+          input.value = String(PRISM_LOCKED[key]);
+        }
+        input.disabled = prism;
+      }
+
+      $(side + "-policy").hidden = !prism;
+      applyUnknown(side);
+      updateChannelVisibility();
+    }
+
+    function applyUnknown(side) {
+      const prism = $(side + "-kind").value === "prism";
+      const penaltyUnknown = $(side + "-penaltyUnknown").checked;
+      const clawUnknown = $(side + "-clawUnknown").checked;
+
+      $(side + "-penalty").disabled = penaltyUnknown;
+      $(side + "-penaltyMonths").disabled = penaltyUnknown;
+      $(side + "-basicClaw").disabled = clawUnknown;
+      $(side + "-extraClaw").disabled = clawUnknown || prism;
+    }
+
+    function updateChannelVisibility() {
+      $("channel-wrap").hidden =
+        $("A-kind").value !== "prism" && $("B-kind").value !== "prism";
+    }
+
+    function setCostState(state) {
+      for (const key of Object.keys(COMMON_FIELDS)) {
+        $("c-" + key).value = String(state.inputs[key]);
+      }
+
+      ["A", "B"].forEach(side => {
+        $(side + "-name").value = state.names[side];
+        $(side + "-kind").value = state.kinds[side];
+
+        for (const key of Object.keys(OFFER_FIELDS)) {
+          $(side + "-" + key).value = String(state.inputs[side][key]);
+        }
+
+        $(side + "-penaltyUnknown").checked = !!state.unknown[side].penalty;
+        $(side + "-clawUnknown").checked = !!state.unknown[side].claw;
+
+        applyKind(side);
+      });
+
+      $("cost-channel").value = state.channel || "clear";
+    }
+
+    function readCostState() {
+      const inputs = {};
+
+      for (const key of Object.keys(COMMON_FIELDS)) {
+        const def = COMMON_FIELDS[key];
+        inputs[key] = readNumber("c-" + key, def[0], def[1], def[2], def[3]);
+      }
+
+      const names = {};
+      const kinds = {};
+      const unknown = {};
+
+      ["A", "B"].forEach(side => {
+        const label = "方案 " + side + "：";
+        unknown[side] = {
+          penalty: $(side + "-penaltyUnknown").checked,
+          claw: $(side + "-clawUnknown").checked
+        };
+        kinds[side] = $(side + "-kind").value;
+        names[side] = $(side + "-name").value.trim() || ("方案 " + side);
+        inputs[side] = {};
+
+        for (const key of Object.keys(OFFER_FIELDS)) {
+          const def = OFFER_FIELDS[key];
+          const ignored =
+            (unknown[side].penalty && (key === "penalty" || key === "penaltyMonths")) ||
+            (unknown[side].claw && (key === "basicClaw" || key === "extraClaw"));
+
+          if (ignored && $(side + "-" + key).value.trim() === "") {
+            inputs[side][key] = 0;
+          } else {
+            inputs[side][key] = readNumber(
+              side + "-" + key, label + def[0], def[1], def[2], def[3]
+            );
+          }
+        }
+
+        if (kinds[side] === "prism") {
+          for (const key of Object.keys(PRISM_LOCKED)) {
+            inputs[side][key] = PRISM_LOCKED[key];
+          }
+        }
+      });
+
+      return {
+        inputs: validateCostInputs(inputs),
+        names,
+        kinds,
+        unknown,
+        channel: $("cost-channel").value
+      };
+    }
+
+    // ---------- 示例情境 ----------
+
+    function offerTerms(values) {
+      return Object.assign({
+        rate: 3.5,
+        basic: 0,
+        fees: 0,
+        extra: 0,
+        extraCap: 0,
+        basicPay: 1,
+        basicClaw: 0,
+        extraPay: 1,
+        extraClaw: 0,
+        penalty: 0,
+        penaltyMonths: 0
+      }, values);
+    }
+
+    function prismVersusBroker(overrides) {
+      const o = overrides || {};
+
+      const state = {
+        names: { A: "PRISM 直达方案", B: "中介渠道方案" },
+        kinds: { A: "prism", B: "broker" },
+        unknown: { A: {}, B: {} },
+        channel: "clear",
+        inputs: {
+          principal: 4000000,
+          months: 360,
+          horizon: o.horizon || 36,
+          A: offerTerms({
+            rate: o.rateA || 3.5,
+            basic: 0.8,
+            extra: POLICY.extraRate,
+            extraCap: POLICY.extraCap,
+            extraPay: POLICY.extraPayMonth,
+            extraClaw: POLICY.extraClawbackMonths,
+            basicClaw: 24,
+            penalty: 1,
+            penaltyMonths: 24
+          }),
+          B: offerTerms({
+            basic: 0.8,
+            extra: o.extraB === undefined ? 0.23 : o.extraB,
+            extraClaw: 24,
+            basicClaw: 24,
+            penalty: 1,
+            penaltyMonths: 24
+          })
+        }
+      };
+
+      return state;
+    }
+
+    // 立项书第3章教学例子：原贷款500万元、30年、3.5%，已供36月。
+    const TEACHING_PRINCIPAL = 4701770.78;
+
+    function teachingExample(missingClaw) {
+      return {
+        names: { A: "A 维持原贷款", B: "B 转按方案" },
+        kinds: { A: "other", B: "other" },
+        unknown: { A: {}, B: { claw: !!missingClaw } },
+        channel: "clear",
+        inputs: {
+          principal: TEACHING_PRINCIPAL,
+          months: 324,
+          horizon: 36,
+          A: offerTerms({ rate: 3.5 }),
+          B: offerTerms({
+            rate: 3.6,
+            fees: 10000,
+            basic: 1,
+            basicPay: 0,
+            basicClaw: 24,
+            penalty: 1,
+            penaltyMonths: 24
+          })
+        }
+      };
+    }
+
+    const COST_PRESETS = {
+      teaching: () => teachingExample(false),
+      missing: () => teachingExample(true),
+      broker: () => prismVersusBroker(),
+      direct: () => prismVersusBroker({ extraB: 0.15 }),
+      rate: () => prismVersusBroker({ rateA: 3.6, extraB: 0 }),
+      early: () => prismVersusBroker({ horizon: 18 })
+    };
+
+    function loadCostPreset(name) {
+      setCostState(COST_PRESETS[name]());
+      cost.source = "已载入合成示例，并非银行实际报价";
+      $("cost-source").textContent = cost.source;
+      $("cost-confirmed").checked = false;
+      invalidateCost();
+    }
+
+    function invalidateCost() {
+      cost.report = null;
+      $("cost-result").hidden = true;
+      $("cost-export").disabled = true;
+      $("cost-message").textContent = "";
+    }
+
+    // ---------- 计算与显示 ----------
+
+    function exitMonthsFor(inputs) {
+      const list = [12, 24, 25, 36, inputs.horizon, inputs.months]
+        .filter(m => m >= 1 && m <= inputs.months);
+
+      return list
+        .filter((m, i) => list.indexOf(m) === i)
+        .sort((a, b) => a - b)
+        .slice(0, 8);
+    }
+
+    function runCost(state) {
+      const x = state.inputs;
+      const anyPrism = state.kinds.A === "prism" || state.kinds.B === "prism";
+
+      if (anyPrism) {
+        if (
+          x.principal < POLICY.minimumPrincipal ||
+          x.principal > POLICY.maximumPrincipal
+        ) {
+          throw new Error(
+            "本金超出首期拟议 HK$200万至500万范围。" +
+            "本版不以此加码政策对超范围贷款作优劣排名。"
+          );
+        }
+
+        if (state.channel !== "clear") {
+          throw new Error(
+            "直达渠道资格未确认或存在中介转介冲突，" +
+            "请先由银行复核；本版暂停优惠排名。"
+          );
+        }
+      }
+
+      const result = calculateOffers(x);
+
+      const exits = exitMonthsFor(x).map(month => {
+        const input = Object.assign({}, x, { horizon: month });
+        const r = calculateOffers(input);
+        return {
+          month,
+          A: r.A,
+          B: r.B,
+          unknownA: unknownImpact(state.unknown.A, r.A),
+          unknownB: unknownImpact(state.unknown.B, r.B)
+        };
+      });
+
+      const series = [];
+      const chartEnd = Math.min(x.months, Math.max(60, Math.min(120, x.horizon * 2)));
+
+      for (let month = 1; month <= chartEnd; month++) {
+        const input = Object.assign({}, x, { horizon: month });
+        const r = calculateOffers(input);
+        const uA = unknownImpact(state.unknown.A, r.A).cost;
+        const uB = unknownImpact(state.unknown.B, r.B).cost;
+        series.push({ x: month, y: uA || uB ? null : r.B.cost - r.A.cost });
+      }
+
+      return {
+        result,
+        exits,
+        series,
+        unknownA: unknownImpact(state.unknown.A, result.A),
+        unknownB: unknownImpact(state.unknown.B, result.B)
+      };
+    }
+
+    function renderCost(state, run) {
+      const names = state.names;
+      const result = run.result;
+      const stopped = run.unknownA.cost || run.unknownB.cost;
+      const missing = [];
+
+      ["A", "B"].forEach(side => {
+        if (state.unknown[side].penalty) {
+          missing.push(names[side] + "：提前清还罚款条款未知");
+        }
+        if (state.unknown[side].claw) {
+          missing.push(names[side] + "：回赠追回条款未知");
+        }
+      });
+
+      const headline = $("cost-headline");
+      headline.className = stopped ? "card result stopped" : "card result";
+
+      if (stopped) {
+        $("cost-title").textContent = "已停止完整排名：条款不完整";
+        $("cost-difference").textContent = "未能比较";
+        $("cost-description").textContent =
+          missing.join("；") + "。未知不当作零；请向报价方取得并核实条款，或交专员处理。";
+      } else {
+        const difference = result.difference;
+        const equal = Math.abs(difference) < 0.005;
+
+        $("cost-title").textContent = equal
+          ? "按本次输入，两方案净成本相同"
+          : "按本次输入，" + (difference < 0 ? names.A : names.B) + "净成本较低";
+
+        $("cost-difference").textContent = money(Math.abs(difference));
+        $("cost-description").textContent =
+          "比较本金 " + money(state.inputs.principal) +
+          "，于第 " + result.held + " 期供款后全数清还。" +
+          "结果只反映输入条款及本模型假设，不代表全市场最优方案。" +
+          (missing.length ? "（" + missing.join("；") + "，但不影响此退出时间。）" : "");
+      }
+
+      // 按退出时间比较
+      $("exit-head").innerHTML =
+        "<tr><th>退出时间</th><th>" + esc(names.A) + " 净成本</th><th>" +
+        esc(names.B) + " 净成本</th><th>B 减 A</th><th>" + esc(names.A) +
+        " 未还本金</th><th>" + esc(names.B) + " 未还本金</th></tr>";
+
+      const exitRows = $("exit-rows");
+      clearChildren(exitRows);
+
+      run.exits.forEach(row => {
+        const unknown = row.unknownA.cost || row.unknownB.cost;
+        const diff = row.B.cost - row.A.cost;
+        const tr = document.createElement("tr");
+
+        if (row.month === state.inputs.horizon) {
+          tr.className = "total";
+        }
+
+        const cells = [
+          ["第 " + row.month + " 个月" + (row.month === state.inputs.months ? "（到期）" : ""), ""],
+          row.unknownA.cost ? ["未知", "unknown"] : [fmt(row.A.cost, 0), ""],
+          row.unknownB.cost ? ["未知", "unknown"] : [fmt(row.B.cost, 0), ""],
+          unknown ? ["未能比较", "unknown"] : [signed(diff, 0), diff > 0.5 ? "neg" : (diff < -0.5 ? "pos" : "")],
+          [fmt(row.A.balance, 2), ""],
+          [fmt(row.B.balance, 2), ""]
+        ];
+
+        cells.forEach(cell => {
+          const td = document.createElement("td");
+          td.textContent = cell[0];
+          if (cell[1]) {
+            td.className = cell[1];
+          }
+          tr.appendChild(td);
+        });
+
+        exitRows.appendChild(tr);
+      });
+
+      // 结论反转
+      const flips = [];
+      let previous = null;
+
+      run.series.forEach(point => {
+        if (point.y === null || Math.abs(point.y) < 0.5) {
+          return;
+        }
+        const sign = point.y > 0 ? 1 : -1;
+        if (previous !== null && sign !== previous) {
+          flips.push({ month: point.x, cheaper: sign > 0 ? names.A : names.B });
+        }
+        previous = sign;
+      });
+
+      $("crossover-note").textContent = run.series.every(p => p.y === null)
+        ? "条款不完整，未能绘出提前退出的成本差距。"
+        : flips.length
+          ? "结论反转：" + flips.slice(0, 3).map(f =>
+            "第 " + f.month + " 个月起 " + f.cheaper + " 较低").join("；") +
+            "。退出时仍须清还的本金另列，成本较低不等于所需现金较少。"
+          : "在图表范围内，两方案的高低次序没有反转。退出时仍须清还的本金另列。";
+
+      $("cost-chart").innerHTML = lineChart(run.series, {
+        height: 230,
+        xLabel: "退出月份",
+        zero: true
+      });
+      $("chart-legend").textContent =
+        "B 减 A 净成本（HK$）：高于虚线代表 " + names.A + " 较低；低于虚线代表 " + names.B + " 较低。";
+
+      // 完整成本明细
+      $("breakdown-title").textContent = "完整成本明细：第 " + result.held + " 个月退出";
+      $("breakdown-head").innerHTML =
+        "<tr><th>项目</th><th>" + esc(names.A) + "</th><th>" + esc(names.B) + "</th></tr>";
+
+      const rows = [
+        ["核定银行基本回赠", v => v.basic.amount],
+        ["核定渠道额外回赠", v => v.extra.amount],
+        ["累计利息", v => v.interest],
+        ["全部方案费用", v => v.fees],
+        ["提前清还罚款", v => v.penalty, "penalty"],
+        ["基本回赠已付追回", v => v.basic.clawback, "claw"],
+        ["额外回赠已付追回", v => v.extra.clawback, "claw"],
+        ["减：实际已收回赠", v => v.received],
+        ["未付而取消；不另计成本", v => v.cancelled, "claw"],
+        ["期末保留的已收回赠", v => v.retained, "claw"],
+        ["净融资成本", v => v.cost, "cost", true],
+        ["每月供款", v => v.payment],
+        ["期末未还本金；另列", v => v.balance]
+      ];
+
+      const tbody = $("breakdown-rows");
+      clearChildren(tbody);
+
+      rows.forEach(row => {
+        const tr = document.createElement("tr");
+        if (row[3]) {
+          tr.className = "total";
+        }
+
+        const label = document.createElement("td");
+        label.textContent = row[0];
+        tr.appendChild(label);
+
+        [[result.A, run.unknownA], [result.B, run.unknownB]].forEach(pair => {
+          const td = document.createElement("td");
+          const flag = row[2];
+          if (flag && pair[1][flag]) {
+            td.textContent = "未知";
+            td.className = "unknown";
+          } else {
+            td.textContent = money(row[1](pair[0]));
+          }
+          tr.appendChild(td);
+        });
+
+        tbody.appendChild(tr);
+      });
+
+      const pending = result.A.pending + result.B.pending;
+
+      $("pending-note").textContent = pending > 0
+        ? "仍有尚未收到的条件回赠，未在本期成本扣除；退出后是否仍可取得，须向报价方确认。"
+        : "本期成本只扣除指定时点前已实际收到的回赠。";
+
+      $("cost-result").hidden = false;
+      $("cost-export").disabled = false;
+    }
+
+    function calculateCostNow() {
+      invalidateCost();
+
+      try {
+        const state = readCostState();
+
+        if (!$("cost-confirmed").checked) {
+          throw new Error("请先核对本次输入及计算假设。");
+        }
+
+        const run = runCost(state);
+
+        cost.report = {
+          format: "prism-cost-comparison",
+          version: 2,
+          policy: POLICY.version,
+          generatedAt: new Date().toISOString(),
+          source: cost.source,
+          names: state.names,
+          kinds: state.kinds,
+          unknown: state.unknown,
+          channel: state.channel,
+          inputs: state.inputs,
+          result: run.result,
+          notice: "示例／自填情境，并非银行报价、审批或优惠承诺。"
+        };
+
+        renderCost(state, run);
+        return true;
+      } catch (error) {
+        $("cost-message").textContent = error.message;
+        return false;
+      }
+    }
+
+    function initCost() {
+      buildCostForm();
+
+      $("cost-form").addEventListener("submit", event => {
+        event.preventDefault();
+        if (calculateCostNow()) {
+          $("cost-result").scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      });
+
+      $("cost-form").addEventListener("input", event => {
+        const target = event.target;
+        if (target.id === "cost-confirmed" || target.id === "cost-import") {
+          return;
+        }
+
+        $("cost-confirmed").checked = false;
+        invalidateCost();
+        cost.source = "自填情境，尚待核对";
+        $("cost-source").textContent = cost.source;
+      });
+
+      $("cost-form").addEventListener("change", event => {
+        if (event.target.tagName === "SELECT" || event.target.type === "checkbox") {
+          if (event.target.id !== "cost-confirmed") {
+            $("cost-confirmed").checked = false;
+            invalidateCost();
+          }
+        }
+      });
+
+      $("cost-confirmed").addEventListener("change", () => {
+        if (!$("cost-confirmed").checked) {
+          invalidateCost();
+        }
+      });
+
+      const presets = document.querySelectorAll("[data-preset]");
+      for (let i = 0; i < presets.length; i++) {
+        presets[i].addEventListener("click", () => {
+          loadCostPreset(presets[i].getAttribute("data-preset"));
+        });
+      }
+
+      $("cost-export").addEventListener("click", () => {
+        if (cost.report) {
+          downloadJson(cost.report, "PRISM_Comparison.json", "cost-message");
+        }
+      });
+
+      $("cost-import").addEventListener("change", event => {
+        const input = event.target;
+        const file = input.files && input.files[0];
+
+        if (!file) {
+          return;
+        }
+
+        readJsonFile(file)
+          .then(data => {
+            setCostState(importedCostState(data));
+            cost.source = "已导入资料，必须重新核对";
+            $("cost-source").textContent = cost.source;
+            $("cost-confirmed").checked = false;
+            $("cost-channel").value = "unknown";
+            invalidateCost();
+            $("cost-message").textContent =
+              "导入成功。请重新确认渠道资格及条款，再按计算；程序不会采用文件内原有排名。";
+          })
+          .catch(error => {
+            $("cost-message").textContent = "导入失败：" + error.message;
+          })
+          .then(() => {
+            input.value = "";
+          });
+      });
+
+      loadCostPreset("teaching");
+    }
+
+    // 只采用验证后的输入；不信任文件内的结果、排名及核对状态。
+    function importedCostState(data) {
+      if (!data || typeof data !== "object") {
+        throw new Error("文件格式或政策版本不相符。");
+      }
+
+      // 原版 v3（PRISM 对中介）导出档
+      if (
+        data.format === "prism-core-comparison" &&
+        data.version === 1 &&
+        data.policy === POLICY.version
+      ) {
+        const v = data.inputs || {};
+        const pick = (suffix, extra) => offerTerms(Object.assign({
+          rate: v["rate" + suffix],
+          fees: v["fees" + suffix],
+          basic: v["basic" + suffix],
+          basicPay: v["basicPay" + suffix],
+          basicClaw: v["basicClaw" + suffix],
+          penalty: v["penalty" + suffix],
+          penaltyMonths: v["penaltyMonths" + suffix]
+        }, extra));
+
+        const state = {
+          names: { A: "PRISM 直达方案", B: "中介渠道方案" },
+          kinds: { A: "prism", B: "broker" },
+          unknown: { A: {}, B: {} },
+          channel: "unknown",
+          inputs: {
+            principal: v.principal,
+            months: v.months,
+            horizon: v.horizon,
+            A: pick("P", PRISM_LOCKED),
+            B: pick("M", {
+              extra: v.extraM,
+              extraCap: v.capM,
+              extraPay: v.extraPayM,
+              extraClaw: v.extraClawM
+            })
+          }
+        };
+
+        validateCostInputs(state.inputs);
+        return state;
+      }
+
+      if (
+        data.format !== "prism-cost-comparison" ||
+        data.version !== 2 ||
+        data.policy !== POLICY.version
+      ) {
+        throw new Error("文件格式或政策版本不相符。");
+      }
+
+      const kinds = data.kinds || {};
+      const names = data.names || {};
+      const unknown = data.unknown || {};
+
+      ["A", "B"].forEach(side => {
+        if (!has(OFFER_KINDS, kinds[side])) {
+          throw new Error("渠道类型无效。");
+        }
+        if (typeof names[side] !== "string") {
+          names[side] = "方案 " + side;
+        }
+        unknown[side] = unknown[side] || {};
+      });
+
+      return {
+        names: { A: names.A.slice(0, 24), B: names.B.slice(0, 24) },
+        kinds: { A: kinds.A, B: kinds.B },
+        unknown: {
+          A: { penalty: unknown.A.penalty === true, claw: unknown.A.claw === true },
+          B: { penalty: unknown.B.penalty === true, claw: unknown.B.claw === true }
+        },
+        channel: "unknown",
+        inputs: validateCostInputs(data.inputs)
+      };
+    }
+
+    // =========================================================
+    // 5. JSON 导出／导入
+    // =========================================================
+
+    function downloadJson(data, filename, messageId) {
+      const content = JSON.stringify(data, null, 2);
+      const blob = new Blob([content], { type: "application/json;charset=utf-8" });
+
+      if (window.navigator.msSaveOrOpenBlob) {
+        window.navigator.msSaveOrOpenBlob(blob, filename);
+        return;
+      }
+
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = filename;
+      document.body.appendChild(anchor);
+      anchor.click();
+      document.body.removeChild(anchor);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+      // 微信等内置浏览器通常禁止下载，改为显示内容让用户复制。
+      if (/MicroMessenger|QQ\/|Weibo/i.test(navigator.userAgent)) {
+        $(messageId).textContent =
+          "如果没有自动下载，请长按或复制以下内容，另存为 .json 文件：\n\n" + content;
+      }
+    }
+
+    function readJsonFile(file) {
+      return new Promise((resolve, reject) => {
+        if (file.size > 200000) {
+          reject(new Error("文件过大，请导入本程序输出的 JSON。"));
+          return;
+        }
+
+        const reader = new FileReader();
+
+        reader.onload = () => {
+          try {
+            resolve(JSON.parse(reader.result));
+          } catch (error) {
+            reject(new Error("文件无法读取，或不是有效的 JSON。"));
+          }
+        };
+        reader.onerror = () => reject(new Error("文件无法读取，或不是有效的 JSON。"));
+        reader.readAsText(file, "utf-8");
+      });
+    }
+
+    // =========================================================
+    // 6. 图表（内嵌 SVG，不依赖外部程序库）
+    // =========================================================
+
+    function niceStep(range, target) {
+      const raw = range / target;
+      const power = Math.pow(10, Math.floor(Math.log(raw) / Math.LN10));
+      const unit = raw / power;
+      const step = unit >= 5 ? 10 : unit >= 2 ? 5 : unit >= 1 ? 2 : 1;
+      return step * power;
+    }
+
+    function axisLabel(value) {
+      const abs = Math.abs(value);
+      if (abs >= 10000) {
+        return fmt(value / 10000, abs >= 100000 ? 0 : 1) + "万";
+      }
+      return fmt(value, 0);
+    }
+
+    function lineChart(points, options) {
+      const width = 640;
+      const height = options.height || 220;
+      const pad = { left: 56, right: 14, top: 12, bottom: 34 };
+      const valid = points.filter(p => p.y !== null);
+
+      if (!valid.length) {
+        return "";
+      }
+
+      const xs = points.map(p => p.x);
+      const ys = valid.map(p => p.y).concat(options.zero ? [0] : []);
+      const xMin = Math.min.apply(null, xs);
+      const xMax = Math.max.apply(null, xs);
+      let yMin = Math.min.apply(null, ys);
+      let yMax = Math.max.apply(null, ys);
+
+      if (yMin === yMax) {
+        yMin -= 1;
+        yMax += 1;
+      }
+
+      const step = niceStep(yMax - yMin, 4);
+      yMin = Math.floor(yMin / step) * step;
+      yMax = Math.ceil(yMax / step) * step;
+
+      const sx = x => pad.left + (x - xMin) / Math.max(1, xMax - xMin) * (width - pad.left - pad.right);
+      const sy = y => pad.top + (yMax - y) / (yMax - yMin) * (height - pad.top - pad.bottom);
+
+      let svg = '<svg viewBox="0 0 ' + width + " " + height + '" role="img" aria-label="' +
+        esc(options.xLabel || "") + '">';
+
+      for (let y = yMin; y <= yMax + step / 2; y += step) {
+        svg += '<line class="axis" x1="' + pad.left + '" x2="' + (width - pad.right) +
+          '" y1="' + sy(y) + '" y2="' + sy(y) + '" opacity="0.5"/>';
+        svg += '<text x="' + (pad.left - 6) + '" y="' + (sy(y) + 4) +
+          '" text-anchor="end">' + axisLabel(y) + "</text>";
+      }
+
+      if (options.zero && yMin < 0 && yMax > 0) {
+        svg += '<line class="zero" x1="' + pad.left + '" x2="' + (width - pad.right) +
+          '" y1="' + sy(0) + '" y2="' + sy(0) + '"/>';
+      }
+
+      const xStep = niceStep(xMax - xMin || 1, 6);
+      for (let x = Math.ceil(xMin / xStep) * xStep; x <= xMax; x += xStep) {
+        svg += '<text x="' + sx(x) + '" y="' + (height - 12) + '" text-anchor="middle">' + x + "</text>";
+      }
+
+      let path = "";
+      let open = false;
+
+      points.forEach(p => {
+        if (p.y === null) {
+          open = false;
+          return;
+        }
+        path += (open ? "L" : "M") + sx(p.x).toFixed(1) + " " + sy(p.y).toFixed(1);
+        open = true;
+      });
+
+      svg += '<path class="line" d="' + path + '"/>';
+      svg += '<text x="' + (width - pad.right) + '" y="' + (height - 1) +
+        '" text-anchor="end">' + esc(options.xLabel || "") + "</text>";
+      svg += "</svg>";
+
+      return svg;
+    }
+
+    function barLineChart(bars, line, options) {
+      const width = 640;
+      const height = options.height || 240;
+      const pad = { left: 56, right: 14, top: 12, bottom: 30 };
+      const values = bars.map(b => b.y).concat(line.map(p => p.y)).concat([0]);
+      let yMin = Math.min.apply(null, values);
+      let yMax = Math.max.apply(null, values);
+
+      if (yMin === yMax) {
+        yMax += 1;
+      }
+
+      const step = niceStep(yMax - yMin, 4);
+      yMin = Math.floor(yMin / step) * step;
+      yMax = Math.ceil(yMax / step) * step;
+
+      const slots = line.length;
+      const slotWidth = (width - pad.left - pad.right) / slots;
+      const cx = i => pad.left + slotWidth * (i + 0.5);
+      const sy = y => pad.top + (yMax - y) / (yMax - yMin) * (height - pad.top - pad.bottom);
+
+      let svg = '<svg viewBox="0 0 ' + width + " " + height + '" role="img" aria-label="' +
+        esc(options.label || "") + '">';
+
+      for (let y = yMin; y <= yMax + step / 2; y += step) {
+        svg += '<line class="axis" x1="' + pad.left + '" x2="' + (width - pad.right) +
+          '" y1="' + sy(y) + '" y2="' + sy(y) + '" opacity="0.5"/>';
+        svg += '<text x="' + (pad.left - 6) + '" y="' + (sy(y) + 4) +
+          '" text-anchor="end">' + fmt(y, 0) + "</text>";
+      }
+
+      svg += '<line class="zero" x1="' + pad.left + '" x2="' + (width - pad.right) +
+        '" y1="' + sy(0) + '" y2="' + sy(0) + '"/>';
+
+      bars.forEach(bar => {
+        const i = bar.slot;
+        const top = sy(Math.max(0, bar.y));
+        const h = Math.abs(sy(0) - sy(bar.y));
+        svg += '<rect class="' + (bar.y >= 0 ? "bar-pos" : "bar-neg") + '" x="' +
+          (cx(i) - slotWidth * 0.28) + '" y="' + top + '" width="' + (slotWidth * 0.56) +
+          '" height="' + Math.max(1, h) + '" rx="3"/>';
+      });
+
+      let path = "";
+      line.forEach((p, i) => {
+        path += (i ? "L" : "M") + cx(i).toFixed(1) + " " + sy(p.y).toFixed(1);
+      });
+      svg += '<path class="line-2" d="' + path + '"/>';
+
+      line.forEach((p, i) => {
+        svg += '<circle cx="' + cx(i) + '" cy="' + sy(p.y) + '" r="3.5" fill="#102d46"/>';
+        svg += '<text x="' + cx(i) + '" y="' + (height - 10) + '" text-anchor="middle">' +
+          esc(p.label) + "</text>";
+      });
+
+      svg += "</svg>";
+      return svg;
+    }
+
+    // =========================================================
+    // 7. PRISM 优惠追回及按揭成数
+    // =========================================================
+
+    function prismAward(principal) {
+      return roundMoney(Math.min(
+        principal * POLICY.extraRate / 100,
+        POLICY.extraCap
+      ));
+    }
+
+    // 期内非例行部分还本：追回＝原优惠 × 还本额 ÷ 原本金；
+    // 24个月内全清：追回未曾追回的已付余额。
+    function calculatePrismClawback(principal, prepayments, exitMonth) {
+      const award = prismAward(principal);
+      const period = POLICY.extraClawbackMonths;
+      const events = [];
+      let clawed = 0;
+      let repaid = 0;
+
+      events.push({
+        label: "取用后30历日内支付 PRISM 加码（模型第 1 月）",
+        claw: 0,
+        note: "paid"
+      });
+
+      prepayments
+        .slice()
+        .sort((a, b) => a.month - b.month)
+        .forEach(item => {
+          if (exitMonth !== null && item.month >= exitMonth) {
+            throw new Error("部分还本月份须早于全清月份。");
+          }
+
+          repaid += item.amount;
+
+          if (repaid >= principal) {
+            throw new Error("部分还本合计须少于原本金；全数清还请填「全清月份」。");
+          }
+
+          const share = item.amount / principal;
+          const inside = item.month <= period;
+          const claw = inside
+            ? Math.min(award - clawed, roundMoney(award * share))
+            : 0;
+
+          clawed = roundMoney(clawed + claw);
+
+          events.push({
+            label: "第 " + item.month + " 月部分还本 " + money(item.amount) +
+              "（占原本金 " + fmt(share * 100, 2) + "%）" +
+              (inside ? "" : "：追回期已届满，不调整"),
+            claw
+          });
+        });
+
+      if (exitMonth !== null) {
+        const inside = exitMonth <= period;
+        const claw = inside ? roundMoney(award - clawed) : 0;
+        clawed = roundMoney(clawed + claw);
+
+        events.push({
+          label: "第 " + exitMonth + " 月全清或转按离行" +
+            (inside ? "：追回未曾追回的已付余额" : "：24 个月后全清，不追回"),
+          claw
+        });
+      }
+
+      let running = 0;
+      events.forEach(event => {
+        running = roundMoney(running + event.claw);
+        event.total = running;
+        event.kept = roundMoney(award - running);
+      });
+
+      return { award, clawed, kept: roundMoney(award - clawed), events };
+    }
+
+    function calculateLtv(loan, value, basicRate, other, includePrism) {
+      const basic = roundMoney(loan * basicRate / 100);
+      const prism = includePrism ? prismAward(loan) : 0;
+      const total = roundMoney(basic + prism + other);
+      const share = total / loan * 100;
+      const exceeds = total > loan * 0.01 + 0.005;
+      const ltv = (exceeds ? loan + total : loan) / value * 100;
+
+      return { basic, prism, total, share, exceeds, ltv };
+    }
+
+    function addPrepayRow(month, amount) {
+      const list = $("of-prepay");
+
+      if (list.children.length >= 6) {
+        return;
+      }
+
+      const row = document.createElement("div");
+      row.className = "row";
+      row.innerHTML =
+        '<label>还本月份<input type="number" min="1" max="600" step="1" inputmode="numeric" data-role="month"></label>' +
+        '<label>还本金额（HK$）<input type="number" min="1" step="any" inputmode="decimal" data-role="amount"></label>' +
+        '<button type="button" aria-label="删除">删除</button>';
+
+      row.querySelector('[data-role="month"]').value = month === undefined ? "" : String(month);
+      row.querySelector('[data-role="amount"]').value = amount === undefined ? "" : String(amount);
+      row.querySelector("button").addEventListener("click", () => {
+        list.removeChild(row);
+        renderOffer();
+      });
+
+      list.appendChild(row);
+    }
+
+    function renderOffer() {
+      const message = $("of-message");
+      message.textContent = "";
+
+      try {
+        const principal = readNumber("of-principal", "实际取用本金", 1, 100000000, false);
+        const exit = readNumber("of-exit", "全清月份", 1, 600, true, true);
+        const prepayments = [];
+        const rows = $("of-prepay").querySelectorAll(".row");
+
+        for (let i = 0; i < rows.length; i++) {
+          const monthInput = rows[i].querySelector('[data-role="month"]');
+          const amountInput = rows[i].querySelector('[data-role="amount"]');
+
+          if (monthInput.value.trim() === "" && amountInput.value.trim() === "") {
+            continue;
+          }
+
+          const month = monthInput.valueAsNumber;
+          const amount = amountInput.valueAsNumber;
+
+          if (!Number.isInteger(month) || month < 1 || month > 600) {
+            throw new Error("还本月份须为 1 至 600 的整数。");
+          }
+          if (!Number.isFinite(amount) || amount <= 0) {
+            throw new Error("还本金额须大于 0。");
+          }
+
+          prepayments.push({ month, amount });
+        }
+
+        const r = calculatePrismClawback(principal, prepayments, exit);
+        const raw = principal * POLICY.extraRate / 100;
+
+        $("of-summary").innerHTML =
+          "<div><dt>PRISM 加码</dt><dd>" + money(r.award) + "</dd></div>" +
+          "<div><dt>计算</dt><dd>min（" + fmt(principal, 0) + " × 0.20% ＝ " + fmt(raw, 2) +
+          "，上限 10,000）</dd></div>" +
+          "<div><dt>支付</dt><dd>符合资格并取用后30历日内</dd></div>" +
+          "<div><dt>追回期</dt><dd>取用日起至第 24 个月届满当日</dd></div>" +
+          "<div><dt>累计追回</dt><dd>" + money(r.clawed) + "</dd></div>" +
+          "<div><dt>客户最终保留</dt><dd>" + money(r.kept) + "</dd></div>";
+
+        const tbody = $("of-rows");
+        clearChildren(tbody);
+
+        r.events.forEach(event => {
+          const tr = document.createElement("tr");
+          [
+            event.label,
+            event.note === "paid" ? "支付 " + money(r.award) : money(event.claw),
+            money(event.total),
+            money(event.kept)
+          ].forEach(text => {
+            const td = document.createElement("td");
+            td.textContent = text;
+            tr.appendChild(td);
+          });
+          tbody.appendChild(tr);
+        });
+      } catch (error) {
+        message.textContent = error.message;
+        $("of-summary").innerHTML = "";
+        clearChildren($("of-rows"));
+      }
+    }
+
+    function loadOfferExample() {
+      $("of-principal").value = "4000000";
+      $("of-exit").value = "18";
+      clearChildren($("of-prepay"));
+      addPrepayRow(12, 400000);
+      renderOffer();
+    }
+
+    function renderLtv() {
+      const message = $("ltv-message");
+      message.textContent = "";
+
+      try {
+        const loan = readNumber("ltv-loan", "贷款额", 1, 100000000, false);
+        const value = readNumber("ltv-value", "物业估值", 1, 1000000000, false);
+        const basic = readNumber("ltv-basic", "银行基本回赠", 0, 20, false);
+        const other = readNumber("ltv-other", "其他现金回赠", 0, 10000000, false);
+        const cap = readNumber("ltv-cap", "适用成数上限", 1, 100, false);
+        const r = calculateLtv(loan, value, basic, other, $("ltv-prism").value === "yes");
+
+        $("ltv-summary").innerHTML =
+          "<div><dt>银行基本回赠</dt><dd>" + money(r.basic) + "</dd></div>" +
+          "<div><dt>PRISM 加码</dt><dd>" + money(r.prism) + "</dd></div>" +
+          "<div><dt>其他现金回赠</dt><dd>" + money(other) + "</dd></div>" +
+          "<div><dt>回赠合计</dt><dd>" + money(r.total) + "（占贷款额 " + fmt(r.share, 2) + "%）</dd></div>" +
+          "<div><dt>成数计算</dt><dd>" + (r.exceeds
+            ? "（" + fmt(loan, 0) + "＋" + fmt(r.total, 0) + "）÷ " + fmt(value, 0)
+            : fmt(loan, 0) + " ÷ " + fmt(value, 0)) + "</dd></div>" +
+          "<div><dt>按揭成数</dt><dd>" + fmt(r.ltv, 2) + "%</dd></div>";
+
+        let verdict;
+        if (r.ltv > cap + 1e-9) {
+          verdict = '<div class="notice danger"><p><strong>超出适用上限 ' + fmt(cap, 2) +
+            "%</strong>：须重新核对本金与首期并取得客户确认，不静默减少放款。</p></div>";
+        } else if (cap - r.ltv < 1) {
+          verdict = '<div class="notice warn"><p><strong>接近适用上限</strong>（差距少于 1 个百分点）：重新核对本金与首期并取得客户确认。</p></div>';
+        } else {
+          verdict = '<div class="notice"><p><strong>未超出适用上限 ' + fmt(cap, 2) + "%</strong>。" +
+            (r.exceeds
+              ? "回赠超过贷款额 1%，已把全部回赠计入贷款额计算成数。"
+              : "回赠未超过贷款额 1%，按贷款额计算成数。") + "</p></div>";
+        }
+        $("ltv-verdict").innerHTML = verdict;
+      } catch (error) {
+        message.textContent = error.message;
+        $("ltv-summary").innerHTML = "";
+        $("ltv-verdict").innerHTML = "";
+      }
+    }
+
+    function loadLtvExample() {
+      $("ltv-loan").value = "4000000";
+      $("ltv-value").value = "6000000";
+      $("ltv-basic").value = "0.9";
+      $("ltv-other").value = "0";
+      $("ltv-cap").value = "70";
+      $("ltv-prism").value = "yes";
+      renderLtv();
+    }
+
+    function initOffer() {
+      $("of-principal").value = "4000000";
+      addPrepayRow();
+
+      $("of-add").addEventListener("click", () => addPrepayRow());
+      $("of-example").addEventListener("click", loadOfferExample);
+      $("ltv-example").addEventListener("click", loadLtvExample);
+
+      const offerSection = document.querySelector('[data-route="offer"]');
+      offerSection.addEventListener("input", event => {
+        if (event.target.id.indexOf("ltv-") === 0) {
+          renderLtv();
+        } else {
+          renderOffer();
+        }
+      });
+      $("ltv-prism").addEventListener("change", renderLtv);
+
+      renderOffer();
+      loadLtvExample();
+    }
+
+    // =========================================================
+    // 8. 银行财务模型
+    // U＝αPc−R−v−A；NPV＝−T0＋Σ(Qₜ·U−Fₜ)÷(1＋r)ᵗ
+    // =========================================================
+
+    const FIN_DEFAULTS = Object.freeze({
+      P: 400,          // 平均本金（万元）
+      alpha: 80,       // 有效节佣比例（%）
+      c: 0.45,         // 可避免净佣金率（%）
+      R: 0.20,         // PRISM 加码（%）
+      Rcap: 10000,     // 加码上限（元）
+      v: 1200,         // 每宗处理成本（元）
+      A: 300,          // 每宗获客成本（元）
+      Q: [100, 250, 500, 800, 1000],
+      F: [80, 85, 90, 95, 100],
+      T0: 300,         // 前置投入（万元）
+      rate: 10,        // 折现率（%）
+      funnel: [20, 50, 70, 60, 60],
+      balance: 350,    // 续留平均余额（万元）
+      margin: 0.60     // 续留风险调整贡献（%）
+    });
+
+    const FIN_UNIT_FIELDS = [
+      ["P", "平均本金 P（万元）", 1, 10000, false],
+      ["alpha", "有效节佣比例 α（%）", 0, 100, false],
+      ["c", "可避免净佣金率 c（%）", 0, 5, false],
+      ["R", "PRISM 加码（%）", 0, 5, false],
+      ["Rcap", "加码上限（元）", 0, 1000000, false],
+      ["v", "每宗处理成本 v（元）", 0, 1000000, false],
+      ["A", "每宗获客成本 A（元）", 0, 1000000, false]
+    ];
+
+    const FUNNEL_LABELS = ["近期有需要", "开始申请", "完成资料", "适合标准流程", "取用"];
+
+    function unitContribution(m) {
+      const P = m.P * 10000;
+      const commission = m.alpha / 100 * P * m.c / 100;
+      const R = m.Rcap > 0 ? Math.min(P * m.R / 100, m.Rcap) : P * m.R / 100;
+      return {
+        commission,
+        R,
+        v: m.v,
+        A: m.A,
+        U: commission - R - m.v - m.A
+      };
+    }
+
+    function annuityFactor(rate, years) {
+      let total = 0;
+      for (let t = 1; t <= years; t++) {
+        total += 1 / Math.pow(1 + rate / 100, t);
+      }
+      return total;
+    }
+
+    function financeModel(m) {
+      const unit = unitContribution(m);
+      const d = t => Math.pow(1 + m.rate / 100, t);
+      const years = [];
+      let cumulative = -m.T0;
+      let discounted = -m.T0;
+      let npv3 = -m.T0;
+      let payback = null;
+      let discPayback = null;
+      let turnPositive = null;
+      let maxGap = Math.min(0, -m.T0);
+
+      for (let t = 1; t <= 5; t++) {
+        const q = m.Q[t - 1];
+        const avoided = q * unit.commission / 10000;
+        const variable = -q * (unit.R + unit.v + unit.A) / 10000;
+        const fixed = -m.F[t - 1];
+        const net = avoided + variable + fixed;
+
+        cumulative += net;
+        discounted += net / d(t);
+        if (t <= 3) {
+          npv3 += net / d(t);
+        }
+
+        if (turnPositive === null && net > 0) {
+          turnPositive = t;
+        }
+        if (payback === null && cumulative >= 0) {
+          payback = t;
+        }
+        if (discPayback === null && discounted >= 0) {
+          discPayback = t;
+        }
+        maxGap = Math.min(maxGap, cumulative);
+
+        years.push({ q, avoided, variable, fixed, net, cumulative });
+      }
+
+      // 投资门槛：使五年净现值为零的每宗贡献。
+      let qDisc = 0;
+      let fDisc = 0;
+      for (let t = 1; t <= 5; t++) {
+        qDisc += m.Q[t - 1] / d(t);
+        fDisc += m.F[t - 1] / d(t);
+      }
+
+      const breakevenU = qDisc > 0 ? (m.T0 + fDisc) * 10000 / qDisc : null;
+      const P = m.P * 10000;
+      const costs = unit.R + unit.v + unit.A;
+      const alphaMin = breakevenU !== null && P * m.c > 0
+        ? (breakevenU + costs) / (P * m.c / 100) * 100
+        : null;
+      const cMin = breakevenU !== null && P * m.alpha > 0
+        ? (breakevenU + costs) / (P * m.alpha / 100) * 100
+        : null;
+
+      return {
+        unit,
+        years,
+        npv: discounted,
+        npv3,
+        payback,
+        discPayback,
+        turnPositive,
+        maxGap,
+        breakevenU,
+        alphaMin,
+        cMin
+      };
+    }
+
+    function scenarioList(m) {
+      const with_ = changes => Object.assign({}, m, changes);
+      const conservative = [100, 200, 300, 400, 500];
+
+      return [
+        ["当前输入的假设", m, true],
+        ["净佣金降至0.40%", with_({ c: 0.40 })],
+        ["平均本金降至300万元", with_({ P: 300 })],
+        ["取用量减半", with_({ Q: m.Q.map(q => q / 2) })],
+        ["取用量改为100／200／300／400／500宗", with_({ Q: conservative })],
+        ["上项保守取用量且前置投入降至180万元", with_({ Q: conservative, T0: 180 })],
+        ["PRISM加码提高至0.25%", with_({ R: 0.25 })],
+        ["佣金0.40%且有效节佣比例60%", with_({ c: 0.40, alpha: 60 })],
+        ["PRISM加码提高至0.23%", with_({ R: 0.23 })],
+        ["加码0.23%且每宗再增加1小时人手（300元）", with_({ R: 0.23, v: m.v + 300 })]
+      ];
+    }
+
+    function buildFinanceForm() {
+      const numberField = (id, label, min, max, integer) =>
+        '<label for="' + id + '">' + esc(label) + '<input id="' + id +
+        '" type="number" min="' + min + '" max="' + max + '" step="' +
+        (integer ? "1" : "any") + '" inputmode="' + (integer ? "numeric" : "decimal") + '"></label>';
+
+      $("fin-unit").innerHTML = FIN_UNIT_FIELDS.map(f =>
+        numberField("fin-" + f[0], f[1], f[2], f[3], f[4])).join("");
+
+      let years = "";
+      for (let t = 1; t <= 5; t++) {
+        years += numberField("fin-Q" + t, "Y" + t + " 取用宗数", 0, 1000000, false);
+      }
+      for (let t = 1; t <= 5; t++) {
+        years += numberField("fin-F" + t, "Y" + t + " 固定营运（万）", 0, 100000, false);
+      }
+      $("fin-years").innerHTML = years;
+
+      $("fin-global").innerHTML =
+        numberField("fin-T0", "前置投入 T0（万元）", 0, 100000, false) +
+        numberField("fin-rate", "折现率（%）", 0, 99, false);
+
+      $("fin-funnel").innerHTML = FUNNEL_LABELS.map((label, i) =>
+        numberField("fin-funnel" + i, label + "（%）", 0.01, 100, false)).join("");
+
+      $("fin-retain").innerHTML =
+        numberField("fin-balance", "续留平均余额（万元）", 0, 100000, false) +
+        numberField("fin-margin", "风险调整贡献（%）", 0, 20, false);
+    }
+
+    function setFinance(m) {
+      FIN_UNIT_FIELDS.forEach(f => {
+        $("fin-" + f[0]).value = String(m[f[0]]);
+      });
+      for (let t = 1; t <= 5; t++) {
+        $("fin-Q" + t).value = String(m.Q[t - 1]);
+        $("fin-F" + t).value = String(m.F[t - 1]);
+      }
+      $("fin-T0").value = String(m.T0);
+      $("fin-rate").value = String(m.rate);
+      m.funnel.forEach((v, i) => {
+        $("fin-funnel" + i).value = String(v);
+      });
+      $("fin-balance").value = String(m.balance);
+      $("fin-margin").value = String(m.margin);
+    }
+
+    function readFinance() {
+      const m = { Q: [], F: [], funnel: [] };
+
+      FIN_UNIT_FIELDS.forEach(f => {
+        m[f[0]] = readNumber("fin-" + f[0], f[1], f[2], f[3], f[4]);
+      });
+      for (let t = 1; t <= 5; t++) {
+        m.Q.push(readNumber("fin-Q" + t, "Y" + t + " 取用宗数", 0, 1000000, false));
+        m.F.push(readNumber("fin-F" + t, "Y" + t + " 固定营运", 0, 100000, false));
+      }
+      m.T0 = readNumber("fin-T0", "前置投入 T0", 0, 100000, false);
+      m.rate = readNumber("fin-rate", "折现率", 0, 99, false);
+      FUNNEL_LABELS.forEach((label, i) => {
+        m.funnel.push(readNumber("fin-funnel" + i, label, 0.01, 100, false));
+      });
+      m.balance = readNumber("fin-balance", "续留平均余额", 0, 100000, false);
+      m.margin = readNumber("fin-margin", "风险调整贡献", 0, 20, false);
+
+      return m;
+    }
+
+    function yearText(t) {
+      return t === null ? "五年内未达" : "Y" + t;
+    }
+
+    function renderFinance() {
+      const message = $("fin-message");
+      message.textContent = "";
+
+      let m;
+      try {
+        m = readFinance();
+      } catch (error) {
+        message.textContent = error.message;
+        $("fin-result").style.opacity = "0.4";
+        return;
+      }
+      $("fin-result").style.opacity = "";
+
+      const r = financeModel(m);
+      const u = r.unit;
+      const kpi = (value, label, tone) =>
+        '<div class="kpi' + (tone ? " " + tone : "") + '"><b>' + value + "</b><span>" + label + "</span></div>";
+
+      $("fin-kpis").innerHTML =
+        kpi(fmt(u.U, 2) + " 元", "每宗净变动贡献 U", u.U >= 0 ? "good" : "bad") +
+        kpi(signed(r.npv, 2) + " 万", "五年净现值（" + fmt(m.rate, 1) + "%）", r.npv >= 0 ? "good" : "bad") +
+        kpi(signed(r.npv3, 2) + " 万", "只计首三个营运年的净现值", r.npv3 >= 0 ? "good" : "bad") +
+        kpi(yearText(r.turnPositive), "年度营运净额转正") +
+        kpi(yearText(r.payback) + "／" + yearText(r.discPayback), "回本（未折现／折现）") +
+        kpi(fmt(-r.maxGap, 1) + " 万", "按年末计最大累计资金缺口");
+
+      $("fin-unit-rows").innerHTML = [
+        ["平均避免佣金", trim(m.P, 2) + "万 × " + trim(m.c, 4) + "% × " + trim(m.alpha, 2) + "%", u.commission],
+        ["基础加码", "min（" + trim(m.P, 2) + "万 × " + trim(m.R, 4) + "%，" + fmt(m.Rcap, 0) + "）", -u.R],
+        ["新增处理", "包含未取用及撤回个案分摊", -u.v],
+        ["增量获客", "包含未转化线索分摊", -u.A],
+        ["净变动贡献", "未扣固定营运及前置投入", u.U]
+      ].map((row, i) =>
+        "<tr" + (i === 4 ? ' class="total"' : "") + "><td>" + esc(row[0]) + "</td><td>" +
+        esc(row[1]) + "</td><td>" + fmt(row[2], 2) + "</td></tr>").join("");
+
+      const yr = key => r.years.map(y => "<td>" + fmt(y[key], 2) + "</td>").join("");
+      $("fin-year-rows").innerHTML =
+        "<tr><td>受惠取用 宗</td>" + r.years.map(y => "<td>" + fmt(y.q, 0) + "</td>").join("") + "</tr>" +
+        "<tr><td>避免佣金</td>" + yr("avoided") + "</tr>" +
+        "<tr><td>变动成本</td>" + yr("variable") + "</tr>" +
+        "<tr><td>固定营运</td>" + yr("fixed") + "</tr>" +
+        "<tr><td>年度营运净额</td>" + yr("net") + "</tr>" +
+        '<tr class="total"><td>含T0累计净额</td>' + yr("cumulative") + "</tr>";
+
+      const line = [{ label: "T0", y: -m.T0 }].concat(r.years.map((y, i) => ({
+        label: "Y" + (i + 1),
+        y: y.cumulative
+      })));
+      const bars = r.years.map((y, i) => ({ slot: i + 1, y: y.net }));
+      $("fin-chart").innerHTML = barLineChart(bars, line, { label: "五年现金流（万港元）" });
+
+      $("fin-threshold").innerHTML =
+        "<div><dt>五年净现值不低于零所需的每宗净变动贡献</dt><dd>" +
+        (r.breakevenU === null ? "—" : fmt(r.breakevenU, 2) + " 元") + "</dd></div>" +
+        "<div><dt>佣金维持 " + fmt(m.c, 2) + "% 时，有效节佣比例至少</dt><dd>" +
+        (r.alphaMin === null ? "—" : fmt(r.alphaMin, 2) + "%") + "</dd></div>" +
+        "<div><dt>比例维持 " + fmt(m.alpha, 0) + "% 时，佣金至少</dt><dd>" +
+        (r.cMin === null ? "—" : fmt(r.cMin, 5) + "%") + "</dd></div>" +
+        "<div><dt>目前每宗贡献与门槛差距</dt><dd>" +
+        (r.breakevenU === null ? "—" : signed(u.U - r.breakevenU, 2) + " 元") + "</dd></div>";
+
+      const scenarios = scenarioList(m).map(s => {
+        const result = financeModel(s[1]);
+        return { label: s[0], U: result.unit.U, npv: result.npv, current: s[2] };
+      });
+
+      $("fin-sens-rows").innerHTML = scenarios.map(s =>
+        "<tr" + (s.current ? ' class="total"' : "") + "><td>" + esc(s.label) + "</td><td>" +
+        fmt(s.U, 0) + '</td><td class="' + (s.npv < 0 ? "neg" : "pos") + '">' +
+        signed(s.npv, 2) + "</td></tr>").join("");
+
+      // 漏斗
+      const conversion = m.funnel.reduce((acc, p) => acc * p / 100, 1);
+      $("fin-funnel-rows").innerHTML =
+        "<tr><td>合计转化率</td><td colspan=\"5\">" + fmt(conversion * 100, 2) + "%</td></tr>" +
+        "<tr><td>取用目标 宗</td>" + m.Q.map(q => "<td>" + fmt(q, 0) + "</td>").join("") + "</tr>" +
+        "<tr><td>约需可触达人数</td>" + m.Q.map(q => {
+          const reach = q / conversion;
+          const approx = reach >= 1000 ? Math.round(reach / 1000) * 1000 : Math.ceil(reach);
+          return "<td>" + fmt(approx, 0) + '<br><span class="muted small">（' + fmt(Math.ceil(reach), 0) + "）</span></td>";
+        }).join("") + "</tr>";
+
+      // 附加情境：到期续留
+      const factor = annuityFactor(m.rate, 5);
+      const perAccount = m.balance * 10000 * m.margin / 100;
+      const negatives = scenarios.filter(s => s.npv < 0);
+
+      $("fin-retain-rows").innerHTML =
+        '<tr><td colspan="3" class="small muted">年金因子 ' + fmt(factor, 4) +
+        "；每账户年贡献约 " + fmt(perAccount, 0) + " 元</td></tr>" +
+        (negatives.length
+          ? negatives.map(s => {
+            const need = perAccount > 0 ? -s.npv * 10000 / factor / perAccount : null;
+            return "<tr><td>" + esc(s.label) + "</td><td>" + fmt(-s.npv, 2) + "</td><td>" +
+              (need === null ? "—" : "约" + fmt(Math.round(need), 0) + "（" + fmt(need, 1) + "）") +
+              "</td></tr>";
+          }).join("")
+          : '<tr><td colspan="3">目前各情境净现值均不低于零，毋须以续留抵消。</td></tr>');
+    }
+
+    function initFinance() {
+      buildFinanceForm();
+      setFinance(FIN_DEFAULTS);
+      $("fin-form").addEventListener("input", renderFinance);
+      $("fin-form").addEventListener("submit", event => event.preventDefault());
+      $("fin-reset").addEventListener("click", () => {
+        setFinance(FIN_DEFAULTS);
+        renderFinance();
+      });
+      renderFinance();
+    }
+
+    // =========================================================
+    // 9. 原型 App（5 步流程，全部为合成资料）
+    // =========================================================
+
+    const APP_OFFER_TERMS = {
+      rate: 3.5,
+      basic: 0.8,
+      fees: 0,
+      extra: POLICY.extraRate,
+      extraCap: POLICY.extraCap,
+      basicPay: 1,
+      basicClaw: 24,
+      extraPay: POLICY.extraPayMonth,
+      extraClaw: POLICY.extraClawbackMonths,
+      penalty: 1,
+      penaltyMonths: 24
+    };
+
+    const app = {};
+
+    function resetApp() {
+      app.step = 0;
+      app.type = "purchase";
+      app.need = {
+        property: "private",
+        value: 6000000,
+        amount: 4000000,
+        years: 30,
+        horizon: 36,
+        referral: "no",
+        consent: false
+      };
+      app.docs = null;
+      app.offerIssued = false;
+      app.version = 1;
+      app.rate = APP_OFFER_TERMS.rate;
+      app.versionNote = "";
+      app.offerRead = false;
+      app.applyConfirmed = false;
+      app.progress = 1;
+      app.message = "";
+      renderApp();
+    }
+
+    function appDocs(type) {
+      const docs = [
+        {
+          id: "id",
+          name: "身份证明文件",
+          detail: "来源：行内 KYC 记录；有效至 2031年5月",
+          status: "valid"
+        },
+        {
+          id: "payroll",
+          name: "出粮记录（近 6 个月）",
+          detail: "来源：本行出粮账户；入账不自动等同合资格收入，由专员核实",
+          status: "valid"
+        },
+        {
+          id: "address",
+          name: "住址证明",
+          detail: "行内记录日期 2025年2月，已超过有效期",
+          status: "expired",
+          actions: [["上载新住址证明（模拟）", "已更新"]]
+        },
+        {
+          id: "income",
+          name: "职位及月入申报",
+          detail: "申报月入 HK$85,000，与出粮记录平均 HK$82,300 不一致",
+          status: "conflict",
+          actions: [["以出粮记录为准", "已确认以出粮记录为准"], ["补交收入证明（模拟）", "已补交收入证明"]]
+        },
+        type === "purchase"
+          ? {
+            id: "contract",
+            name: "临时买卖合约",
+            detail: "行内没有此文件",
+            status: "missing",
+            actions: [["上载（模拟）", "已上载"]]
+          }
+          : {
+            id: "mortgage",
+            name: "现有按揭结欠及还款记录",
+            detail: "他行转入须提供；行内没有此文件",
+            status: "missing",
+            actions: [["上载（模拟）", "已上载"]]
+          },
+        {
+          id: "tax",
+          name: "最近一年税单",
+          detail: "行内没有此文件",
+          status: "missing",
+          actions: [["上载（模拟）", "已上载"]]
+        }
+      ];
+
+      return docs;
+    }
+
+    const DOC_STATUS = {
+      valid: ["有效・重用", "done"],
+      expired: ["过期・需更新", "bad"],
+      conflict: ["矛盾・请确认", "bad"],
+      missing: ["待补", "sim"],
+      resolved: ["已确认", "done"]
+    };
+
+    function appOfferTerms() {
+      return Object.assign({}, APP_OFFER_TERMS, { rate: app.rate });
+    }
+
+    function renderAppSteps() {
+      const steps = $("app-steps");
+      let html = "";
+      for (let i = 1; i <= 5; i++) {
+        html += '<li class="' + (app.step >= i ? "on" : "") + '"></li>';
+      }
+      steps.innerHTML = html;
+      steps.setAttribute("aria-label", app.step ? "第 " + app.step + " 步，共 5 步" : "入口");
+    }
+
+    function screenHeader(step, title) {
+      return '<p class="small muted" style="margin: 0">第 ' + step + " 步／共 5 步</p><h2>" + esc(title) + "</h2>";
+    }
+
+    function renderApp() {
+      renderAppSteps();
+      const screen = $("app-screen");
+      const render = [appEntry, appNeed, appDocsScreen, appOfferScreen, appCostScreen, appCaseScreen][app.step];
+      screen.innerHTML = render();
+      bindApp(screen);
+    }
+
+    function appEntry() {
+      return (
+        '<p class="small muted" style="margin-top: 0">你好，陈先生（合成客户）</p>' +
+        '<div class="tile"><b>PRISM 直达按揭</b><br><span class="small muted">本行出粮客户 ✓ · 出粮账户已连续 26 个月（合成资料）</span></div>' +
+        '<button class="tile big" type="button" data-act="start" data-type="purchase"><b>申请本行按揭</b><span>新买楼，按揭本金 200万至500万元</span></button>' +
+        '<button class="tile big" type="button" data-act="start" data-type="refinance"><b>评估转按成本</b><span>由他行转入，先看持有期成本再决定</span></button>' +
+        '<p class="small muted">取得其他银行报价属自选功能；没有外部报价，你仍可完成本行申请。</p>' +
+        '<p class="small muted"><span class="tag sim">模拟</span> 非真实银行画面，不会提交任何申请。</p>'
+      );
+    }
+
+    function appNeed() {
+      const n = app.need;
+      return (
+        screenHeader(1, "确认需要") +
+        '<p class="small muted">交易类型：' + (app.type === "purchase" ? "新按（新买楼）" : "他行转入") + "</p>" +
+        '<div class="fields" style="grid-template-columns: 1fr">' +
+        '<label>物业类型<select id="ap-property">' +
+        '<option value="private"' + (n.property === "private" ? " selected" : "") + ">香港标准私人住宅</option>" +
+        '<option value="subsidised"' + (n.property === "subsidised" ? " selected" : "") + ">资助房屋</option>" +
+        "</select></label>" +
+        '<label>物业估值（HK$）<input id="ap-value" type="number" inputmode="decimal" value="' + n.value + '"></label>' +
+        '<label>融资额（HK$）<input id="ap-amount" type="number" inputmode="decimal" value="' + n.amount + '"></label>' +
+        '<label>年期（年）<input id="ap-years" type="number" inputmode="numeric" value="' + n.years + '"></label>' +
+        '<label>预计持有期（月）<input id="ap-horizon" type="number" inputmode="numeric" value="' + n.horizon + '"></label>' +
+        '<label>是否已有中介就这宗交易向本行提交转介？<select id="ap-referral">' +
+        '<option value="no"' + (n.referral === "no" ? " selected" : "") + ">没有</option>" +
+        '<option value="yes"' + (n.referral === "yes" ? " selected" : "") + ">有</option>" +
+        "</select></label>" +
+        "</div>" +
+        '<label class="check"><input id="ap-consent" type="checkbox"' + (n.consent ? " checked" : "") +
+        '><span class="small">我同意本行为「按揭申请及成本核对」这个指定用途，使用我的行内资料。</span></label>' +
+        '<p class="message small">' + esc(app.message) + "</p>" +
+        '<div class="actions"><button type="button" data-act="back">返回</button>' +
+        '<button type="button" class="primary" data-act="need-next">下一步</button></div>'
+      );
+    }
+
+    function appDocsScreen() {
+      const docs = app.docs;
+      const outstanding = docs.filter(d => d.status !== "valid" && d.status !== "resolved").length;
+
+      return (
+        screenHeader(2, "整理资料") +
+        '<p class="small muted">用途：按揭申请及成本核对（指定用途授权）。已重用行内有效资料，只列出需要你处理的项目。</p>' +
+        docs.map(d => {
+          const status = DOC_STATUS[d.status];
+          return (
+            '<div class="tile doc-item"><div class="info"><b>' + esc(d.name) + "</b><small>" +
+            esc(d.resolvedNote || d.detail) + "</small>" +
+            (d.actions && d.status !== "resolved"
+              ? '<div class="ops">' + d.actions.map((a, i) =>
+                '<button type="button" data-act="doc" data-doc="' + d.id + '" data-i="' + i + '">' + esc(a[0]) + "</button>").join("") + "</div>"
+              : "") +
+            '</div><span class="tag ' + status[1] + '">' + status[0] + "</span></div>"
+          );
+        }).join("") +
+        '<p class="small"><strong>' + (outstanding ? "尚余 " + outstanding + " 项待处理" : "资料已齐备") + "</strong></p>" +
+        '<div class="actions"><button type="button" data-act="back">返回</button>' +
+        '<button type="button" class="primary" data-act="docs-next"' + (outstanding ? " disabled" : "") +
+        ">提交予专员出具方案</button></div>"
+      );
+    }
+
+    function appOfferScreen() {
+      if (!app.offerIssued) {
+        return (
+          screenHeader(3, "取得方案") +
+          '<div class="notice"><p class="small">资料已提交予按揭专员（模拟）。<br>人工试点目标：1工作日首次联络、1工作日初次资料审查，以及资料齐备后1工作日出具条件方案。补件通知不算出价完成。</p></div>' +
+          '<div class="actions"><button type="button" data-act="back">返回</button>' +
+          '<button type="button" class="primary" data-act="issue">查看条件方案（模拟出具）</button></div>'
+        );
+      }
+
+      const n = app.need;
+      const today = new Date();
+      const expiry = new Date(today.getTime() + 14 * 86400000);
+      const basic = roundMoney(n.amount * APP_OFFER_TERMS.basic / 100);
+      const extra = prismAward(n.amount);
+      const ltv = calculateLtv(n.amount, n.value, APP_OFFER_TERMS.basic, 0, true);
+
+      return (
+        screenHeader(3, "取得方案") +
+        (app.versionNote ? '<div class="notice warn"><p class="small">' + esc(app.versionNote) + "</p></div>" : "") +
+        '<div class="tile"><dl class="kv">' +
+        "<div><dt>方案编号</dt><dd>PRISM-CO-2026-00128 · v" + app.version + "</dd></div>" +
+        "<div><dt>出具者</dt><dd>按揭专员（授权职员，模拟）</dd></div>" +
+        "<div><dt>资料日期</dt><dd>" + isoDate(today) + "</dd></div>" +
+        "<div><dt>有效期至</dt><dd>" + isoDate(expiry) + "</dd></div>" +
+        "<div><dt>本金</dt><dd>" + money(n.amount) + "</dd></div>" +
+        "<div><dt>年期</dt><dd>" + n.years + " 年</dd></div>" +
+        "<div><dt>年利率</dt><dd>" + fmt(app.rate, 2) + "%（合成示例）</dd></div>" +
+        "<div><dt>封顶</dt><dd>示例为固定利率教学模型</dd></div>" +
+        "<div><dt>方案费用</dt><dd>HK$0.00</dd></div>" +
+        "<div><dt>银行基本回赠</dt><dd>0.80%（" + money(basic) + "）</dd></div>" +
+        "<div><dt>PRISM 拟议加码</dt><dd>0.20%（" + money(extra) + "）</dd></div>" +
+        "<div><dt>回赠支付</dt><dd>基本第 1 月；PRISM 取用后30历日内</dd></div>" +
+        "<div><dt>提前清还</dt><dd>24 个月内全清按未还本金 1%</dd></div>" +
+        "<div><dt>回赠追回</dt><dd>24 个月内全清追回已付回赠</dd></div>" +
+        "<div><dt>按揭成数</dt><dd>" + fmt(ltv.ltv, 2) + "%" + (ltv.exceeds ? "（回赠计入）" : "") + "</dd></div>" +
+        "</dl></div>" +
+        '<div class="tile"><b>待完成核验</b><ul class="small" style="margin: 6px 0 0">' +
+        "<li>物业估值</li><li>正式信贷审批</li><li>收入最终核实</li><li>律师文件及签署</li></ul>" +
+        '<p class="small muted" style="margin-bottom: 0">条件方案不等于最终批核。收入、估值、信贷或产品条件变更时，银行重新审核；系统保留前后版本及你的确认记录。</p></div>' +
+        (app.version === 1
+          ? '<button type="button" data-act="revise" style="width: 100%; margin-bottom: 12px">模拟条款改动（估值后利率调整）</button>'
+          : "") +
+        '<label class="check"><input id="ap-read" type="checkbox"' + (app.offerRead ? " checked" : "") +
+        '><span class="small">我已阅读尚待核验事项及条款（v' + app.version + "）。</span></label>" +
+        '<div class="actions"><button type="button" data-act="back">返回</button>' +
+        '<button type="button" class="primary" data-act="offer-next"' + (app.offerRead ? "" : " disabled") +
+        ">核对成本</button></div>"
+      );
+    }
+
+    function appCostScreen() {
+      const n = app.need;
+      const months = n.years * 12;
+      const terms = appOfferTerms();
+      const exits = [12, 24, 25, 36, n.horizon]
+        .filter((m, i, list) => m <= months && list.indexOf(m) === i)
+        .sort((a, b) => a - b);
+
+      const rows = exits.map(m => {
+        const r = evaluateOffer(terms, n.amount, months, m);
+        return "<tr" + (m === n.horizon ? ' class="total"' : "") + "><td>第 " + m + " 月</td><td>" +
+          fmt(r.cost, 0) + "</td><td>" + fmt(r.balance, 0) + "</td></tr>";
+      }).join("");
+
+      const atHorizon = evaluateOffer(terms, n.amount, months, n.horizon);
+
+      return (
+        screenHeader(4, "核对成本") +
+        '<p class="small">按预计持有期 <strong>' + n.horizon + " 个月</strong>，本方案（v" + app.version +
+        "，年利率 " + fmt(app.rate, 2) + "%）净融资成本约 <strong>" + money(atHorizon.cost) + "</strong>，每月供款 " +
+        money(atHorizon.payment) + "。</p>" +
+        '<div class="table-wrap"><table class="num"><thead><tr><th>退出</th><th>净成本</th><th>未还本金</th></tr></thead><tbody>' +
+        rows + "</tbody></table></div>" +
+        '<p class="small muted">净融资成本＝利息＋费用＋清还罚款＋回赠追回－已收回赠。退出时仍须清还的本金另列。24 个月内全清须付罚款并退回回赠，所以第 24 与 25 月差距明显。</p>' +
+        '<button type="button" data-act="compare" style="width: 100%; margin-bottom: 8px">与其他报价比较（自选）</button>' +
+        '<label class="check"><input id="ap-apply" type="checkbox"' + (app.applyConfirmed ? " checked" : "") +
+        '><span class="small">我确认以此方案提交正式申请（模拟，不会真的提交）。</span></label>' +
+        '<div class="actions"><button type="button" data-act="back">返回</button>' +
+        '<button type="button" class="primary" data-act="apply"' + (app.applyConfirmed ? "" : " disabled") +
+        ">提交正式申请</button></div>"
+      );
+    }
+
+    const CASE_STAGES = [
+      ["提交正式申请", "客户", "已完成"],
+      ["首次联络", "按揭专员", "目标 1 工作日"],
+      ["初次资料审查", "按揭专员", "目标 1 工作日"],
+      ["物业估值", "估值及信贷", "逾时须列原因、责任人和下一期限"],
+      ["正式信贷审批", "信贷", "另行计时"],
+      ["律师文件及签署", "客户及律师", "完成法定确认及签署"],
+      ["取用（贷款正式发放）", "营运", "按实际周期追踪"],
+      ["PRISM 优惠支付", "财务", "取用后 30 历日内"],
+      ["追回期届满", "系统", "取用起 24 个月"]
+    ];
+
+    function appCaseScreen() {
+      const n = app.need;
+      const p = app.progress;
+      const award = prismAward(n.amount);
+      const offerStatus =
+        p < 6 ? "预算已预留 · 双人复核完成 · 待取用"
+          : p === 6 ? "已取用，待支付（30 历日内）"
+            : p === 7 ? "已支付 " + money(award) + " · 追回期中（至第 24 个月）"
+              : p === 8 ? "已支付 " + money(award) + " · 追回期中（至第 24 个月）"
+                : "追回期已届满 · 优惠完成";
+      const next = CASE_STAGES[Math.min(p, CASE_STAGES.length - 1)];
+
+      return (
+        screenHeader(5, "跟进取用") +
+        '<div class="tile"><dl class="kv">' +
+        "<div><dt>案件编号</dt><dd>PRISM-CASE-2026-0412</dd></div>" +
+        "<div><dt>负责人</dt><dd>按揭专员 李小姐（合成）</dd></div>" +
+        "<div><dt>方案</dt><dd>PRISM-CO-2026-00128 · v" + app.version + "</dd></div>" +
+        "<div><dt>补件</dt><dd>" + (p === 3 ? "估值报告待出（模拟）" : "暂无") + "</dd></div>" +
+        "<div><dt>优惠状态</dt><dd>" + esc(offerStatus) + "</dd></div>" +
+        "</dl></div>" +
+        (p < CASE_STAGES.length
+          ? '<div class="notice"><p class="small"><strong>下一步：</strong>' + esc(next[0]) + "<br>责任人：" +
+            esc(next[1]) + "　期限：" + esc(next[2]) + "</p></div>"
+          : '<div class="notice"><p class="small"><strong>案件已完成。</strong>同一案件编号贯穿申请、补件、取用和优惠。</p></div>') +
+        '<ol class="timeline">' +
+        CASE_STAGES.map((s, i) =>
+          '<li class="' + (i < p ? "done" : i === p ? "current" : "") + '">' + esc(s[0]) +
+          "<small>" + esc(s[1]) + " · " + esc(s[2]) + "</small></li>").join("") +
+        "</ol>" +
+        '<div class="actions">' +
+        (p < CASE_STAGES.length
+          ? '<button type="button" class="primary" data-act="advance">模拟下一步</button>'
+          : "") +
+        '<button type="button" data-act="restart">重新开始演示</button></div>'
+      );
+    }
+
+    function bindApp(screen) {
+      const buttons = screen.querySelectorAll("[data-act]");
+
+      for (let i = 0; i < buttons.length; i++) {
+        buttons[i].addEventListener("click", () => appAction(buttons[i]));
+      }
+
+      const read = $("ap-read");
+      if (read) {
+        read.addEventListener("change", () => {
+          app.offerRead = read.checked;
+          renderApp();
+        });
+      }
+
+      const apply = $("ap-apply");
+      if (apply) {
+        apply.addEventListener("change", () => {
+          app.applyConfirmed = apply.checked;
+          renderApp();
+        });
+      }
+    }
+
+    function saveNeedForm() {
+      const n = app.need;
+      n.property = $("ap-property").value;
+      n.value = $("ap-value").valueAsNumber;
+      n.amount = $("ap-amount").valueAsNumber;
+      n.years = $("ap-years").valueAsNumber;
+      n.horizon = $("ap-horizon").valueAsNumber;
+      n.referral = $("ap-referral").value;
+      n.consent = $("ap-consent").checked;
+    }
+
+    function validateNeed() {
+      const n = app.need;
+
+      if (n.property !== "private") {
+        return "资助房屋不在首期范围，另行评估；已为你转交一般人工服务（模拟）。";
+      }
+      if (n.referral === "yes") {
+        return "按试点规则，已有有效中介转介的交易维持原渠道处理，不改标为直接客户。你仍可经一般服务申请。";
+      }
+      if (!Number.isFinite(n.value) || n.value <= 0) {
+        return "请填写物业估值。";
+      }
+      if (!Number.isFinite(n.amount) || n.amount < POLICY.minimumPrincipal || n.amount > POLICY.maximumPrincipal) {
+        return "首期只处理 200万至500万元的标准按揭；超出范围由一般人工服务承接。";
+      }
+      if (n.amount >= n.value) {
+        return "融资额须低于物业估值。";
+      }
+      if (!Number.isInteger(n.years) || n.years < 1 || n.years > 30) {
+        return "年期须为 1 至 30 年的整数。";
+      }
+      if (!Number.isInteger(n.horizon) || n.horizon < 1 || n.horizon > n.years * 12) {
+        return "预计持有期须为 1 至 " + (n.years * 12) + " 个月的整数。";
+      }
+      if (!n.consent) {
+        return "请先同意指定用途授权。";
+      }
+      return "";
+    }
+
+    function appAction(button) {
+      const act = button.getAttribute("data-act");
+      app.message = "";
+
+      if (act === "start") {
+        app.type = button.getAttribute("data-type");
+        app.step = 1;
+      } else if (act === "back") {
+        if (app.step === 1) {
+          saveNeedForm();
+        }
+        app.step = Math.max(0, app.step - 1);
+      } else if (act === "need-next") {
+        saveNeedForm();
+        app.message = validateNeed();
+        if (!app.message) {
+          if (!app.docs || app.docs.type !== app.type) {
+            app.docs = appDocs(app.type);
+            app.docs.type = app.type;
+          }
+          app.step = 2;
+        }
+      } else if (act === "doc") {
+        const doc = app.docs.filter(d => d.id === button.getAttribute("data-doc"))[0];
+        const action = doc.actions[Number(button.getAttribute("data-i"))];
+        doc.status = "resolved";
+        doc.resolvedNote = action[1] + " · " + isoDate(new Date());
+      } else if (act === "docs-next") {
+        app.step = 3;
+      } else if (act === "issue") {
+        app.offerIssued = true;
+      } else if (act === "revise") {
+        app.version = 2;
+        app.rate = 3.55;
+        app.offerRead = false;
+        app.applyConfirmed = false;
+        app.versionNote =
+          "条款已由 v1 改为 v2：年利率 3.50% → 3.55%（估值后调整，模拟）。旧核验已失效，成本已重新计算，请重新确认。";
+      } else if (act === "offer-next") {
+        app.step = 4;
+      } else if (act === "compare") {
+        prefillCostFromApp();
+        location.hash = "#cost";
+        return;
+      } else if (act === "apply") {
+        app.step = 5;
+        app.progress = 1;
+      } else if (act === "advance") {
+        app.progress = Math.min(CASE_STAGES.length, app.progress + 1);
+      } else if (act === "restart") {
+        resetApp();
+        return;
+      }
+
+      renderApp();
+      if (window.innerWidth < 900) {
+        $("app-screen").scrollIntoView({ block: "start" });
+      }
+    }
+
+    function prefillCostFromApp() {
+      const n = app.need;
+      const state = prismVersusBroker({ horizon: n.horizon });
+      state.names.A = "PRISM 条件方案 v" + app.version;
+      state.inputs.principal = n.amount;
+      state.inputs.months = n.years * 12;
+      state.inputs.A = appOfferTerms();
+      setCostState(state);
+      cost.source = "由原型 App 条件方案带入；中介方案为合成示例，请改为你的外部报价";
+      $("cost-source").textContent = cost.source;
+      $("cost-confirmed").checked = false;
+      invalidateCost();
+    }
+
+    // ---------- 解释服务（固定核准说明） ----------
+
+    const FAQ = [
+      {
+        q: "什么是净融资成本？",
+        a: "净融资成本＝累计利息＋方案特有费用＋清还罚款＋回赠追回－已收回赠。退出时仍须清还的本金另列，避免把成本较低误解为所需现金较少。",
+        src: "立项书第3章「持有期成本」；附录「按揭模型」",
+        keys: ["净融资成本", "成本", "计算", "利息", "怎样计"]
+      },
+      {
+        q: "为什么要看预计持有期？",
+        a: "同一组条款，在不同退出时间结论可以相反。立项书教学例子中，转按方案若在24个月内全清，须付1%罚款并退回全部回赠，较贵约6万元；第25月起罚款及追回不适用，反而较省约2.3万至2.7万元。",
+        src: "立项书第3章「持有期成本」",
+        keys: ["持有期", "持有", "退出", "12", "36", "转按", "结论"]
+      },
+      {
+        q: "条件方案是否等于批核？",
+        a: "不等于。条件方案列明本金、年期、利率及封顶、费用、回赠、提前清还和追回条款，以及出具者、资料日期、有效期及待完成核验。收入、估值、信贷或产品条件变更时，银行会重新审核；AI 输出不作批准。",
+        src: "立项书第3章「方案内容」；第6章「授信误导」",
+        keys: ["批核", "批准", "审批", "条件方案", "保证", "一定"]
+      },
+      {
+        q: "PRISM 优惠何时支付？",
+        a: "拟议加码为实际取用本金0.20%，每宗上限10,000元，于符合资格并取用后30历日内支付；银行基本回赠另列。全部属待批准政策。",
+        src: "立项书第3章「直达优惠」",
+        keys: ["支付", "何时", "几时", "什么时候", "加码", "0.20", "发放", "入账"]
+      },
+      {
+        q: "什么情况会追回优惠？",
+        a: "取用日起至24个月届满当日全清或转按离行，追回未曾追回的已付PRISM余额，取消未付部分。期内非例行部分还本按原优惠乘以还本额占原本金比例调整，正常供款不调整。例：400万元贷款第12月额外还本40万元，追回800元；第18月全清，再追回7,200元。",
+        src: "立项书第3章「直达优惠」；附录「优惠及日期」",
+        keys: ["追回", "被追回", "收回", "退回", "全清", "还本", "离行", "24"]
+      },
+      {
+        q: "为什么系统有时停止排名？",
+        a: "罚息或回赠追回条款缺失时，系统不把未知当作零，停止完整排名；未支持的浮息重设、部分还本或特殊条款亦停止自动排名，交专员处理。",
+        src: "立项书第1章；第4章「故障处理」",
+        keys: ["停止", "排名", "未知", "缺", "条款", "不完整"]
+      },
+      {
+        q: "如果其他银行或中介较便宜？",
+        a: "系统按相同持有期口径照实显示差距，由你自行选择；同条款换品牌结果须相同，外行较省亦照实显示。本案不设按中介报价补差；未确认个人资格的公开优惠只可列为参考。",
+        src: "立项书第3章「直达优惠」；第6章「比较偏向本行」",
+        keys: ["中介", "其他银行", "外行", "便宜", "较省", "补差", "比较", "偏向"]
+      },
+      {
+        q: "我的资料会如何使用？",
+        a: "比较、贷款申请及推广用途分开，最少取数、加密及最小权限；不用客户文件默认训练模型，并提供人工处理及更正渠道。本演示只用合成资料。",
+        src: "立项书第6章「资料及AI风险」「资料与责任」",
+        keys: ["资料", "私隐", "隐私", "用途", "训练", "删除", "安全"]
+      },
+      {
+        q: "可以转真人专员吗？",
+        a: "可以。解释服务可随时转人工；模型没有出价或付款权限。人工试点目标为1工作日首次联络。",
+        src: "立项书第3章「服务时限」；第4章「系统架构」",
+        keys: ["真人", "专员", "人工", "联络", "客服"]
+      },
+      {
+        q: "回赠会否影响按揭成数？",
+        a: "回赠超过贷款额1%时，须把该笔回赠计入贷款额计算按揭成数，而非只计超出部分。例：贷款400万元、估值600万元、回赠合计44,000元，成数为67.40%。接近适用上限时，会重新核对本金与首期并取得你的确认，不静默减少放款。",
+        src: "立项书第6章「回赠处理」",
+        keys: ["成数", "1%", "估值", "现金回赠", "上限"]
+      }
+    ];
+
+    function showFaq(item) {
+      const box = $("faq-answer");
+
+      if (!item) {
+        box.innerHTML =
+          '<div class="faq-answer"><strong>未有核准说明涵盖此问题。</strong><br>' +
+          "按「无来源不补写」原则，本服务不会自行编写答案；已为你转交按揭专员跟进（模拟）。" +
+          '<span class="src">来源：立项书第4章「解释服务」控制</span></div>';
+        return;
+      }
+
+      box.innerHTML =
+        '<div class="faq-answer"><strong>' + esc(item.q) + "</strong><br>" + esc(item.a) +
+        '<span class="src">来源：' + esc(item.src) + "</span></div>";
+    }
+
+    function askFaq() {
+      const query = $("faq-query").value.trim().toLowerCase();
+
+      if (!query) {
+        return;
+      }
+
+      let best = null;
+      let bestScore = 0;
+
+      FAQ.forEach(item => {
+        let score = 0;
+        item.keys.forEach(key => {
+          if (query.indexOf(key.toLowerCase()) >= 0) {
+            score += key.length;
+          }
+        });
+        if (score > bestScore) {
+          best = item;
+          bestScore = score;
+        }
+      });
+
+      showFaq(best);
+    }
+
+    function initApp() {
+      const list = $("faq-list");
+      FAQ.forEach(item => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.textContent = item.q;
+        button.addEventListener("click", () => showFaq(item));
+        list.appendChild(button);
+      });
+
+      $("faq-ask").addEventListener("click", askFaq);
+      $("faq-query").addEventListener("keydown", event => {
+        if (event.key === "Enter") {
+          askFaq();
+        }
+      });
+
+      resetApp();
+    }
+
+    // =========================================================
+    // 10. 首页案例捷径
+    // =========================================================
+
+    const DEMOS = {
+      "app-start": () => resetApp(),
+      "cost-teaching": () => {
+        loadCostPreset("teaching");
+        $("cost-confirmed").checked = true;
+        calculateCostNow();
+      },
+      "cost-missing": () => {
+        loadCostPreset("missing");
+        $("cost-confirmed").checked = true;
+        calculateCostNow();
+      },
+      "offer-example": () => loadOfferExample(),
+      "ltv-example": () => loadLtvExample()
+    };
+
+    (function () {
+      const links = document.querySelectorAll("[data-demo]");
+      for (let i = 0; i < links.length; i++) {
+        links[i].addEventListener("click", () => {
+          const demo = DEMOS[links[i].getAttribute("data-demo")];
+          if (demo) {
+            demo();
+          }
+        });
+      }
+    })();
+
+    // =========================================================
+    // 11. 启动
+    // =========================================================
+
+    initCost();
+    initOffer();
+    initFinance();
+    initApp();
+    showRoute();
+  </script>
+</body>
+</html>
