@@ -1,11 +1,113 @@
 {
   "version": 1,
   "skills": {
+    "alphagbm-bps-backtest": {
+      "source": "AlphaGBM/skills",
+      "sourceType": "github",
+      "skillPath": "skills/options/alphagbm-bps-backtest/SKILL.md",
+      "computedHash": "685feaf847ebe0269a01614e709c4add921404c851f40c05186235021c30cb6f"
+    },
+    "alphagbm-earnings-crush": {
+      "source": "AlphaGBM/skills",
+      "sourceType": "github",
+      "skillPath": "skills/options/alphagbm-earnings-crush/SKILL.md",
+      "computedHash": "63ad3243f18c3af8e981ba7f6954be315cd958054e6bcb1c06117a5e8cfed0cd"
+    },
+    "alphagbm-greeks": {
+      "source": "AlphaGBM/skills",
+      "sourceType": "github",
+      "skillPath": "skills/options/alphagbm-greeks/SKILL.md",
+      "computedHash": "fefc2cee7ebfbc55b4abbb7ab711894f54e75e0a7b8405199f9e3b1e044cedb1"
+    },
+    "alphagbm-hedge-advisor": {
+      "source": "AlphaGBM/skills",
+      "sourceType": "github",
+      "skillPath": "skills/options/alphagbm-hedge-advisor/SKILL.md",
+      "computedHash": "f8976b6ae4d975ba16d3bb8833437dcaedb45689bb7ec3dcdb4562043471c6aa"
+    },
+    "alphagbm-investment-review": {
+      "source": "AlphaGBM/skills",
+      "sourceType": "github",
+      "skillPath": "skills/core/alphagbm-investment-review/SKILL.md",
+      "computedHash": "d64dda9aaeb8a57850e28397983fb6ed2b739bedb91a89b32aeaa66f79583fb3"
+    },
+    "alphagbm-iv-rank": {
+      "source": "AlphaGBM/skills",
+      "sourceType": "github",
+      "skillPath": "skills/options/alphagbm-iv-rank/SKILL.md",
+      "computedHash": "a5d35113528edde84bb9ca6cab635be20b26a6553d8ebd708f99c7c0330472ca"
+    },
+    "alphagbm-news-impact": {
+      "source": "AlphaGBM/skills",
+      "sourceType": "github",
+      "skillPath": "skills/core/alphagbm-news-impact/SKILL.md",
+      "computedHash": "ce0b5a1694c0f07edb11cfc986a5b461df9d9b8c5529aac4a83054a2628718d4"
+    },
+    "alphagbm-options-research": {
+      "source": "AlphaGBM/skills",
+      "sourceType": "github",
+      "skillPath": "skills/core/alphagbm-options-research/SKILL.md",
+      "computedHash": "ed3efe0c3509048d2f909ec19313aa448ec63f48c943193fb2e2a74a92004f73"
+    },
+    "alphagbm-options-score": {
+      "source": "AlphaGBM/skills",
+      "sourceType": "github",
+      "skillPath": "skills/options/alphagbm-options-score/SKILL.md",
+      "computedHash": "f3aff5e07ba6c81e709f796861aab76a118457f680b1878c9147a2b68765782c"
+    },
+    "alphagbm-options-strategy": {
+      "source": "AlphaGBM/skills",
+      "sourceType": "github",
+      "skillPath": "skills/options/alphagbm-options-strategy/SKILL.md",
+      "computedHash": "9f158fff14270e2beb9ffb1983f6fa1f14f266c93463ea732eef8f92fc404a30"
+    },
+    "alphagbm-pnl-simulator": {
+      "source": "AlphaGBM/skills",
+      "sourceType": "github",
+      "skillPath": "skills/options/alphagbm-pnl-simulator/SKILL.md",
+      "computedHash": "399d46693e73de149d310868fb756f91ea2f00753a73a82e70da5b51fa79e21a"
+    },
+    "alphagbm-report-breakdown": {
+      "source": "AlphaGBM/skills",
+      "sourceType": "github",
+      "skillPath": "skills/core/alphagbm-report-breakdown/SKILL.md",
+      "computedHash": "46cd0723fe9d5b1f899aadf4d76563ec2288e542bc97f0c5465cb10d7c8023ab"
+    },
+    "alphagbm-research-reader": {
+      "source": "AlphaGBM/skills",
+      "sourceType": "github",
+      "skillPath": "skills/stocks/alphagbm-research-reader/SKILL.md",
+      "computedHash": "4c8ccd5be676e4ef1ff60bf1cb7bb5dd0071f6cda7fb82165cdc16e0e4ce8c07"
+    },
+    "alphagbm-stock-analysis": {
+      "source": "AlphaGBM/skills",
+      "sourceType": "github",
+      "skillPath": "skills/stocks/alphagbm-stock-analysis/SKILL.md",
+      "computedHash": "e73773b56f65e31df6d0dd63b47c6e7d9c464e4d8f71aefb3616e0ec3b6804a3"
+    },
     "alphagbm-stock-research": {
       "source": "AlphaGBM/skills",
       "sourceType": "github",
       "skillPath": "skills/core/alphagbm-stock-research/SKILL.md",
       "computedHash": "d19894f7038e9dd174b20ffc1dcb109eb4653cea23b7e906705673065dfb1d8f"
+    },
+    "alphagbm-unusual-activity": {
+      "source": "AlphaGBM/skills",
+      "sourceType": "github",
+      "skillPath": "skills/options/alphagbm-unusual-activity/SKILL.md",
+      "computedHash": "49ec1fce77ae8d14eb3bc900dd335c8699d91b325f5cd5a19fd80ea28e356b75"
+    },
+    "alphagbm-vol-smile": {
+      "source": "AlphaGBM/skills",
+      "sourceType": "github",
+      "skillPath": "skills/options/alphagbm-vol-smile/SKILL.md",
+      "computedHash": "0867a2258d8fe08ed848c07a50f1a463bdd7ff52dcb33ec9f9d3a2ffd13861e3"
+    },
+    "alphagbm-vol-surface": {
+      "source": "AlphaGBM/skills",
+      "sourceType": "github",
+      "skillPath": "skills/options/alphagbm-vol-surface/SKILL.md",
+      "computedHash": "dd2a5a33e7ae2c824bd42ef7c7aae8bbe57c9c5c7e60d2ab7e776e53221adb19"
     }
   }
 }
