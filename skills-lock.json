@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "alphagbm-stock-research": {
+      "source": "AlphaGBM/skills",
+      "sourceType": "github",
+      "skillPath": "skills/core/alphagbm-stock-research/SKILL.md",
+      "computedHash": "d19894f7038e9dd174b20ffc1dcb109eb4653cea23b7e906705673065dfb1d8f"
+    }
+  }
+}
