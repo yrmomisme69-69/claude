@@ -14,6 +14,10 @@ export const MODEL =
     ? process.env.GEMINI_MODEL?.trim() || "gemini-3.8-flash"
     : process.env.CLAUDE_MODEL?.trim() || "claude-sonnet-5-5";
 
+/** Gemini model to switch to when MODEL is overloaded. Set GEMINI_FALLBACK_MODEL=none to turn it off. */
+const rawFallback = process.env.GEMINI_FALLBACK_MODEL?.trim();
+export const GEMINI_FALLBACK_MODEL = rawFallback === "none" ? "" : rawFallback || "gemini-2.5-flash";
+
 type Effort = "low" | "medium" | "high";
 const rawEffort = process.env.AI_EFFORT?.trim() || process.env.CLAUDE_EFFORT?.trim();
 export const EFFORT: Effort = rawEffort === "low" || rawEffort === "high" ? rawEffort : "medium";

@@ -18,7 +18,7 @@ export async function callClaude<T>(opts: StructuredRequest): Promise<{ data: T;
       ),
       messages: [{ role: "user", content: opts.content.map(toClaudeBlock) }],
       output_config: {
-        effort: EFFORT,
+        effort: opts.effort ?? EFFORT,
         format: { type: "json_schema", schema: opts.schema },
       },
     });
