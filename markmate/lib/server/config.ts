@@ -16,7 +16,7 @@ export const MODEL =
 
 /** Gemini model to switch to when MODEL is overloaded. Set GEMINI_FALLBACK_MODEL=none to turn it off. */
 const rawFallback = process.env.GEMINI_FALLBACK_MODEL?.trim();
-export const GEMINI_FALLBACK_MODEL = rawFallback === "none" ? "" : rawFallback || "gemini-2.5-flash";
+export const GEMINI_FALLBACK_MODEL = rawFallback === "none" ? "" : rawFallback || "gemini-3.5-flash-lite";
 
 type Effort = "low" | "medium" | "high";
 const rawEffort = process.env.AI_EFFORT?.trim() || process.env.CLAUDE_EFFORT?.trim();

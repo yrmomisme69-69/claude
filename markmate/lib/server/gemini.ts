@@ -108,7 +108,10 @@ function friendlyGeminiError(err: unknown, model: string): FriendlyError {
     }
     if (status === 503) return new FriendlyError("Gemini 而家太繁忙（503），等一陣再試。", 503);
     if (status === 500 || status === 504) return new FriendlyError(`Gemini 伺服器出錯（${status}），等一陣再試。`, 503);
-    if (status === 404) return new FriendlyError(`搵唔到模型 ${model}。請檢查 GEMINI_MODEL。`, 500);
+    if (status === 404) {
+      const setting = model === MODEL ? "GEMINI_MODEL" : "GEMINI_FALLBACK_MODEL";
+      return new FriendlyError(`搵唔到模型 ${model}。請檢查 ${setting}。`, 500);
+    }
     return new FriendlyError(`AI 服務出錯（${status}）。請再試一次。`, 502);
   }
   if (err instanceof Error && /fetch failed|network|ECONN|ETIMEDOUT|abort/i.test(err.message)) {
