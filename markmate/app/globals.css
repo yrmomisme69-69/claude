@@ -1,0 +1,171 @@
+@import "tailwindcss";
+
+/* Design tokens: a marking desk. Graph-paper desk, white paper,
+   red pen for right/wrong, blue pen for the correct answer,
+   yellow highlighter for "please check this yourself". */
+:root {
+  --desk: #e8edf3;
+  --grid: rgba(31, 86, 214, 0.07);
+  --paper: #ffffff;
+  --paper-2: #f6f8fb;
+  --ink: #172030;
+  --ink-soft: #4d5a6c;
+  --ink-faint: #7f8a9a;
+  --line: #d4dce7;
+  --redpen: #d92b26;
+  --bluepen: #1f56d6;
+  --marker: #f2b705;
+  --marker-soft: #fff3c4;
+  --ok-soft: #fde8e7;
+  --blue-soft: #e5edff;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --desk: #0f1520;
+    --grid: rgba(120, 160, 255, 0.06);
+    --paper: #182131;
+    --paper-2: #1e2939;
+    --ink: #e7ecf4;
+    --ink-soft: #b2bdcc;
+    --ink-faint: #8591a3;
+    --line: #2c394d;
+    --redpen: #ff5a52;
+    --bluepen: #6f9bff;
+    --marker: #f5c542;
+    --marker-soft: #3a3115;
+    --ok-soft: #3a1c1c;
+    --blue-soft: #1c2a4a;
+  }
+}
+
+@theme inline {
+  --color-desk: var(--desk);
+  --color-paper: var(--paper);
+  --color-paper-2: var(--paper-2);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-ink-faint: var(--ink-faint);
+  --color-line: var(--line);
+  --color-redpen: var(--redpen);
+  --color-bluepen: var(--bluepen);
+  --color-marker: var(--marker);
+  --color-marker-soft: var(--marker-soft);
+  --color-ok-soft: var(--ok-soft);
+  --color-blue-soft: var(--blue-soft);
+  --font-sans: "Noto Sans HK", "PingFang HK", "Microsoft JhengHei", system-ui, sans-serif;
+  --font-pen: "Caveat", "Noto Sans HK", cursive;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background-color: var(--desk);
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 28px 28px;
+  color: var(--ink);
+  font-family: var(--font-sans);
+  line-height: 1.6;
+}
+
+:focus-visible {
+  outline: 2px solid var(--bluepen);
+  outline-offset: 2px;
+}
+/* Marks on the page show focus by turning their label blue instead. */
+svg [role="button"]:focus {
+  outline: none;
+}
+
+.paper {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  box-shadow: 0 1px 0 rgba(23, 32, 48, 0.04), 0 8px 24px -12px rgba(23, 32, 48, 0.18);
+}
+
+/* Pen strokes on the marked page */
+.pen-text {
+  font-family: var(--font-pen);
+  font-weight: 700;
+  paint-order: stroke;
+  stroke: #ffffff;
+  stroke-linejoin: round;
+}
+
+/* Explanation text */
+.prose-mark p {
+  margin: 0.5em 0;
+}
+.prose-mark ul,
+.prose-mark ol {
+  margin: 0.5em 0;
+  padding-left: 1.3em;
+}
+.prose-mark ul {
+  list-style: disc;
+}
+.prose-mark ol {
+  list-style: decimal;
+}
+.prose-mark strong {
+  font-weight: 700;
+}
+.prose-mark code {
+  background: var(--paper-2);
+  padding: 0.1em 0.3em;
+  border-radius: 4px;
+  font-size: 0.92em;
+}
+.prose-mark table {
+  border-collapse: collapse;
+  margin: 0.6em 0;
+  font-size: 0.92em;
+}
+.prose-mark th,
+.prose-mark td {
+  border: 1px solid var(--line);
+  padding: 0.25em 0.5em;
+}
+.prose-mark .katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.2em 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .draw-in {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: draw 420ms ease-out forwards;
+  }
+  @keyframes draw {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+}
+
+@media print {
+  body {
+    background: #fff;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-page {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    box-shadow: none !important;
+    /* keep a whole marked page on one sheet of A4 */
+    max-width: 74%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .print-break {
+    break-before: page;
+  }
+}
