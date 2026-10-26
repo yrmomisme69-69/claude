@@ -9,7 +9,7 @@ The owner is a university student who does not write code yet. Explain changes i
 - `npm install` (postinstall copies the pdf.js worker into `public/`)
 - `npm run dev` → http://localhost:3000
 - `npm run build` must pass before pushing (it type-checks).
-- Env vars: see `.env.example`. Without `ANTHROPIC_API_KEY` only the built-in demo works.
+- Env vars: see `.env.example`. Without `ANTHROPIC_API_KEY` or `GEMINI_API_KEY` only the built-in demo works.
 
 ## Architecture
 
@@ -17,7 +17,9 @@ The owner is a university student who does not write code yet. Explain changes i
 - `app/page.tsx` – client state machine: setup → results. Converts files to page images, reads the answer key once, then grades pages two at a time and shows each page as it finishes.
 - `app/api/grade/route.ts` – one request per page (keeps each call well under Vercel's 300 s limit and 4.5 MB body limit). System prompt + answer key are prompt-cached so later pages are cheaper.
 - `app/api/answer-key/route.ts` – transcribes answer-key pages to text once; that text is reused for every page.
-- `lib/server/claude.ts` – `callStructured()`: streaming Messages API call with `output_config.format` (JSON schema) and `output_config.effort`; maps API errors to friendly Chinese messages.
+- `lib/server/ai.ts` – `callStructured()` picks the provider (`PROVIDER` in `config.ts`: `AI_PROVIDER`, else Gemini when only `GEMINI_API_KEY` is set, else Claude). Provider-neutral `ContentPart`, `TokenUsage`, `FriendlyError`.
+- `lib/server/claude.ts` – streaming Messages API call with `output_config.format` (JSON schema) and `output_config.effort`; maps API errors to friendly Chinese messages.
+- `lib/server/gemini.ts` – `@google/genai` `generateContent` with `responseJsonSchema` and `thinkingLevel` (Gemini 3+ only); thinking tokens count as output in `TokenUsage`.
 - `lib/schema.ts` – JSON schemas. Structured-output rules: every property required, `additionalProperties: false`, no min/max, no nullable unions. Unknown values are `-1`, `""` or `[]`.
 - `lib/prompts.ts` – marking rules. Change marking behaviour here.
 - `lib/server/metered.ts` – wraps every Claude call: access code → per-IP daily pages → whole-site daily USD budget (reserve an upper estimate first, then settle the real cost from `usage`). Keep every new Claude call inside `metered()`.
@@ -27,7 +29,9 @@ The owner is a university student who does not write code yet. Explain changes i
 
 ## Coordinates (important)
 
-Claude returns absolute pixel coordinates in the image it processes. `lib/imageSizing.ts` is Anthropic's reference resize implementation; `lib/client/files.ts` resizes every page to exactly that size before upload, so coordinates map 1:1. Current models (Claude 4.7 and later, including Sonnet 5.5 / Opus 5.5) are on the high-resolution tier (≤ 2576 px long edge, ≤ 4784 visual tokens). `lib/server/config.ts#modelImageTier` switches to the standard tier for older models. Never send PDFs to the API as documents when coordinates are needed — they are rasterised server-side at unknown sizes; we render PDFs with pdf.js in the browser instead.
+Claude returns absolute pixel coordinates in the image it processes. `lib/imageSizing.ts` is Anthropic's reference resize implementation; `lib/client/files.ts` resizes every page to exactly that size before upload, so coordinates map 1:1. Current models (Claude 4.7 and later, including Sonnet 5.5 / Opus 5.5) are on the high-resolution tier (≤ 2576 px long edge, ≤ 4784 visual tokens). `lib/server/config.ts#modelImageTier` switches to the standard tier for older models.
+
+Gemini instead uses its native format: boxes `[ymin, xmin, ymax, xmax]` and points `[y, x]` on a 0–1000 scale (`GEMINI_GRADING_SYSTEM_PROMPT`, `geminiPageGradingSchema`). `app/api/grade/route.ts#normalizedToPixels` converts them to pixel `[x1, y1, x2, y2]` / `[x, y]` before `sanitize`, so the client always gets pixels. Never send PDFs to the API as documents when coordinates are needed — they are rasterised server-side at unknown sizes; we render PDFs with pdf.js in the browser instead.
 
 ## Conventions
 

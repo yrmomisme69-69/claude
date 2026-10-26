@@ -1,4 +1,4 @@
-import type Anthropic from "@anthropic-ai/sdk";
+import type { TokenUsage } from "./ai";
 
 // USD per million tokens, from https://platform.claude.com/docs/en/about-claude/pricing
 // (5-minute cache writes, which is what this app uses). Check that page when prices change.
@@ -17,6 +17,12 @@ const PRICES: Record<string, Price> = {
   "claude-opus-5": { input: 5, cacheWrite: 6.25, cacheRead: 0.5, output: 25 },
   "claude-fable-5-1": { input: 10, cacheWrite: 12.5, cacheRead: 0.25, output: 50 },
   "claude-haiku-4-5": { input: 1, cacheWrite: 1.25, cacheRead: 0.1, output: 5 },
+  // Gemini paid-tier prices (https://ai.google.dev/gemini-api/docs/pricing). On the free tier the real cost
+  // is US$0, so the daily budget over-counts. 3.8 Flash uses its price from 1 Jan 2027 (its launch price is
+  // half that), and the alias is priced the same. Cached reads are priced as normal input to stay on the safe side.
+  "gemini-3.8-flash": { input: 1.5, cacheWrite: 1.5, cacheRead: 1.5, output: 7.5 },
+  "gemini-flash-latest": { input: 1.5, cacheWrite: 1.5, cacheRead: 1.5, output: 7.5 },
+  "gemini-2.5-flash": { input: 0.3, cacheWrite: 0.3, cacheRead: 0.3, output: 2.5 },
 };
 
 /** Claude Haiku 5.5 costs more once a prompt passes 100k tokens. */
@@ -33,7 +39,7 @@ export function priceFor(model: string): Price {
 }
 
 /** Real cost in USD of one finished request. */
-export function costOf(model: string, usage: Anthropic.Usage): number {
+export function costOf(model: string, usage: TokenUsage): number {
   const input = usage.input_tokens || 0;
   const write = usage.cache_creation_input_tokens || 0;
   const read = usage.cache_read_input_tokens || 0;

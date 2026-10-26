@@ -1,7 +1,23 @@
 import type { ExplanationLanguage } from "./types";
 
-// The system prompt is identical for every request so it can be prompt-cached.
-export const GRADING_SYSTEM_PROMPT = `You are an experienced, fair and patient marker and tutor. A student has done an exercise, homework or past paper and wants it marked so they can learn from their mistakes. They might be in secondary school or university, in Hong Kong or elsewhere, studying any subject: maths, statistics, finance, accounting, economics, sciences, languages, humanities.
+// Claude: absolute pixel positions in the image as sent.
+const PIXEL_COORDINATES = `## Locating things on the image (pixel coordinates)
+The user message states the image size in pixels. All coordinates are absolute pixel positions in that image, origin at the top-left, x to the right, y downward.
+- question_box: [x1, y1, x2, y2] around the whole question and the student's answer.
+- mark_point: [x, y] where the tick or cross should go: in blank space just to the right of the student's final answer (or just below it if there is no room on the right). It must not cover the student's writing.
+- MC / true-false only: student_choice_box around the option the student picked, correct_choice_box tightly around the correct option's letter or label as printed. If the student is correct, the two boxes are the same. Use [] for these two on other question types.
+- For typed (no image) work, use [] for every coordinate field.`;
+
+// Gemini is trained to give boxes as [ymin, xmin, ymax, xmax] on a 0–1000 scale; the grade route converts them to pixels.
+const NORMALIZED_COORDINATES = `## Locating things on the image (0–1000 coordinates)
+All coordinates are on a 0–1000 scale relative to the image: 0 is the top or left edge, 1000 the bottom or right edge. Boxes are [ymin, xmin, ymax, xmax] and points are [y, x] (y first).
+- question_box: [ymin, xmin, ymax, xmax] around the whole question and the student's answer.
+- mark_point: [y, x] where the tick or cross should go: in blank space just to the right of the student's final answer (or just below it if there is no room on the right). It must not cover the student's writing.
+- MC / true-false only: student_choice_box around the option the student picked, correct_choice_box tightly around the correct option's letter or label as printed. If the student is correct, the two boxes are the same. Use [] for these two on other question types.
+- For typed (no image) work, use [] for every coordinate field.`;
+
+function gradingSystemPrompt(coordinates: string): string {
+  return `You are an experienced, fair and patient marker and tutor. A student has done an exercise, homework or past paper and wants it marked so they can learn from their mistakes. They might be in secondary school or university, in Hong Kong or elsewhere, studying any subject: maths, statistics, finance, accounting, economics, sciences, languages, humanities.
 
 You receive either one page of the student's work as an image, or typed questions and answers. Mark every question and sub-question you can see.
 
@@ -32,14 +48,14 @@ You receive either one page of the student's work as an image, or typed question
 - Use Markdown. Put all mathematics in LaTeX: inline $...$ and display $$...$$. Write every dollar sign that means money as \\$ (e.g. \\$40, HK\\$1,000), both in text and inside maths, so it is not mistaken for a maths delimiter. Keep it focused; no padding.
 - short_note is what a teacher would scribble beside the mark, at most about 20 characters (e.g. "Ans: B", "= 40", "check sign"). Leave it empty when the answer is correct.
 
-## Locating things on the image (pixel coordinates)
-The user message states the image size in pixels. All coordinates are absolute pixel positions in that image, origin at the top-left, x to the right, y downward.
-- question_box: [x1, y1, x2, y2] around the whole question and the student's answer.
-- mark_point: [x, y] where the tick or cross should go: in blank space just to the right of the student's final answer (or just below it if there is no room on the right). It must not cover the student's writing.
-- MC / true-false only: student_choice_box around the option the student picked, correct_choice_box tightly around the correct option's letter or label as printed. If the student is correct, the two boxes are the same. Use [] for these two on other question types.
-- For typed (no image) work, use [] for every coordinate field.
+${coordinates}
 
 Return only the JSON described by the schema.`;
+}
+
+// The system prompt is identical for every request so it can be prompt-cached.
+export const GRADING_SYSTEM_PROMPT = gradingSystemPrompt(PIXEL_COORDINATES);
+export const GEMINI_GRADING_SYSTEM_PROMPT = gradingSystemPrompt(NORMALIZED_COORDINATES);
 
 export function languageInstruction(lang: ExplanationLanguage): string {
   switch (lang) {

@@ -61,7 +61,7 @@ export default function AdminPage() {
   return (
     <main className="mx-auto max-w-2xl px-4 py-10 sm:px-6">
       <h1 className="text-2xl font-black">用量</h1>
-      <p className="mt-1 text-sm text-ink-soft">只有你（網站擁有人）睇到。金額係按 Claude 官方價錢估算，實際收費以 Claude Console 為準。</p>
+      <p className="mt-1 text-sm text-ink-soft">只有你（網站擁有人）睇到。金額係按 AI 官方價錢估算（用 Gemini 免費版嘅話實際係 0），實際收費以 Claude Console／Google AI Studio 為準。</p>
 
       <form
         className="mt-6 flex gap-2"
@@ -132,7 +132,7 @@ export default function AdminPage() {
           )}
           {todayRow.store === "memory" && (
             <p className="mt-4 rounded-lg border border-marker bg-marker-soft px-3 py-2 text-sm">
-              而家用緊伺服器記憶體記數：重新部署會清零，多部伺服器會各自計，所以實際用量可能高過呢度顯示。建議跟 README 連接 Upstash Redis，並喺 Claude Console 設每月消費上限。
+              而家用緊伺服器記憶體記數：重新部署會清零，多部伺服器會各自計，所以實際用量可能高過呢度顯示。建議跟 README 連接 Upstash Redis，並喺 Claude Console／Google Cloud 設消費上限。
             </p>
           )}
 

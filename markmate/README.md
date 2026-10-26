@@ -16,9 +16,21 @@
 
 ## 上線步驟（唔使識寫 code，大約 20 分鐘）
 
-你需要三樣嘢：一個 **GitHub** 帳戶（放 code）、一個 **Vercel** 帳戶（免費放網站）、一條 **Claude API key**（俾 AI 改卷用）。
+你需要三樣嘢：一個 **GitHub** 帳戶（放 code）、一個 **Vercel** 帳戶（免費放網站）、一條 **AI 嘅 API key**（俾 AI 改卷用）。AI 可以揀 **Gemini**（有免費額度）或者 **Claude**，二揀一就得。
 
-### 第 1 步：攞 Claude API key
+### 第 1 步（Gemini，免費）：攞 Gemini API key
+
+1. 去 <https://aistudio.google.com>，用 Google 帳戶登入。
+2. 撳 **Get API key** → **Create API key**，複製嗰條 key，**唔好俾任何人睇**。
+3. 第 3 步填環境變數時，填 `GEMINI_API_KEY`（唔使填 `ANTHROPIC_API_KEY`）。
+
+**要知嘅嘢**：
+- **免費版有用量限制**（每分鐘、每日都有上限，每頁功課用一次），而且 Google 會改。實際上限喺 AI Studio 入面你個 project 嘅 rate limit 頁睇。用晒會見到「Gemini 用量到咗上限」，聽日再試，或者喺 AI Studio 開 billing 轉付費。
+- **私隱**：免費版上載嘅內容，Google 可以用嚟改善佢哋嘅產品；付費版就唔會。
+- **記號位置**：Gemini 嘅 ✓ ✗ 位置可能冇 Claude 咁準，偏咗可以用「調整記號位置」拖返去。
+- 網站嘅每日金額上限（`DAILY_BUDGET_USD`）係按 Gemini **付費價**估算，用免費版實際係 0 蚊。想唔受佢限制可以設做 `0`，靠 `DAILY_PAGE_LIMIT` 限每人頁數就得。
+
+### 第 1 步（Claude，付費）：攞 Claude API key
 
 1. 去 <https://platform.claude.com>，用電郵登記。
 2. 去 **Billing** 增值少少（例如 US$5 試用）。
@@ -41,7 +53,7 @@
 3. 打開 **Environment Variables**，加：
    | Name | Value |
    |---|---|
-   | `ANTHROPIC_API_KEY` | 第 1 步嘅 key |
+   | `GEMINI_API_KEY` 或者 `ANTHROPIC_API_KEY` | 第 1 步嘅 key（用邊個 AI 就填邊個） |
    | `ACCESS_CODE` | 自己諗一個密碼（建議加，防止陌生人用你嘅額度） |
    | `DAILY_BUDGET_USD` | 全站每日最多用幾多美金，例如 `2`（約 HK$15） |
    | `ADMIN_CODE` | 另一個密碼，用嚟睇用量頁 |
@@ -86,7 +98,10 @@
 
 | 名稱 | 必須？ | 用途 |
 |---|---|---|
-| `ANTHROPIC_API_KEY` | 必須 | Claude API key |
+| `GEMINI_API_KEY` | 二揀一 | Gemini API key（Google AI Studio） |
+| `ANTHROPIC_API_KEY` | 二揀一 | Claude API key |
+| `AI_PROVIDER` | 選填 | 兩條 key 都填咗嘅話揀用邊個：`gemini` 或者 `claude`。冇填就預設 Claude（只有 Gemini key 就用 Gemini） |
+| `GEMINI_MODEL` | 選填 | 預設 `gemini-3.8-flash`。改其他模型前，留意 `lib/server/pricing.ts` 冇佢價錢嘅話會按最貴價估算 |
 | `ACCESS_CODE` | 建議 | 入場密碼，冇設就任何人都用到 |
 | `DAILY_BUDGET_USD` | 建議 | 全站每日最多用幾多美金，預設 `2`。`0` = 唔設上限 |
 | `ADMIN_CODE` | 建議 | 管理員密碼，用嚟開 `/admin` 用量頁 |
@@ -94,7 +109,7 @@
 | Upstash Redis | 建議 | 喺 Vercel Storage 連接，會自動加 `KV_REST_API_URL` / `KV_REST_API_TOKEN`（或 `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN`） |
 | `APP_TIMEZONE` | 選填 | 每日重置用嘅時區，預設 `Asia/Hong_Kong` |
 | `CLAUDE_MODEL` | 選填 | 預設 `claude-sonnet-5-5`。想平好多可以改 `claude-haiku-5-5`（約平 20 倍，但難題冇咁準）；想更準可以改 `claude-opus-5-5`（約貴一倍） |
-| `CLAUDE_EFFORT` | 選填 | `low` / `medium` / `high`，預設 `medium`。越高越準但越慢越貴 |
+| `AI_EFFORT` | 選填 | `low` / `medium` / `high`，預設 `medium`。越高越準但越慢越貴（舊名 `CLAUDE_EFFORT` 都得） |
 
 ---
 
@@ -141,7 +156,8 @@
 
 ```
 app/page.tsx              主畫面（上載、改卷流程、結果）
-app/api/grade/route.ts    改一頁：將相片同答案傳俾 Claude，返回每題結果同座標
+app/api/grade/route.ts    改一頁：將相片同答案傳俾 AI，返回每題結果同座標
+lib/server/ai.ts          揀用 Claude（claude.ts）定 Gemini（gemini.ts）
 app/api/answer-key/route.ts  讀答案頁，轉做文字
 app/admin/page.tsx        用量頁（要 ADMIN_CODE）
 lib/server/usage.ts       每日上限同用量紀錄（Upstash Redis，冇就用記憶體）

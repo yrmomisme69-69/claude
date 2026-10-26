@@ -1,7 +1,7 @@
-import type Anthropic from "@anthropic-ai/sdk";
-import { GRADING_SYSTEM_PROMPT, languageInstruction } from "@/lib/prompts";
-import { pageGradingSchema } from "@/lib/schema";
-import { callStructured } from "@/lib/server/claude";
+import { GEMINI_GRADING_SYSTEM_PROMPT, GRADING_SYSTEM_PROMPT, languageInstruction } from "@/lib/prompts";
+import { geminiPageGradingSchema, pageGradingSchema } from "@/lib/schema";
+import { callStructured, type ContentPart } from "@/lib/server/ai";
+import { PROVIDER } from "@/lib/server/config";
 import { metered } from "@/lib/server/metered";
 import type { Box, GradeRequestBody, GradedQuestion, PageGrading, Point } from "@/lib/types";
 
@@ -35,7 +35,7 @@ export async function POST(req: Request) {
 
   const answerKey = (body.answerKeyText || "").slice(0, MAX_TEXT).trim();
   const system = [
-    { text: GRADING_SYSTEM_PROMPT, cache: true },
+    { text: PROVIDER === "gemini" ? GEMINI_GRADING_SYSTEM_PROMPT : GRADING_SYSTEM_PROMPT, cache: true },
     {
       text: answerKey
         ? `## Answer key / marking scheme provided by the student\nUse this as the reference for every question it covers. Questions it does not cover: solve them yourself.\n<answer_key>\n${answerKey}\n</answer_key>`
@@ -44,13 +44,16 @@ export async function POST(req: Request) {
     },
   ];
 
-  const content: Anthropic.ContentBlockParam[] = [];
+  const content: ContentPart[] = [];
   if (hasImage) {
     content.push({
       type: "text",
-      text: `Page ${body.pageNumber} of ${body.totalPages}. The image is exactly ${width} × ${height} pixels; give all coordinates in this pixel space.`,
+      text:
+        PROVIDER === "gemini"
+          ? `Page ${body.pageNumber} of ${body.totalPages}. Give all coordinates on the 0–1000 scale described above.`
+          : `Page ${body.pageNumber} of ${body.totalPages}. The image is exactly ${width} × ${height} pixels; give all coordinates in this pixel space.`,
     });
-    content.push({ type: "image", source: { type: "base64", media_type: "image/jpeg", data: body.image! } });
+    content.push({ type: "image", data: body.image! });
   }
   if (typedWork) {
     content.push({
@@ -73,12 +76,30 @@ export async function POST(req: Request) {
     callStructured<PageGrading>({
       system,
       content,
-      schema: pageGradingSchema as unknown as Record<string, unknown>,
+      schema: (PROVIDER === "gemini" ? geminiPageGradingSchema : pageGradingSchema) as unknown as Record<string, unknown>,
       maxTokens: 32000,
     }),
   );
   if (!result.ok) return json({ error: result.error }, result.status);
-  return json(sanitize(result.data, hasImage ? width : 0, hasImage ? height : 0));
+  const page = PROVIDER === "gemini" && hasImage ? normalizedToPixels(result.data, width, height) : result.data;
+  return json(sanitize(page, hasImage ? width : 0, hasImage ? height : 0));
+}
+
+/** Gemini answers in [ymin, xmin, ymax, xmax] / [y, x] on a 0–1000 scale; turn them into pixel [x1, y1, x2, y2] / [x, y]. */
+function normalizedToPixels(page: PageGrading, w: number, h: number): PageGrading {
+  const box = (b: Box): Box =>
+    Array.isArray(b) && b.length === 4 ? [(b[1] * w) / 1000, (b[0] * h) / 1000, (b[3] * w) / 1000, (b[2] * h) / 1000] : [];
+  const point = (p: Point): Point => (Array.isArray(p) && p.length === 2 ? [(p[1] * w) / 1000, (p[0] * h) / 1000] : []);
+  return {
+    ...page,
+    questions: (page.questions || []).map((q) => ({
+      ...q,
+      question_box: box(q.question_box),
+      mark_point: point(q.mark_point),
+      student_choice_box: box(q.student_choice_box),
+      correct_choice_box: box(q.correct_choice_box),
+    })),
+  };
 }
 
 /** Make sure coordinates are well-formed and inside the image. */

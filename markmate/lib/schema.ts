@@ -1,4 +1,4 @@
-// JSON schemas for Claude structured outputs (output_config.format).
+// JSON schemas for structured outputs (Claude output_config.format / Gemini responseJsonSchema).
 // Rules from the docs: every object lists all its properties in `required`,
 // sets additionalProperties: false, and avoids min/max constraints and nullable
 // unions. "Unknown" values are therefore expressed as -1, "" or [].
@@ -134,6 +134,45 @@ export const answerKeySchema = {
     general_notes: {
       type: "string",
       description: "Any general marking instructions in the key (e.g. accept 3 s.f.). Empty if none.",
+    },
+  },
+} as const;
+
+// Gemini variant: same fields, but coordinates on Gemini's native 0–1000 scale
+// ([ymin, xmin, ymax, xmax] boxes, [y, x] points). The grade route converts them to pixels.
+const normalizedBox = {
+  type: "array",
+  items: { type: "integer" },
+  description: "Box [ymin, xmin, ymax, xmax] on a 0–1000 scale of the page image. Use [] if it does not apply or you cannot locate it.",
+} as const;
+const q = pageGradingSchema.properties.questions.items;
+
+export const geminiPageGradingSchema = {
+  ...pageGradingSchema,
+  properties: {
+    ...pageGradingSchema.properties,
+    questions: {
+      ...pageGradingSchema.properties.questions,
+      items: {
+        ...q,
+        properties: {
+          ...q.properties,
+          question_box: normalizedBox,
+          mark_point: {
+            ...q.properties.mark_point,
+            description:
+              "Point [y, x] on a 0–1000 scale where the tick or cross should be drawn: in empty space just to the right of (or below) the student's final answer, not covering any writing. [] if none.",
+          },
+          student_choice_box: {
+            ...normalizedBox,
+            description: "For MC/true-false only: [ymin, xmin, ymax, xmax] (0–1000) around the option the student chose. [] otherwise.",
+          },
+          correct_choice_box: {
+            ...normalizedBox,
+            description: "For MC/true-false only: [ymin, xmin, ymax, xmax] (0–1000) around the correct option's letter/label as printed on the page. [] otherwise.",
+          },
+        },
+      },
     },
   },
 } as const;

@@ -1,30 +1,13 @@
 import Anthropic from "@anthropic-ai/sdk";
+import { FriendlyError, type ContentPart, type StructuredRequest, type TokenUsage } from "./ai";
 import { EFFORT, MODEL, getClient } from "./config";
-
-export class FriendlyError extends Error {
-  status: number;
-  /** Tokens already used (and paid for) before the error, if any. */
-  usage?: Anthropic.Usage;
-  constructor(message: string, status = 500, usage?: Anthropic.Usage) {
-    super(message);
-    this.status = status;
-    this.usage = usage;
-  }
-}
-
-type SystemBlock = { text: string; cache?: boolean };
 
 /**
  * Calls Claude with a JSON schema (structured outputs) and returns the parsed JSON.
  * Uses streaming under the hood so long answers never hit the SDK's
  * non-streaming timeout guard.
  */
-export async function callStructured<T>(opts: {
-  system: SystemBlock[];
-  content: Anthropic.ContentBlockParam[];
-  schema: Record<string, unknown>;
-  maxTokens: number;
-}): Promise<{ data: T; usage: Anthropic.Usage }> {
+export async function callClaude<T>(opts: StructuredRequest): Promise<{ data: T; usage: TokenUsage }> {
   const client = getClient();
   try {
     const stream = client.messages.stream({
@@ -33,7 +16,7 @@ export async function callStructured<T>(opts: {
       system: opts.system.map((b) =>
         b.cache ? { type: "text" as const, text: b.text, cache_control: { type: "ephemeral" as const } } : { type: "text" as const, text: b.text },
       ),
-      messages: [{ role: "user", content: opts.content }],
+      messages: [{ role: "user", content: opts.content.map(toClaudeBlock) }],
       output_config: {
         effort: EFFORT,
         format: { type: "json_schema", schema: opts.schema },
@@ -75,4 +58,10 @@ export async function callStructured<T>(opts: {
     console.error("Unexpected error", err);
     throw new FriendlyError("改卷時出咗未預期嘅錯誤，請再試一次。", 500);
   }
+}
+
+function toClaudeBlock(part: ContentPart): Anthropic.ContentBlockParam {
+  return part.type === "text"
+    ? { type: "text", text: part.text }
+    : { type: "image", source: { type: "base64", media_type: "image/jpeg", data: part.data } };
 }

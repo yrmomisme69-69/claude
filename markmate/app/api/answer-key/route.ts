@@ -1,7 +1,6 @@
-import type Anthropic from "@anthropic-ai/sdk";
 import { ANSWER_KEY_SYSTEM_PROMPT } from "@/lib/prompts";
 import { answerKeySchema } from "@/lib/schema";
-import { callStructured } from "@/lib/server/claude";
+import { callStructured, type ContentPart } from "@/lib/server/ai";
 import { metered } from "@/lib/server/metered";
 import type { AnswerKeyExtraction, AnswerKeyRequestBody } from "@/lib/types";
 
@@ -23,10 +22,10 @@ export async function POST(req: Request) {
   const total = images.reduce((n, img) => n + (img.data?.length || 0), 0);
   if (total > MAX_TOTAL_BASE64) return Response.json({ error: "答案頁太大，請分開上載。" }, { status: 413 });
 
-  const content: Anthropic.ContentBlockParam[] = [];
+  const content: ContentPart[] = [];
   images.forEach((img, i) => {
     content.push({ type: "text", text: `Answer key page ${body.startPage + i}:` });
-    content.push({ type: "image", source: { type: "base64", media_type: "image/jpeg", data: img.data } });
+    content.push({ type: "image", data: img.data });
   });
   content.push({ type: "text", text: "Transcribe every answer on these pages." });
 
