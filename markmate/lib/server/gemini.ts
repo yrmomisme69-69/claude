@@ -1,9 +1,26 @@
 import { ApiError, FinishReason, ThinkingLevel, type GenerateContentResponse, type Part } from "@google/genai";
 import { FriendlyError, type StructuredRequest, type TokenUsage } from "./ai";
-import { EFFORT, MODEL, getGeminiClient } from "./config";
+import { EFFORT, GEMINI_FALLBACK_MODEL, MODEL, getGeminiClient } from "./config";
 
+/** Overloaded, timed out or internal errors: often gone a few seconds later or on another model. */
 const RETRYABLE = new Set([500, 503, 504]);
-const RETRY_DELAYS_MS = [2_000, 6_000];
+
+/**
+ * Which model each attempt uses, and how long to wait before it. Busy new models fail often on the
+ * free tier, so after one failure we move to the fallback model, which also has its own free quota.
+ */
+const ATTEMPTS: { model: string; delayMs: number }[] =
+  GEMINI_FALLBACK_MODEL && GEMINI_FALLBACK_MODEL !== MODEL
+    ? [
+        { model: MODEL, delayMs: 0 },
+        { model: GEMINI_FALLBACK_MODEL, delayMs: 1_000 },
+        { model: GEMINI_FALLBACK_MODEL, delayMs: 5_000 },
+      ]
+    : [
+        { model: MODEL, delayMs: 0 },
+        { model: MODEL, delayMs: 2_000 },
+        { model: MODEL, delayMs: 6_000 },
+      ];
 
 const LEVELS = { low: ThinkingLevel.LOW, medium: ThinkingLevel.MEDIUM, high: ThinkingLevel.HIGH } as const;
 
@@ -22,27 +39,32 @@ export async function callGemini<T>(opts: StructuredRequest): Promise<{ data: T;
     p.type === "text" ? { text: p.text } : { inlineData: { mimeType: "image/jpeg", data: p.data } },
   );
   const started = Date.now();
+  const effort = opts.effort ?? EFFORT;
   let response: GenerateContentResponse | undefined;
   for (let attempt = 0; !response; attempt++) {
+    const { model } = ATTEMPTS[attempt];
     try {
       response = await getGeminiClient().models.generateContent({
-        model: MODEL,
+        model,
         contents: [{ role: "user", parts }],
         config: {
           systemInstruction: opts.system.map((b) => b.text).join("\n\n"),
           responseMimeType: "application/json",
           responseJsonSchema: opts.schema,
           maxOutputTokens: opts.maxTokens,
-          ...(supportsThinkingLevel(MODEL) ? { thinkingConfig: { thinkingLevel: LEVELS[EFFORT] } } : {}),
+          ...(supportsThinkingLevel(model) ? { thinkingConfig: { thinkingLevel: LEVELS[effort] } } : {}),
           httpOptions: { timeout: 280_000 - (Date.now() - started) }, // finish before Vercel's 300 s limit
         },
       });
     } catch (err) {
-      console.error(`Gemini error (attempt ${attempt + 1}, model ${MODEL}):`, err instanceof Error ? err.message : err);
-      // Overloaded / internal errors are often gone a few seconds later; retry while there is time left.
-      const retryable = err instanceof ApiError && RETRYABLE.has(err.status);
-      if (!retryable || attempt >= RETRY_DELAYS_MS.length || Date.now() - started > 60_000) throw friendlyGeminiError(err);
-      await new Promise((r) => setTimeout(r, RETRY_DELAYS_MS[attempt]));
+      console.error(`Gemini error (attempt ${attempt + 1}, model ${model}):`, err instanceof Error ? err.message : err);
+      const next = ATTEMPTS[attempt + 1];
+      // A used-up free quota (429) is per model, so it is only worth retrying on a different model.
+      const retryable =
+        err instanceof ApiError && (RETRYABLE.has(err.status) || (err.status === 429 && next?.model !== model));
+      // Each attempt can take a minute before Gemini gives up, so stop while Vercel's 300 s limit is still far off.
+      if (!retryable || !next || Date.now() - started > 180_000) throw friendlyGeminiError(err, model);
+      await new Promise((r) => setTimeout(r, next.delayMs));
     }
   }
 
@@ -75,7 +97,7 @@ function usageOf(response: GenerateContentResponse): TokenUsage {
   };
 }
 
-function friendlyGeminiError(err: unknown): FriendlyError {
+function friendlyGeminiError(err: unknown, model: string): FriendlyError {
   if (err instanceof ApiError) {
     const status = err.status;
     if (status === 401 || status === 403 || (status === 400 && /api key/i.test(err.message))) {
@@ -86,7 +108,7 @@ function friendlyGeminiError(err: unknown): FriendlyError {
     }
     if (status === 503) return new FriendlyError("Gemini 而家太繁忙（503），等一陣再試。", 503);
     if (status === 500 || status === 504) return new FriendlyError(`Gemini 伺服器出錯（${status}），等一陣再試。`, 503);
-    if (status === 404) return new FriendlyError(`搵唔到模型 ${MODEL}。請檢查 GEMINI_MODEL。`, 500);
+    if (status === 404) return new FriendlyError(`搵唔到模型 ${model}。請檢查 GEMINI_MODEL。`, 500);
     return new FriendlyError(`AI 服務出錯（${status}）。請再試一次。`, 502);
   }
   if (err instanceof Error && /fetch failed|network|ECONN|ETIMEDOUT|abort/i.test(err.message)) {

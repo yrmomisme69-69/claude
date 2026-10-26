@@ -36,6 +36,7 @@ export async function POST(req: Request) {
       content,
       schema: answerKeySchema as unknown as Record<string, unknown>,
       maxTokens: 32000,
+      effort: "low", // copying answers needs little reasoning, and is much faster
     }),
   );
   if (!result.ok) return Response.json({ error: result.error }, { status: result.status });

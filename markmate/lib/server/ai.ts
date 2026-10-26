@@ -29,6 +29,8 @@ export interface StructuredRequest {
   content: ContentPart[];
   schema: Record<string, unknown>;
   maxTokens: number;
+  /** Overrides the configured thinking effort for this call. */
+  effort?: "low" | "medium" | "high";
 }
 
 /** Asks the configured AI (Claude or Gemini) for JSON matching `schema`. */
