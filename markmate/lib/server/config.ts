@@ -57,6 +57,6 @@ export function getClient(): Anthropic {
 
 let geminiClient: GoogleGenAI | null = null;
 export function getGeminiClient(): GoogleGenAI {
-  if (!geminiClient) geminiClient = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+  if (!geminiClient) geminiClient = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY?.trim() });
   return geminiClient;
 }

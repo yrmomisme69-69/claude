@@ -2,6 +2,9 @@ import { ApiError, FinishReason, ThinkingLevel, type GenerateContentResponse, ty
 import { FriendlyError, type StructuredRequest, type TokenUsage } from "./ai";
 import { EFFORT, MODEL, getGeminiClient } from "./config";
 
+const RETRYABLE = new Set([500, 503, 504]);
+const RETRY_DELAYS_MS = [2_000, 6_000];
+
 const LEVELS = { low: ThinkingLevel.LOW, medium: ThinkingLevel.MEDIUM, high: ThinkingLevel.HIGH } as const;
 
 /** Gemini 3 and later take a thinking level; 2.x models only take a token budget, so leave it to them. */
@@ -18,22 +21,29 @@ export async function callGemini<T>(opts: StructuredRequest): Promise<{ data: T;
   const parts: Part[] = opts.content.map((p) =>
     p.type === "text" ? { text: p.text } : { inlineData: { mimeType: "image/jpeg", data: p.data } },
   );
-  let response: GenerateContentResponse;
-  try {
-    response = await getGeminiClient().models.generateContent({
-      model: MODEL,
-      contents: [{ role: "user", parts }],
-      config: {
-        systemInstruction: opts.system.map((b) => b.text).join("\n\n"),
-        responseMimeType: "application/json",
-        responseJsonSchema: opts.schema,
-        maxOutputTokens: opts.maxTokens,
-        ...(supportsThinkingLevel(MODEL) ? { thinkingConfig: { thinkingLevel: LEVELS[EFFORT] } } : {}),
-        httpOptions: { timeout: 280_000 }, // finish before Vercel's 300 s limit
-      },
-    });
-  } catch (err) {
-    throw friendlyGeminiError(err);
+  const started = Date.now();
+  let response: GenerateContentResponse | undefined;
+  for (let attempt = 0; !response; attempt++) {
+    try {
+      response = await getGeminiClient().models.generateContent({
+        model: MODEL,
+        contents: [{ role: "user", parts }],
+        config: {
+          systemInstruction: opts.system.map((b) => b.text).join("\n\n"),
+          responseMimeType: "application/json",
+          responseJsonSchema: opts.schema,
+          maxOutputTokens: opts.maxTokens,
+          ...(supportsThinkingLevel(MODEL) ? { thinkingConfig: { thinkingLevel: LEVELS[EFFORT] } } : {}),
+          httpOptions: { timeout: 280_000 - (Date.now() - started) }, // finish before Vercel's 300 s limit
+        },
+      });
+    } catch (err) {
+      console.error(`Gemini error (attempt ${attempt + 1}, model ${MODEL}):`, err instanceof Error ? err.message : err);
+      // Overloaded / internal errors are often gone a few seconds later; retry while there is time left.
+      const retryable = err instanceof ApiError && RETRYABLE.has(err.status);
+      if (!retryable || attempt >= RETRY_DELAYS_MS.length || Date.now() - started > 60_000) throw friendlyGeminiError(err);
+      await new Promise((r) => setTimeout(r, RETRY_DELAYS_MS[attempt]));
+    }
   }
 
   const usage = usageOf(response);
@@ -74,9 +84,9 @@ function friendlyGeminiError(err: unknown): FriendlyError {
     if (status === 429) {
       return new FriendlyError("Gemini 用量到咗上限（免費版每分鐘同每日都有限制），等一陣或者聽日再試。", 429);
     }
-    if (status === 500 || status === 503 || status === 504) return new FriendlyError("Gemini 而家太繁忙，等一陣再試。", 503);
+    if (status === 503) return new FriendlyError("Gemini 而家太繁忙（503），等一陣再試。", 503);
+    if (status === 500 || status === 504) return new FriendlyError(`Gemini 伺服器出錯（${status}），等一陣再試。`, 503);
     if (status === 404) return new FriendlyError(`搵唔到模型 ${MODEL}。請檢查 GEMINI_MODEL。`, 500);
-    console.error("Gemini API error", status, err.message);
     return new FriendlyError(`AI 服務出錯（${status}）。請再試一次。`, 502);
   }
   if (err instanceof Error && /fetch failed|network|ECONN|ETIMEDOUT|abort/i.test(err.message)) {
