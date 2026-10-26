@@ -102,7 +102,7 @@
 | `ANTHROPIC_API_KEY` | 二揀一 | Claude API key |
 | `AI_PROVIDER` | 選填 | 兩條 key 都填咗嘅話揀用邊個：`gemini` 或者 `claude`。冇填就預設 Claude（只有 Gemini key 就用 Gemini） |
 | `GEMINI_MODEL` | 選填 | 預設 `gemini-3.8-flash`。改其他模型前，留意 `lib/server/pricing.ts` 冇佢價錢嘅話會按最貴價估算 |
-| `GEMINI_FALLBACK_MODEL` | 選填 | 主模型太繁忙（503／504）或者用晒免費額度時自動轉用嘅模型，預設 `gemini-2.5-flash`。填 `none` 就唔轉 |
+| `GEMINI_FALLBACK_MODEL` | 選填 | 主模型太繁忙（503／504）或者用晒免費額度時自動轉用嘅模型，預設 `gemini-3.5-flash-lite`。填 `none` 就唔轉 |
 | `ACCESS_CODE` | 建議 | 入場密碼，冇設就任何人都用到 |
 | `DAILY_BUDGET_USD` | 建議 | 全站每日最多用幾多美金，預設 `2`。`0` = 唔設上限 |
 | `ADMIN_CODE` | 建議 | 管理員密碼，用嚟開 `/admin` 用量頁 |

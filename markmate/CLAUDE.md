@@ -19,7 +19,7 @@ The owner is a university student who does not write code yet. Explain changes i
 - `app/api/answer-key/route.ts` – transcribes answer-key pages to text once; that text is reused for every page.
 - `lib/server/ai.ts` – `callStructured()` picks the provider (`PROVIDER` in `config.ts`: `AI_PROVIDER`, else Gemini when only `GEMINI_API_KEY` is set, else Claude). Provider-neutral `ContentPart`, `TokenUsage`, `FriendlyError`.
 - `lib/server/claude.ts` – streaming Messages API call with `output_config.format` (JSON schema) and `output_config.effort`; maps API errors to friendly Chinese messages.
-- `lib/server/gemini.ts` – `@google/genai` `generateContent` with `responseJsonSchema` and `thinkingLevel` (Gemini 3+ only); thinking tokens count as output in `TokenUsage`. On 500/503/504 (and 429 when switching model) it retries on `GEMINI_FALLBACK_MODEL` (default `gemini-2.5-flash`); every failure is logged with its model.
+- `lib/server/gemini.ts` – `@google/genai` `generateContent` with `responseJsonSchema` and `thinkingLevel` (Gemini 3+ only); thinking tokens count as output in `TokenUsage`. On 500/503/504 (and 429 when switching model) it retries on `GEMINI_FALLBACK_MODEL` (default `gemini-3.5-flash-lite`); every failure is logged with its model.
 - `lib/schema.ts` – JSON schemas. Structured-output rules: every property required, `additionalProperties: false`, no min/max, no nullable unions. Unknown values are `-1`, `""` or `[]`.
 - `lib/prompts.ts` – marking rules. Change marking behaviour here.
 - `lib/server/metered.ts` – wraps every Claude call: access code → per-IP daily pages → whole-site daily USD budget (reserve an upper estimate first, then settle the real cost from `usage`). Keep every new Claude call inside `metered()`.
